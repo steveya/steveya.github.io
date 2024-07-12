@@ -143,9 +143,9 @@ We will derive the formula for the zero-coupon bond prices two different ways. T
 
    $$\frac{\partial A}{\partial t}\frac{1}{A} - \mu B + \frac{1}{2}B^2\sigma^2 = 0$$
 
-   Integrate from $$t$$ to $$T$$:
+   Solve for the integral, we get
 
-   $$\ln\left(A\left(t,T\right)\right) = \mu\left(T-t\right)^2/2 - \sigma^2\left(T-t\right)^3/6 + C$$
+   $$\ln\left(A\left(t,T\right)\right) = -\mu\left(T-t\right)^2/2 + \sigma^2\left(T-t\right)^3/6 + C$$
 
    Where $$C$$ is a constant of integration.
 
@@ -157,11 +157,11 @@ We will derive the formula for the zero-coupon bond prices two different ways. T
 
 8. Write the final expression for $$A(t,T)$$
 
-   $$A\left(t,T\right) = \exp\left(\mu\left(T-t\right)^2/2 - \sigma^2\left(T-t\right)^3/6\right)$$
+   $$A\left(t,T\right) = \exp\left(-\mu\left(T-t\right)^2/2 + \sigma^2\left(T-t\right)^3/6\right)$$
 
 9. Apply the formula to the bond price
 
-   $$P\left(t,T\right) = \exp\left(\mu\left(T-t\right)^2/2 - \sigma^2\left(T-t\right)^3/6 - (T-t)r\right)$$
+   $$P\left(t,T\right) = \exp\left(-\mu\left(T-t\right)^2/2 + \sigma^2\left(T-t\right)^3/6 - (T-t)r\right)$$
 
 ### Implementation: Simulating Merton's Model
 We first show how to simulate the Merton's model using the Euler-Maruyama method. The Euler-Maruyama method is a simple and intuitive way to discretize a continuous-time stochastic process. It is based on the idea that the continuous-time process can be approximated by a sequence of discrete-time processes, each with a small time step. The following code simulate $$T$$ years of short rates, where each year is divided into $$N$$ time steps.
@@ -220,7 +220,7 @@ def B(t, T):
 
 def A(t, T, mu, sigma):
     tau = T - t
-    return np.exp(mu * tau**2 / 2 + (sigma**2 * tau**3) / 6)
+    return np.exp(-mu * tau**2 / 2 + (sigma**2 * tau**3) / 6)
 
 def zero_coupon_bond_price(t, T, r, mu, sigma):
     return A(t, T, mu, sigma) * np.exp(-B(t, T) * r)
@@ -250,11 +250,11 @@ $$\frac{\partial^2 y}{\partial r^2} = 0$$
 
 The resuling dynamic for $$y$$ is a stochastic process that depends on both $$y$$ and $$r$$ in its diffusion term. Let $$\tau = T-t$$ then
 
-$$dy = \frac{1}{\tau} \left[-\mu \left(\tau+1\right) - \frac{1}{2}\sigma^2 \tau^2 + y_t - r_t \right] dt - \frac{\sigma}{\tau} dW_t$$
+$$dy = \left[-\mu \left(\tau+1\right) + \frac{1}{2}\sigma^2 \tau - \frac{y_t - r_t}{\tau} \right] dt - \sigma\tau dW_t$$
 
 When we look at the one-factor Vasicek model later, where the short rate follows a Ornstein-Uhlenbeck process, we will see that the dynamic of the zero-coupon bond yield is also a Ornstein-Uhlenbeck process. However, in the case of the Merton's model, the dynamic of the zero-coupon bond yield no longer resembles another Brownian motion with constant drift.
 
-What is more important is that as time to maturity $$\tau$$ increases, the yield volatility decreases towards zero. This is a source of common criticism of the short rate models, because empirically the volatility of long-term yields is much higher than what the short-rate model predicts.
+What is more important is that the yield volatility increases linearly with $$\tau$$. This is empirically not true as short rates are much more volatile than long rates in general. As we will see later with other short-rate models that include mean-reversion, they tend to have the opposite problem where long-rate volatility is too low.
 
 ### Wrapping Up
 While simplistic in its assumptions, the Merton's model is a good starting point for understanding the short-rate models both in terms of technicality and historical development. It already exhibit some of the key features and limitations of the short-rate models. In the next post, I will discuss a plethora of classic short-rate models developed for the rest of the 1970s, before we enter into the world of the multi-factor short-rate models.
