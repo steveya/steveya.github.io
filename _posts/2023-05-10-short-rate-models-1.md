@@ -1,10 +1,11 @@
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 ---
 layout: post
 title: "Short Rate Models (Part 1: Merton's Model)"
 date: 2023-05-10
 tags: [study-notes, quantitative-finance, short-rate-models]
 ---
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
 # Refresher on Short Rate Models (Part 1: Merton's Model)
 
