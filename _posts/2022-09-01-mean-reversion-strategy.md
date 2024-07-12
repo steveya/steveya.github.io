@@ -132,7 +132,8 @@ $$
 
 Figure 1 shows the asymptotic expected Sharpe ratio as a function of the mean reversion speed $$\theta$$. Simulation results are shown in orange, and are produced by generating 1000 PnL paths of the strategy with $$t=100$$ and $$\sigma=0.1$$. Each path is discretized into 252 trading days in a year. Different $$\sigma$$ values are also tried and yield the same result.
 
-![Figure 1. Asumptotic Expected Sharpe Ratio of Mean Reversion Strategy](https://github.com/steveya/steveya.github.io/blob/master/assets/img/post_assets/rv_sharpe_ratio.png?raw=true)
+![Figure 1. Asumptotic Expected Sharpe Ratio of Mean Reversion Strategy](/assets/img/post_assets/rv_sharp_ratio.png)
+
 
 # Observations
 The primary contributor to the expected annualized PnL is the term $$\sigma^2$$. This term originates from the quadratic variation $$\langle X_t \rangle$$, a critical component in our model that reflects the strategy's profit from trading effectively in fluctuating markets--buying when prices are lower and selling when they are higher. This aspect of the strategy, encapsulated by the quadratic variation, operates independently of the fair value estimations.
