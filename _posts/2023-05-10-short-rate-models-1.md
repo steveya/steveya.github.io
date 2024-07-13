@@ -245,17 +245,17 @@ where
 
 $$\frac{\partial y}{\partial t} = \frac{-1}{T-t}\left(\frac{dA/dt}{A\left(t, T\right)} + \frac{dB\left(t,T\right)}{dt} r_t + y_t\right)$$
 
-$$\frac{\partial y}{\partial r} = -B\left(t, T\right)$$
+$$\frac{\partial y}{\partial r} = -\frac{B\left(t, T\right)}{T-t}$$
 
 $$\frac{\partial^2 y}{\partial r^2} = 0$$
 
 The resuling dynamic for $$y$$ is a stochastic process that depends on both $$y$$ and $$r$$ in its diffusion term. Let $$\tau = T-t$$ then
 
-$$dy = \left[-\mu \left(\tau+1\right) + \frac{1}{2}\sigma^2 \tau - \frac{y_t - r_t}{\tau} \right] dt - \sigma\tau dW_t$$
+$$dy = \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\tau\sigma^2\right] dt - \sigma dW_t$$
 
-When we look at the one-factor Vasicek model later, where the short rate follows a Ornstein-Uhlenbeck process, we will see that the dynamic of the zero-coupon bond yield is also a Ornstein-Uhlenbeck process. However, in the case of the Merton's model, the dynamic of the zero-coupon bond yield no longer resembles another Brownian motion with constant drift.
+Later when we look at the one-factor Vasicek model, in which the short rate follows a Ornstein-Uhlenbeck process, we will see that the dynamic of the zero-coupon bond yield is also a Ornstein-Uhlenbeck process. However, in the case of the Merton's model, the dynamic of the zero-coupon bond yield no longer resembles another Brownian motion with constant drift. In this case the drift depends on the level of the short and long rate and is not a constant.
 
-What is more important is that the yield volatility increases linearly with $$\tau$$. This is empirically not true as short rates are much more volatile than long rates in general. As we will see later with other short-rate models that include mean-reversion, they tend to have the opposite problem where long-rate volatility is too low.
+What is more important is that the yield volatility is the same regardless of $$\tau$$. This is not consistent with empirical observation: the short rates are much more volatile than long rates in general. For short-rate models that include mean-reversion, such as the Vasicek model, they tend to have the opposite problem where long-rate volatility is too low.
 
 ### Wrapping Up
 While simplistic in its assumptions, the Merton's model is a good starting point for understanding the short-rate models both in terms of technicality and historical development. It already exhibit some of the key features and limitations of the short-rate models. In the next post, I will discuss a plethora of classic short-rate models developed for the rest of the 1970s, before we enter into the world of the multi-factor short-rate models.
