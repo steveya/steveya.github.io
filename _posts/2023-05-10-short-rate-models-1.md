@@ -24,6 +24,8 @@ In this first post, I start with some preliminaries and introduce a simple short
 
 The calibration of the model parameters is actually a big topic in and of itself, and I will make a post of it later.
 
+Some code snippets included in this posts can be found in the [Github repository](https://github.com/steveya/steveya.github.io/blob/8a20c7552a82a586e9334eb12e2df500c9e95379/content/term_structure_models/merton_model.ipynb).
+
 ## Preliminaries
 Zero-coupon bonds form the foundation of term structure modeling. For a zero-coupon bond maturing at time $$T$$, the relationship between its price $$P(t, T)$$ and (continuously compounded) yield-to-maturity (YTM) $$y(t, T)$$ at time $$t$$ is given by
 
