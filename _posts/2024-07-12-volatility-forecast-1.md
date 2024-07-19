@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Extending Smooth Transitioning Exponential Smoothing Volatility Forecasts (WIP)"
-date: 2024-07-10
+title: "Extending Smooth Transitioning Exponential Smoothing Volatility Forecasts (Part 1 - Replication)"
+date: 2024-07-12
 tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 ---
 
@@ -28,7 +28,7 @@ Exponential-weighted moving average (EWMA) is itself a popular smoorhing and tim
 I came across a paper on Smooth Transition Exponential Smoothing (STES) (Taylor, 2004) a few years ago. It started with the empirical observation that past return shocks exhibit asymmetric relationship with future realized volatility, and therefore one should assign more different weights to the recent observation depending on characteristics of the recent shock. The STES uses functions of past asset returns to help determine the value of $$\alpha$$. Specifically, STES is fomulated as 
 
 $$
-\begin{equation}\label{eq:expsmooth}
+\begin{equation}\label{eq:stexpsmooth}
     \begin{aligned}
         \alpha_t &= \frac{1}{1+\exp\left(X_t \beta\right)} \\
         \hat{\sigma}^2_t &= \alpha_{t-1} r^2_{t-1} + (1-\alpha_{t-1})\hat{\sigma}^2_{t-1}
@@ -55,6 +55,12 @@ Table 2: Comparison of the STES model and the ES model on market data.
 
 | Model | RMSE |
 | --- | --- |
-| STES-AE | 2.845 |
-| STES-SE | 2.878 |
-| ES      | 2.852 |
+| STES-AE&SE | 4.50e-04 |
+| STES-E&AE | 4.52e-04 |
+| STES-E&SE | 4.50e-04 |
+| ES        | 4.64e-04 |
+
+# Conclusion and Next Steps
+I have replicated (somewhat) the results of the 2020 paper on STES and the ES model. The results are not exactly the same as the paper, but they are close and lead to the same conclusion about the relative performance of the two models. There are a lot more interesting observations from the STES model, in particular, how the fitted parrameters imply that the realized volatility responds to past shocks differently depending on the sign and the magnitude of the shock. In terms of robustness to outliers, the STES also respond better by downweighting the weights on outliers. The out-of-sample difference in error seem small, not order of magnitude. This is understandable, as we have not structurally changed the volatility forecast model; we only change the how the weights $$\alpha$$ are computed.
+
+In the next post I will implement a STES model using XGBoost. 
