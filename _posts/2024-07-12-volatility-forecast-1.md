@@ -41,4 +41,20 @@ in this formulation, $$\alpha_t$$ is no longer a constant as in the ES model, bu
 Not being on a vol trade desk of any sort, my research interest was not about forecasting realized volatility. I wanted to tackle a different but related problem: how to quantitatively select the $$\alpha$$ parameter of a exponential smoothing model. The technique used in this paper not only addresses this problem in the context of vol forecasting, but also resonate with some other work I have seen before at work. At the end I chose another method that is more suited to the problems I had, but this paper left an impression on me. Years later I saw its follow-up paper (Liu, Taylor, Choo 2020) that extended the model to test if past trading volumn help forecast realized volatility. I also came across other papers that model the regression coefficient as a random forest instead of a constant or a random walk. These together give me the idea of replacing the logistic function with a random forest. In this post I implement it to test how it performs on simulated and market data.
 
 ### Replication
-First I want to see if I can replicate some of the simulation and market results from their 2020 paper. The authors first fit the ES model and the STES model (and other GARCH models) on a training sample of simulated GARCH time series contaminated by extreme outliers, and measure their performance on the test sample 1-step ahead root mean square forecast error. They found that on this simulated data, the STES can already slightly outperform the ES model in the presence of outliers. Repeating the author's experiement on 1000 runs of simulated contaminated GARCH time series, I found that the STES model outperformed the ES model on average, even though just barely.
+First I want to see if I can replicate some of the simulation and market results from their 2020 paper. The authors first fit the ES model and the STES model (and other GARCH models) on a training sample of simulated GARCH time series contaminated by extreme outliers, and measure their performance on the test sample 1-step ahead root mean square forecast error. They found that on this simulated data, the STES can already slightly outperform the ES model in the presence of outliers. Repeating the author's experiement on 1000 runs of simulated contaminated GARCH time series, I found that one of the STES model using $$\lvert r_t \rvert$$ slightlyoutperformed the ES model on average.
+
+Table 1: Comparison of the STES model and the ES model on simulated data.
+
+| Model | RMSE |
+| --- | --- |
+| STES-AE | 2.845 |
+| STES-SE | 2.878 |
+| ES      | 2.852 |
+
+Table 2: Comparison of the STES model and the ES model on market data.
+
+| Model | RMSE |
+| --- | --- |
+| STES-AE | 2.845 |
+| STES-SE | 2.878 |
+| ES      | 2.852 |
