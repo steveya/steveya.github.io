@@ -7,7 +7,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
-# Refresher on Short Rate Models (Part 1: Merton's Model)
+# Short Rate Models (Part 1: Merton's Model)
 
 ## Table of Contents
 
@@ -24,7 +24,7 @@ In this first post, I start with some preliminaries and introduce a simple short
 
 The calibration of the model parameters is actually a big topic in and of itself, and I will make a post of it later.
 
-Some code snippets included in this posts can be found in the [Github repository](https://github.com/steveya/steveya.github.io/blob/8a20c7552a82a586e9334eb12e2df500c9e95379/content/term_structure_models/merton_model.ipynb).
+Code snippets included in this posts (and more) can be found in the [Github repository](https://github.com/steveya/steveya.github.io/blob/8a20c7552a82a586e9334eb12e2df500c9e95379/content/term_structure_models/merton_model.ipynb).
 
 ## Preliminaries
 Zero-coupon bonds form the foundation of term structure modeling. For a zero-coupon bond maturing at time $$T$$, the relationship between its price $$P(t, T)$$ and (continuously compounded) yield-to-maturity (YTM) $$y(t, T)$$ at time $$t$$ is given by
@@ -47,7 +47,7 @@ $$y\left(t, T\right) = \frac{1}{T-t}\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$
 
 $$P\left(t, T\right) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]$$
 
-These fundamental relationships provide the basis for more complex term structure models.
+These fundamental relationships will be used to derive the price and yield of the zero-coupon bonds from the short-rate process.
 
 ## Merton's Model (1973)
 The Merton's model is one of the first short rate models and is arguably the simplest one; it laid the foundation for many subsequent short-rate models. It was introduced in 1973 by the renowned economist Robert C. Merton, who extended the concepts of equity option pricing to the bond market by modeling the dynamics of short-rate as a simple Gaussian process.
@@ -70,6 +70,9 @@ Merton's model was one of the first to apply continuous-time stochastic processe
 
 #### Gaussian Process
 The model assumes that the short rate follows a Gaussian process, allowing for both positive and negative levels. It also assumes that rate volatility is constant and independent of the level of the short rate. This modelling choice is inconsistent with empirical restults. While rates can go negative (though mostly inconceivable at 1973), the short-rate volatility generally do depend on the level of the short rate. Short-rates also exhibit mean-reversion as opposed to having a constant drift. Later generations of short-rate models are invented to address these issues.
+
+#### Equilibrium Short-Rate Model
+Note that the Merton's model belongs to a subclass of the short-rate model called the *Equilibrium short-rate model*. This class of model generally cannot fit to the initial term structure, By allowing $$\mu = \mu_t$$ to depend on time, we obtain the **Ho-Lee Model**, which is an *Arbitrage-Free short-rate model*, one can fit the initial term structure by varying $$\mu_t$$ deterministically over time.
 
 ### Bond Pricing in Merton's Model
 The price of a zero-coupon bond is given by:
@@ -168,11 +171,6 @@ We will derive the formula for the zero-coupon bond prices two different ways. T
 
 ### Implementation: Simulating Merton's Model
 We first show how to simulate the Merton's model using the Euler-Maruyama method. The Euler-Maruyama method is a simple and intuitive way to discretize a continuous-time stochastic process. It is based on the idea that the continuous-time process can be approximated by a sequence of discrete-time processes, each with a small time step. The following code simulate $$T$$ years of short rates, where each year is divided into $$N$$ time steps.
-
-1. Import necessary libraries
-2. Define model parameters: $$r_0$$, $$\mu$$, $$\sigma$$
-3. Set up time grid: $$t = [0, \Delta t, 2\Delta t, ..., T \times N]$$
-4. Implement Euler-Maruyama method for simulation:
 
 ```python
 # Euler-Maruyama Method to Simulate Merton Model
