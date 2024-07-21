@@ -2,6 +2,7 @@
 layout: post
 title: "Extending Smooth Transitioning Exponential Smoothing Volatility Forecasts (Part 1 - Baseline Model)"
 date: 2024-07-12
+categories: [Quantitative Finance]
 tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 ---
 

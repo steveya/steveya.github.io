@@ -1,7 +1,7 @@
 ---
 title: "WIP - Roll Your Own Nowcast(s) (Part 1)"
 date: 2023-07-20
-categories: [General, Welcome]
+categories: [Quantitative Finance]
 tags: [nowcasting, tutorial]
 ---
 
@@ -23,3 +23,7 @@ In this post, I will walk through the process of building one's own nowcasting m
 The goal of this series of posts is to implement a nowcasting model from scratch, with mathematical derivations and code displayed side-by-side. There are plenty of research in the nowcasting literature, and there are quite a few repos with implementations, but there is a lack of tutorials on how to go from the mathematical derivation of the model and the actual implementation. This series aim to fill that gap.
 
 ## Preliminaries
+
+## Data Preparation
+
+## Model Specification

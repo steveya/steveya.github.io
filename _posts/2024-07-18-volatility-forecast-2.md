@@ -2,6 +2,7 @@
 layout: post
 title: "(WIP) Extending Smooth Transitioning Exponential Smoothing Volatility Forecasts (Part 2 - XGBoost)"
 date: 2024-07-18
+categories: [Quantitative Finance]
 tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 ---
 

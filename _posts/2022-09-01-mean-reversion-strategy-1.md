@@ -1,7 +1,8 @@
 ---
 layout: post
-title: 'Expected Performance of a Mean-Reversion Trading Strategy'
+title: 'Expected Performance of a Mean-Reversion Trading Strategy - Part 1'
 date: 2022-09-01
+categories: [Quantitative Finance]
 tags: [quantitative-finance]
 ---
 
