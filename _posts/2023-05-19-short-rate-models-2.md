@@ -11,7 +11,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 ## Table of Contents
 
-1. [Simulating Merton's Model](#simulating-mertons-model)
+1. [Simulating Merton Model](#simulating-mertons-model)
 2. [Calibration to Market Observed Short Rates](#calibration-to-market-observed-short-rates)
 
 
