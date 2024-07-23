@@ -10,7 +10,7 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 
 # Introduction
 
-(Code snippets included in this posts can be found in the [Github repository](https://github.com/steveya/steveya.github.io/blob/8a20c7552a82a586e9334eb12e2df500c9e95379/content/volatility_forecasts/random_forest_ewma.ipynb).)
+(Code snippets included in this posts can be found in the [Github repository](https://github.com/steveya/volatility-forecast/notebook/random_forest_ewma.ipynb).)
 
 The exponential smoothing (ES) model is a popular yet simple volatility forecasting method used in finance and economics. It is formulated as
 
