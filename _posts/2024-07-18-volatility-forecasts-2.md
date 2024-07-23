@@ -67,7 +67,7 @@ I decide to keep the first model simple by not imposing any temporal smoothness 
 #### Custom Objective Function
 The core of the XGBoost-STES model is a custom objective function designed to minimize the root mean squared error (RMSE) between the forecasted variance and the realized squared returns. Since the model is not directly predicting the label (realized variance) but instead predicting $$\alpha_4$$ from which the variance forecast is recursively computed, a custom objective function is needed. 
 
-Furthermore, since we are going to handle generating random contiguous subsamples ourselves, we need to pass the subsample indices to the objective function as well.
+Furthermore, since we are going to handle generating random contiguous subsamples ourselves, we need to pass the subsample indices to the objective function as well. The XGBoost allows the users to pass in their own objective function of the signature `obj: pred, dtrain -> grad, hess`, 
 
 ```python
 def stes_variance_objective(self, preds, dtrain, indices=None):
