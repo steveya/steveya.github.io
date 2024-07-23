@@ -13,7 +13,6 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 1. [Simulating Merton's Model](#simulating-mertons-model)
 2. [Calibration to Market Observed Short Rates](#calibration-to-market-observed-short-rates)
-3. [Merson's Model](#mertons-model-1973)
 
 
 ## Simulating Merton's Model
