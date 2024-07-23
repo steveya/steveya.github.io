@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "WIP - Short Rate Models (Part 3: Introducing Vasicek Model)"
+title: "Short Rate Models (Part 3: Introducing Vasicek Model)"
 date: 2023-06-10
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
