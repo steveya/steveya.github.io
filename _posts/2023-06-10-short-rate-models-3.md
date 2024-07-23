@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "WIP - Short Rate Models (Part 2: Vasicek Model)"
+title: "WIP - Short Rate Models (Part 3: Introducing Vasicek Model)"
 date: 2023-06-10
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
@@ -8,18 +8,15 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
-# Short Rate Models (Part 2: Vasicek Model)
 
 ## Table of Contents
 
-1. [Introduction](https://steveya.github.io/posts/short-rate-models-1/#introduction)
-2. [Preliminaries](https://steveya.github.io/posts/short-rate-models-1/#preliminaries)
-3. [Merson's Model](https://steveya.github.io/posts/short-rate-models-1/#mertons-model-1973)
-4. [Vasicek Model](#vasicek-model)
+41. [Vasicek Model](#vasicek-model)
 
 ## Vasicek Model
+We continue our refresher series on the **short-rate models**. In the [previous post](https://steveya.github.io/posts/short-rate-models-1/), I introduced the Merton's model and the Euler-Maruyama method to simulate it. In this post, I will discuss the Vasicek model, which is one of the earliest and most influential term structure models after the Merton's model.
 
-The Vasicek model, introduced by Oldrich Vasicek in 1977, is one of the earliest and most influential term structure models after the Merton's model. It relaxes the restriction placed on the short rate process by letting it follow a mean-reverting Ornstein-Uhlenbeck process. This assumption ensures that the short rate does not go unbounded as in the Merton model, and allows for an attachment of economic ideas such as the long-term equilibrium short rate that rates tend to fluctuate around a long-term equilibrium level. Because of this, many of the later extensions of the short-rate models are extensions to the Vasicek model.
+Introduced by Oldrich Vasicek in 1977, the Vasicek model relaxes the restriction placed on the short rate process by letting it follow a mean-reverting Ornstein-Uhlenbeck process. This assumption ensures that the short rate does not go unbounded as in the Merton model, and allows for an attachment of economic ideas such as the long-term equilibrium short rate that rates tend to fluctuate around a long-term equilibrium level. Because of this, many of the later extensions of the short-rate models are extensions to the Vasicek model.
 
 ### Model Specification
 
@@ -135,17 +132,69 @@ $$
 \begin{aligned}
 P(t,T) &= A(t,T)e^{-B(t,T)r_t} \\
 A(t,T) &= \exp\left[\left(\theta -\frac{\sigma^2}{\kappa^2}\right)\left[\frac{1-e^{-\kappa\tau}}{\kappa}-\tau\right] - \frac{\sigma^2}{4\kappa}\left[\frac{1 - e^{-\kappa\tau}}{\kappa}\right]^2\right] \\
-B(t,T) &= \frac{1-e^{-\kappa\tau}}{\tau}
+B(t,T) &= \frac{1-e^{-\kappa\tau}}{\kappa}
 \end{aligned}
 \end{equation}
 $$
 
-### Implementation: Simulating the Vasicek Model
-As with the Merton's model, I first simulate the Vasicek model using the Euler-Maruyama method. Moreover, as mentioned in the previous post, a direct discretization from the stochastic differential equation ignores errors from time aggregation, especially when mean-reversion is strong. To show this, I also provide a more exact discretization of the Vasicek model, and simulate their path under different mean-reversion speeds and discretization schemes.
+**Exercise**: follow what we did in the Merton's model, use Ito's Lemma to derive an expression for $$dP/P$$ in terms of A and B, and set the drift term to the risk-free rate as the expected return under the risk-neutral measure. Show that 
 
+$$
+\frac{dA/dt}{A} - r\frac{dB}{dt} - \mu\left(t, r_t\right) = r - \frac{1}{2} B^2\sigma^2
+$$
 
+where $$\mu\left(t, r_t\right) = \kappa\left(\theta - r_t\right)$$ is the drift term.
 
 ### Dynamic of the zero-coupon bond yield
+We can similarly derive the dynamic of the zero-coupon bond yield as we did for the Merton model. However, this time, instead of applying Itô's lemma to the solution of the bond yield for the Vasicek model directly, we apply it to the more general solution
 
+$$
+y_t = -\frac{\log\left(A\left(t,T\right)\right) - B\left(t,T\right) r_t}{T-t}
+$$
 
+where
 
+$$
+dr_t = \mu(t, r_t) dt + \sigma(t, r_t) dW_t
+$$
+
+where $$\mu(t, r_t)$$ is the drift term, $$\sigma(t, r_t)$$ is the diffusion term, both depends only on $$t$$ and short rate $$r_t$$, and $$W_t$$ is a standard Wiener process. Computing the partial derivatives of the function $$g(t, r_t) = y_t$$ with respect to $$t$$ and $$r_t$$, we get
+
+$$
+\begin{equation}
+\begin{aligned}
+\frac{\partial y_t}{\partial t} &= \frac{-\log\left(A(t,T)\right) + B(t,T) r_t}{(T-t)^2} + \frac{-\frac{d \log(A(t,T))}{d t} + \frac{d B(t,T)}{d t} r_t}{T-t} \\
+&= \frac{1}{T-t}\left(y_t -\frac{d A(t,T) / dt}{A(t, T)} + \frac{d B(t,T)}{dt} r_t \right) \\
+\frac{\partial g}{\partial r_t} &= \frac{B(t,T)}{T-t} \\
+\frac{\partial^2 g}{\partial r_t^2} &= 0 \\
+\end{aligned}
+\end{equation}
+$$
+
+Itô's Lemma states that for a function $$g(t, r_t)$$,
+
+$$
+dg(t, r_t) = \left( \frac{\partial g}{\partial t} + \mu(t, r_t) \frac{\partial g}{\partial r_t} + \frac{1}{2} \sigma^2(t, r_t) \frac{\partial^2 g}{\partial r_t^2} \right) dt + \sigma(t, r_t) \frac{\partial g}{\partial r_t} \, dW_t
+$$
+
+Substituting the partial derivatives into Itô's Lemma and simplifying the expression, and set $$\tau = T-t$$, we get
+
+$$
+\begin{equation}
+\begin{aligned}
+dy_t &= \frac{1}{\tau}\left(y_t - \frac{d A\left(t,T\right) / dt}{A(t, T)} + \frac{d B\left(t, T\right)}{dt} r_t + \mu(t, r_t) B(t,T) \right) dt + \frac{\sigma(t, r_t) B(t,T)}{\tau} \, dW_t \\
+&= \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\frac{B^2}{\tau}\sigma^2\right] dt + \frac{B}{\tau} \sigma  dW_t \\
+\end{aligned}
+\end{equation}
+$$
+
+Let's conpare this with the $$d_y$$ from the Merton model.
+
+$$dy = \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\tau\sigma^2\right] dt + \sigma dW_t$$
+
+we see that while the carry/rolldown term $$\left(y_t - r_t\right)/\tau$$ is the same, the convexity adjustment and the diffusion term are both different.
+
+Recall that in the Vasicek model, $$B\left(t, T\right) = \kappa^{-1}\left(1-\exp\left(-\kappa\tau\right)\right)$$, and as $$\tau$$ increases, $$B$$ tends to the constant $$1 / \kappa$$. Therefore both $$B^2/\tau$$ and $$B/\tau$$ tend to 0 as $$\tau$$ increases. Therefore, longer rates have diminishing volatility and convexity adjustment, and as the tenor increases, carry/rolldown becoomes the dominant driver of the expected yield change.
+
+### Wrapping Up
+The Vasicek model added mean-reversion to the drift term that limits the range of which the average short rate move to as tenor goes up, driving down the volatility of the long rates. The volatility curve has to be downward sloping and tends to 0, whereas the volatility curve is a constant under the Merton model.

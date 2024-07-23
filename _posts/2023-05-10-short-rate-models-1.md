@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Short Rate Models (Part 1: Merton's Model)"
+title: "Short Rate Models (Part 1: Introducing Merton's Model)"
 date: 2023-05-10
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
@@ -8,7 +8,6 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
-# Short Rate Models (Part 1: Merton's Model)
 
 ## Table of Contents
 
@@ -17,18 +16,17 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 3. [Merson's Model](#mertons-model-1973)
 
 ## Introduction
-Welcome to my refresher series on the **short-rate models**. It is a type of interest rate term structure models that was commonly used in the industry and acamamia. The refresher is disguised as a step-by-step guide written to help you (and me) understand, formulate, and solve this type of models by deriving and implementing well-known models of varying complexity and generality.
+Welcome, dear reader, to my refresher series on **short-rate models**! These little mathematical marvels are one of the main workhorses of interest rate modeling in both ivory towers of acamemic research and the blood and steel of the Wall street desk quants. The mission of this refresher series is to help you understand, formulate, and solve these models by deriving and implementing well-known versions of varying complexity and generality.
 
-The short-rate models explicitly specify the evolution of the instantaneous spot interest rate, also known as the short rate, at which the market lends to a borrower for an infinitesimal period of time. The short rate is assumed to evolve over time according to a stochastic process that captures the observed or theorized behavior. If the short rate evolves according to the assumed process, then by the no-arbitrage principle, all rates at which the market lends to a borrower over longer periods of time can also be determined by the parameters of the process. These parameters are unknown and need to be calibrated from the market observed yield curves. 
+The short-rate models has been around the block for a while. Despite their seeming initial simplicity, they can be a very versatile tool to model interest rates. They explicitly specify how the instantaneous spot interest rate (our "short rate") evolves over time. This is the rate at which you could theoretically borrow money for an infinitesimally short period. 
 
-In this first post, I start with some preliminaries and introduce a simple short-rate model. I then go step-by-step to derive the price of a zero-coupon bond and the simulation of the model. It is then followed by a Python implementations of the simulation of the short-rate process and the pricing of the zero coupon bond. 
+The short rate is assumed to evolve over time according to a stochastic process that captures observed or theorized price of market behaviors. Once we've nailed down this evolution, the no-arbitrage principle can help us figure out rates for longer borrowing periods.
 
-The calibration of the model parameters is actually a big topic in and of itself, and I will make a post of it later.
+In this first post, we start with some preliminaries then go step-by-step to derive the price of a zero-coupon bond and the simulation of the model. It is then followed by a Python implementations of the simulation of the short-rate process and the pricing of the zero coupon bond. Code snippets included in this posts (and more) can be found in the [Github repository](https://github.com/steveya/short-rate-models/notebook/merton_model.ipynb). The code library will evolve with the series as we build out more and more types of models that can benefit from more abstraction.
 
-Code snippets included in this posts (and more) can be found in the [Github repository](https://github.com/steveya/steveya.github.io/blob/8a20c7552a82a586e9334eb12e2df500c9e95379/content/term_structure_models/merton_model.ipynb).
 
 ## Preliminaries
-Zero-coupon bonds form the foundation of term structure modeling. For a zero-coupon bond maturing at time $$T$$, the relationship between its price $$P(t, T)$$ and (continuously compounded) yield-to-maturity (YTM) $$y(t, T)$$ at time $$t$$ is given by
+Zero-coupon bonds (ZCB) form the foundation of term structure modeling. The price of a $$T$$-year ZCB at time $$t$$ ($$P(t, T)$$) is the risk-adjusted present value of 1-dollar in $$T$$-years. The (continuously compounded) yield-to-maturity (YTM) $$y(t, T)$$ at time $$t$$ is given by
 
 - YTM to Price: 
 
@@ -48,7 +46,7 @@ $$y\left(t, T\right) = \frac{1}{T-t}\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$
 
 $$P\left(t, T\right) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]$$
 
-These fundamental relationships will be used to derive the price and yield of the zero-coupon bonds from the short-rate process.
+These fundamental relationships will be used to calculate the price and yield of ZCB from the short-rate process. Readers familiar with asset pricing will notice that the price of a ZCB is calculated with respect to the risk-neutral measure $$Q$$. We will not concern ourselves with the risk-neutral and the physical measure just yet. All measures are assumed to be risk-neutral unless otherwise indicated. A fuller treatment will be postponed to a later post on model calibration to observed yield curve.
 
 ## Merton's Model (1973)
 The Merton's model is one of the first short rate models and is arguably the simplest one; it laid the foundation for many subsequent short-rate models. It was introduced in 1973 by the renowned economist Robert C. Merton, who extended the concepts of equity option pricing to the bond market by modeling the dynamics of short-rate as a simple Gaussian process.
@@ -56,13 +54,13 @@ The Merton's model is one of the first short rate models and is arguably the sim
 ### Model Specification
 Merton's model is defined by the following stochastic differential equation:
 
-$$dr_t = \mu dt + \sigma dW_t$$
+$$dr_t = \mu dt + \sigma dW^Q_t$$
 
 where:
 - $$r_t$$: short-term interest rate at time $$t$$
 - $$\mu$$: constant drift term
 - $$\sigma$$: constant volatility
-- $$W_t$$: Wiener process (standard Brownian motion)
+- $$W^Q_t$$: Wiener process (standard Brownian motion) under the risk-neutral measure $$Q$$.
 
 ### Key Concepts
 
@@ -73,15 +71,14 @@ Merton's model was one of the first to apply continuous-time stochastic processe
 The model assumes that the short rate follows a Gaussian process, allowing for both positive and negative levels. It also assumes that rate volatility is constant and independent of the level of the short rate. This modelling choice is inconsistent with empirical restults. While rates can go negative (though mostly inconceivable at 1973), the short-rate volatility generally do depend on the level of the short rate. Short-rates also exhibit mean-reversion as opposed to having a constant drift. Later generations of short-rate models are invented to address these issues.
 
 #### Equilibrium Short-Rate Model
-Note that the Merton's model belongs to a subclass of the short-rate model called the *Equilibrium short-rate model*. This class of model generally cannot fit to the initial term structure, By allowing $$\mu = \mu_t$$ to depend on time, we obtain the **Ho-Lee Model**, which is an *Arbitrage-Free short-rate model*, one can fit the initial term structure by varying $$\mu_t$$ deterministically over time.
+Note that the Merton's model belongs to a subclass of the short-rate model called the **equilibrium model**. This class of model cannot fit to the initial term structure exactly. This is because the yield curve generated by some short-rate models can assume only certain forms. There is another class of short-rate models called the **arbitrage-free model**. which allows $$\mu = \mu_t$$ to depend on time. For the Merton model, if we let $$mu$$ to a deterministic funciton of time, then we obtain the **Ho-Lee Model** that can fit the initial term structure exactly by varying $$\mu_t$$ deterministically over time.
 
-### Bond Pricing in Merton's Model
-The price of a zero-coupon bond is given by:
+### Derivation of the Bond Pricing in Merton's Model
+The price of a $$T$$-year ZCB is given by:
 
 $$P(t,T) = \exp\left(-(T-t)r_t - \frac{\mu \left(T-t\right)^2}{2} + \frac{\sigma^2\left(T-t\right)^3}{6}\right)$$
 
-### Derivation of the Bond Price Formula
-We will derive the formula for the zero-coupon bond prices two different ways. The first is to solve stochastic integral directly, while the second is to "guess" the form of the solution and solve it by matching the bond price formula to the guessed solution.
+We will derive this formula two different ways. The first is to solve stochastic integral directly and the second is to "guess" the form of the solution and solve it by matching the bond price formula to the guessed solution. Even though I call the second way the "guessed" solution, it is actually based on the observation that the Merton model falls in the category of the affine term-structure model, whose prices are all of the form $$A(t, T)exp(-B(t, T) r_t)$$. This will be covered in later posts.
 
 #### Direct Solution
 1. Start with the general bond pricing equation:
@@ -170,51 +167,9 @@ We will derive the formula for the zero-coupon bond prices two different ways. T
 
    $$P\left(t,T\right) = \exp\left(-\mu\left(T-t\right)^2/2 + \sigma^2\left(T-t\right)^3/6 - (T-t)r\right)$$
 
-### Implementation: Simulating Merton's Model
-We first show how to simulate the Merton's model using the Euler-Maruyama method. The Euler-Maruyama method is a simple and intuitive way to discretize a continuous-time stochastic process. It is based on the idea that the continuous-time process can be approximated by a sequence of discrete-time processes, each with a small time step. The following code simulate $$T$$ years of short rates, where each year is divided into $$N$$ time steps.
 
-```python
-# Euler-Maruyama Method to Simulate Merton Model
-def merton_simulate(r0, mu, sigma, T=10, N=252):
-    """
-    Simulates the Merton model using the Euler-Maruyama method.
-    
-    Parameters:
-    r0 (float): Initial short rate.
-    mu (float): Annualized drift of the short rate.
-    sigma (float): Annualized volatility of the short rate.
-    T (int): Number of years to simulate.
-    N (int): Number of time steps per year.
-    
-    Returns:
-    t (np.ndarray): Time steps.
-    r (np.ndarray): Simulated short rates.
-    """
-    dt = 1 / N
-    t = np.linspace(0, T, (T * N) + 1)
-    r = np.zeros((T * N) + 1)
-    r[0] = r0
-    drift = mu * dt
-    diffustion = sigma * np.random.normal(0, np.sqrt(dt), (N))
-    for i in range(1, N+1):
-        dr = drift + diffustion[i-1]
-        r[i] = r[i-1] + dr
-    
-    return t, r
-```
-
-In general, this discretization is only an approximation because it ignores errors from time aggregation, the problem is more pronounced when there is mean-reversion. This will be discussed in more detail in the next post, but the exact way to discretize a continuous-time process is to first solve the stochastic differential equation.
-
-$$\int_0^t dr_s = \int_0^t \mu ds + \int_0^t \sigma dW_s$$
-
-then discretize the solution. For the Merton's model, this Euler-Maruyama discretization works as intended.
-
-### Implementation: Zero Coupon Bond Price and Yields Merton's Model
-Implementing the zero-coupon bond price and yields in Merton's model is straightforward. I first implement the $$A$$ and the $$B$$ function from "guessed solution" and use them to implement the bond price and yield formula. We will later see that there is a special sub-class of short-rate models whose zero-coupon bond yield is an affine function of the short rates, i.e. 
-
-$$y(t, T) = \frac{1}{T-t}\left(\log\left(A\left(t,T\right)\right) + B\left(t,T\right) r_t\right)$$
-
-and we can later create a class that implements this special sub-class of short-rate models by simply overriding the $$A$$ and $$B$$ functions
+### Implementation: ZCB Price and Yields Merton's Model
+Implementing the ZCB price and yields in Merton's model is straightforward once we had derived its solutions as above. Even though we arrive at the solution using two different approaches, the second solution is derived using our "external" knowledge that the Merton model is an affine term structure model, as mentioned above. Therefore it would make sense to implement our pricing function with this knowledge in mind; but for now, we do not need build all the abstraction pertaining to the affine term structure yet. We first implement the $$A$$ and the $$B$$ function and use them in the ZCB price and yield formula. Once we introduce the affine term structure model in more details, we will implement the affine term structure model class and override the $$A$$ and $$B$$ functions, but there is still quite some way before we get there.
 
 ```python
 def B(t, T):
@@ -234,29 +189,27 @@ def zero_coupon_yield(t, T, r, mu, sigma):
 ```
 
 ### Dynamic of the zero-coupon bond yield
-For all one-factor affine short-rate models, the dynamic of thezero-coupon bond yield $$y(t, T)$$ can be derived by applying the Itô's lemma to the zero-coupon bond yield formula.
+For all one-factor affine short-rate models, the risk-neutral dynamic of the zero-coupon bond yield $$y(t, T)$$ can be derived by applying the Itô's lemma to the zero-coupon bond yield formula. This gives
 
-$$y_t = -\frac{\log\left(A\left(t,T\right)\right) + B\left(t,T\right) r_t}{T-t}$$
-
-e.g.
-
-$$dy = \frac{\partial y}{\partial t} dt + \frac{\partial y}{\partial r} dr + \frac{1}{2}\frac{\partial^2 y}{\partial r^2} \left(dr\right)^2 $$
+$$
+dy = \frac{\partial y}{\partial t} dt + \frac{\partial y}{\partial r} dr + \frac{1}{2}\frac{\partial^2 y}{\partial r^2} \left(dr\right)^2 
+$$
 
 where
 
-$$\frac{\partial y}{\partial t} = \frac{-1}{T-t}\left(\frac{dA/dt}{A\left(t, T\right)} + \frac{dB\left(t,T\right)}{dt} r_t + y_t\right)$$
+$$\frac{\partial y}{\partial t} = \frac{1}{T-t}\left(y_t - \frac{dA/dt}{A\left(t, T\right)} + \frac{dB\left(t,T\right)}{dt} r_t\right)$$
 
-$$\frac{\partial y}{\partial r} = -\frac{B\left(t, T\right)}{T-t}$$
+$$\frac{\partial y}{\partial r} = \frac{B\left(t, T\right)}{T-t} = 1$$
 
 $$\frac{\partial^2 y}{\partial r^2} = 0$$
 
 The resuling dynamic for $$y$$ is a stochastic process that depends on both $$y$$ and $$r$$ in its diffusion term. Let $$\tau = T-t$$ then
 
-$$dy = \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\tau\sigma^2\right] dt - \sigma dW_t$$
+$$dy = \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\tau\sigma^2\right] dt + \sigma dW_t$$
 
-Later when we look at the one-factor Vasicek model, in which the short rate follows a Ornstein-Uhlenbeck process, we will see that the dynamic of the zero-coupon bond yield is also a Ornstein-Uhlenbeck process. However, in the case of the Merton's model, the dynamic of the zero-coupon bond yield no longer resembles another Brownian motion with constant drift. In this case the drift depends on the level of the short and long rate and is not a constant.
-
-What is more important is that the yield volatility is the same regardless of $$\tau$$. This is not consistent with empirical observation: the short rates are much more volatile than long rates in general. For short-rate models that include mean-reversion, such as the Vasicek model, they tend to have the opposite problem where long-rate volatility is too low.
+The drift term can be interpreted as the sum of the annualized carry/rolldown $$\left(y_t - r_t\right)/\tau$$ and the convexity adjustement term $$\frac{1}{2}\tau\sigma^2$$. The diffusion term is the volatility of the short rate $$\sigma$$, which is the same regardless of $$\tau$$. This is not consistent with empirical observation: the short rates are much more volatile than long rates in general. For short-rate models that include mean-reversion, such as the Vasicek model, they tend to have the opposite problem where long-rate volatility is too low. As we will see when we intrduce the Vasicek model.
 
 ### Wrapping Up
-While simplistic in its assumptions, the Merton's model is a good starting point for understanding the short-rate models both in terms of technicality and historical development. It already exhibit some of the key features and limitations of the short-rate models. In the next post, I will discuss a plethora of classic short-rate models developed for the rest of the 1970s, before we enter into the world of the multi-factor short-rate models.
+While simplistic in its assumptions, Merton's model serves as an excellent starting point for understanding short-rate models, both in terms of technicality and historical development. It already exhibits some of the key features and limitations of short-rate models. In the next post, we'll review how to simulate short rates from $$\mu$$ and $$\sigma$$, as well as how to calibrate the Merton's model to market observed short rates.
+
+
