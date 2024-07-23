@@ -1,6 +1,6 @@
 ---
 title: "WIP - Roll Your Own Nowcast(s) (Part 1)"
-date: 2023-07-20
+date: 2024-07-21
 categories: [Quantitative Finance]
 tags: [nowcasting, tutorial]
 ---
