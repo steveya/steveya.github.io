@@ -60,14 +60,18 @@ $$
 
 where $$\widehat{\sigma}^2_{t-1}$$ is the estimated volatility at time $$t-1$$ and $$r_t$$ is the asset log returns at time $$t$$. The $$S_t$$ still contains the three features from the previous returns, and $$\mathcal{F}$$ is a XGBoost model, and $$g$$ is a sigmoid function that restrict the coefficients from the XGBoost model to be between 0 and 1, the proper range for $$\alpha_t$$. The loss function remains the same and is the in-sample 1-day ahead RMSE. 
 
+$$
+\mathtt{loss} = \frac{1}{T}\sum_{i=1}^{T}\left(r^2_{i} - \widehat{\sogma}^2_{i}\right)^2
+$$
+
 I decide to keep the first model simple by not imposing any temporal smoothness regularization as (Coulombe 2020) did, but similar to (Coulombe 2020), each tree is split over different contiguous subsamples. The XGBoost model is chosen instead of a random forest for this analysis, if the results are promising, I will maybe test a random forest model as well.
 
 ### Implementation of XGBoost-STES
 
 #### Custom Objective Function
-The core of the XGBoost-STES model is a custom objective function designed to minimize the root mean squared error (RMSE) between the forecasted variance and the realized squared returns. Since the model is not directly predicting the label (realized variance) but instead predicting $$\alpha_4$$ from which the variance forecast is recursively computed, a custom objective function is needed. 
+The core of the XGBoost-STES model is a custom objective function designed to minimize the root mean squared error (RMSE) between the forecasted variance and the realized squared daily returns. The model does not directly predict the label (1-day ahead realized variance.) Instead, its predictions are first transformed by the sigmoid function to produce $$\alpha$$s, from which the 1-day ahead variance forecasts are recursively computed. A custom objective function is needed to handle this. test
 
-Furthermore, since we are going to handle generating random contiguous subsamples ourselves, we need to pass the subsample indices to the objective function as well. The XGBoost allows the users to pass in their own objective function of the signature `obj: pred, dtrain -> grad, hess`, 
+Moreover, since we are going to handle generating random contiguous subsamples ourselves, we need to pass the subsample indices to the objective function as well. The XGBoost allows the users to pass in their own objective function of the signature `obj: pred, dtrain -> grad, hess`. 
 
 ```python
 def stes_variance_objective(self, preds, dtrain, indices=None):
