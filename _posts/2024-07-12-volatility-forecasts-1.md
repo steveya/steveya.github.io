@@ -1,12 +1,15 @@
 ---
 layout: post
-title: "Extending Smooth Transitioning Exponential Smoothing Volatility Forecasts (Part 1 - Baseline Model)"
+title: "Volatility Forecasts (Part 1 - Baseline Model)"
 date: 2021-09-07
 categories: [Quantitative Finance]
 tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 ---
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
+#### Updates
+(Code snippets included in this posts can be found in the [Github repository](https://github.com/steveya/volatility-forecast/notebook/random_forest_ewma.ipynb).) I have updated the data used in this post to the end of 2023 so that the results can be compared with the new model in [the next post](https://steveya.github.io/posts/volatility-forecast-2/).
 
 ## Table of Contents
 
@@ -16,9 +19,6 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 4. [Conclusion and Next Steps](#conclusion-and-next-steps)
 
 ## Introduction
-
-(Code snippets included in this posts can be found in the [Github repository](https://github.com/steveya/volatility-forecast/notebook/random_forest_ewma.ipynb).)
-
 The exponential smoothing (ES) model is a popular yet simple volatility forecasting method used in finance and economics. It is formulated as
 
 $$
@@ -43,14 +43,13 @@ $$
 \end{equation}
 $$
 
-in this formulation, $$\alpha_t$$ is no longer a constant as in the ES model, but is determined by the set of variables $$X_t$$, which includes a constant term and $$\lvert r_t \rvert$$ or $$r_t^2$$ that measures the magnitude of the most recent return, and/or $$r_t$$ which can introduce leverage effects into the model. The auther went on to demonstrate that STES performed competitively against ES and other GARCH models in terms of 1-step forecast error for major equity indices.
+in this formulation, $$\alpha_t$$ is no longer a constant as in the ES model, but is determined by the set of **transition variables** $$X_t$$, which can include a constant term and $$\lvert r_t \rvert$$ or $$r_t^2$$ that measures the magnitude of the most recent return, and/or $$r_t$$ which can introduce leverage effects into the model, among others. The auther went on to demonstrate that STES performed competitively against ES and other GARCH models in terms of 1-step forecast error for major equity indices.
 
-Not being on a vol trade desk of any sort, my research interest was not about forecasting realized volatility. I wanted to tackle a different but related problem: how to quantitatively select the $$\alpha$$ parameter of a exponential smoothing model. The technique used in this paper not only addresses this problem in the context of vol forecasting, but also resonate with some other work I have seen before at work. At the end I chose another method that is more suited to the problems I had, but this paper left an impression on me. Years later, recently I saw its follow-up paper [(Liu, Taylor, Choo 2020)](https://doi.org/10.1016/j.econmod.2020.02.021) that extended the model to test if past trading volumn help forecast realized volatility and analyze the robustness of the STES model to outliers.
+Not being on a vol trade desk of any sort, my research interest was not about forecasting realized volatility. I wanted to tackle a different but related problem: how to quantitatively select the $$\alpha$$ parameter of a exponential smoothing model. The technique used in this paper not only addresses this problem in the context of vol forecasting, but also resonate with some other work I have seen before at work. At the end I chose another method that is more suited to the specific problems I had, but this paper left an impression on me. Years later in the present day, I saw its follow-up paper [(Liu, Taylor, Choo 2020)](https://doi.org/10.1016/j.econmod.2020.02.021) that extended the model to test if past trading volumn help forecast realized volatility and analyze the robustness of the STES model to outliers. I decide to see if I can replicate their results and maybe extend their model with other variables in the future.
 
 ## Results
-First we try to replicate some of the simulation and market results from the (Liu et al 2020) paper. They first fit the ES model and the STES model (and other GARCH models) on a training sample of simulated GARCH time series contaminated by extreme outliers, and measure their performance on the test sample 1-step ahead root mean square forecast error. They found that on this simulated data, the STES can already slightly outperform the ES model in the presence of outliers. Repeating the author's experiement on 1000 runs of simulated contaminated GARCH time series, I found that one of the STES model using $$\lvert r_t \rvert$$ slightlyoutperformed the ES model on average, listed in Table 1. However, I do not think there is a reason STES should outperform the ES model on the simulated data, as the groudtruth is a constant parameter GARCH model with some added outliers. 
-
-Table 1: Comparison of the STES model and the ES model on simulated data ($$\eta = 4$$).
+### STES vs ES on Simulated Returns
+First let us replicate some of their results from the (Liu et al 2020) paper. They horserace a set of volatility forecast models that include the ES model and the STES model by fitting their parameters on a training sample and compare their test-sample metrics that includes RMSE among others. They do this first on simulated GARCH time series contaminated by extreme outliers, and found that on the simulated data, the STES can already slightly outperform the ES model, and can better handle outliers. My result is listed in Table 1 with the their results. While I cannot reproduce their numbers, I actually do not think there is a reason why STES should outperform the ES model on the simulated data, as the groudtruth is a constant parameter GARCH model with some added outliers. I follow the author's model naming convention: STES-AE means that only the aboslute return (AE) is used as the transition variable. Similarly, STES-E&AE&SE contains both returns (E), absolute returns (AE) and squared returns (SE) as transition variables. 
 
 | Model | RMSE | (Liu et al 2020) |
 | --- | --- | --- |
@@ -58,19 +57,23 @@ Table 1: Comparison of the STES model and the ES model on simulated data ($$\eta
 | STES-SE | 2.88 | 2.44 |
 | ES      | 2.85 | 2.45 |
 
-However, when applying the the SPY returns, I think STES has the potential to outperform the simple ES model. Table 2 shows the out-of-sample RMSE of the STES model on SPY's realized variance and confirms my prior belief.
+[Table 1: Comparison of the STES model and the ES model on simulated data ($$\eta = 4$$).]
 
-Table 2: Comparison of the STES model and the ES model on SPY returns. Since the sample and data I use I different from the authors, their results are not listed. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31.
+### STES vs ES on SPY Returns
+When fitting the model to the SPY returns, STES has the potential to outperform the simple ES model. Table 2 shows the out-of-sample RMSE of the STES model on SPY's realized variance and confirms my prior belief.
+
 | Model | Test RMSE | Train RMSE |
 | --- | --- | --- |
-| STES-AE&SE | 4.49e-04 | 4.96e-04 |
-| STES-E&AE  | 4.52e-04 | 4.93e-04 |
-| STES-E&SE  | 4.50e-04 | 4.95e-04 |
-| ES         | 4.64e-04 | 4.99e-04 |
+| STES-E&AE&SE | 4.48e-04 | 4.98e-04 |
+| STES-AE&SE   | 4.49e-04 | 4.96e-04 |
+| STES-E&SE    | 4.50e-04 | 4.95e-04 |
+| STES-E&AE    | 4.52e-04 | 4.93e-04 |
+| ES           | 4.64e-04 | 4.99e-04 |
 
-## Conclusion and Next Steps
-While I cannot exactly replicate the results in Liu et al (2020) on the simulated time series, the out-of-sample RMSE on SPY's realized variance is a bit better for the STES models. 
+[Table 2: Comparison of the STES model and the ES model on SPY returns. Since the sample and data I use I different from the authors, their results are not listed. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31]
 
-In both (Taylor 2004) and (Liu et al 2020) they draw interesting observations about the parameters of the fitted STES model. In particular, the fitted parrameters imply that the realized volatility responds to past shocks differently depending on the sign and the magnitude of the shock. Moreover, in terms of robustness to outliers, the STES also respond better by downweighting the weights on outliers. 
+While I cannot exactly replicate the results in Liu et al (2020) on the simulated time series, STES performs better on the SPY's data in terms of the out-of-sample RMSE, consistent with the author's calculations on different data sets. However, the gains  seem small, not order of magnitude better, and its net-of-cost performance as a trading strategy is untested. I will be curious to test this forecast as a vol trading strategy.
 
-However, the out-of-sample differences in error seem small, not order of magnitude.
+## Other Observations
+The author observes that since STES is not a statistical model, they cannot conduct significance tests on the parameters. In both (Taylor 2004) and (Liu et al 2020) they draw interesting observations about the parameters of the fitted STES model. In particular, the fitted parrameters imply that the realized volatility responds to past shocks differently depending on the sign and the magnitude of the shock. Moreover, in terms of robustness to outliers, the STES also respond better by downweighting the weights on outliers. 
+
