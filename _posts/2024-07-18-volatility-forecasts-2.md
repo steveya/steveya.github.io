@@ -15,7 +15,7 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 1. [Recap](#recap)
 2. [XGBoost-STES](#xgboost-stes)
 3. [Results](#results)
-4. [Conclusion](#conclusion)
+4. [Wrapping Up](#wrapping-up)
 
 
 ## Recap

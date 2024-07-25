@@ -16,7 +16,7 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 1. [Introduction](#introduction)
 2. [Smooth Transition Exponential Smoothing](#smooth-transition-exponential-smoothing)
 3. [Results](#results)
-4. [Conclusion and Next Steps](#conclusion-and-next-steps)
+4. [Other Observations](#other-observations)
 
 ## Introduction
 The exponential smoothing (ES) model is a popular yet simple volatility forecasting method used in finance and economics. It is formulated as
