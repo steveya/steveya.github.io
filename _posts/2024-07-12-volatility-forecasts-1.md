@@ -60,14 +60,13 @@ Table 1: Comparison of the STES model and the ES model on simulated data ($$\eta
 
 However, when applying the the SPY returns, I think STES has the potential to outperform the simple ES model. Table 2 shows the out-of-sample RMSE of the STES model on SPY's realized variance and confirms my prior belief.
 
-Table 2: Comparison of the STES model and the ES model on SPY returns. Since the sample and data I use I different from the authors, their results are not listed.
-
-| Model | RMSE |
-| --- | --- |
-| STES-AE&SE | 4.50e-04 |
-| STES-E&AE | 4.52e-04 |
-| STES-E&SE | 4.50e-04 |
-| ES        | 4.64e-04 |
+Table 2: Comparison of the STES model and the ES model on SPY returns. Since the sample and data I use I different from the authors, their results are not listed. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31.
+| Model | Test RMSE | Train RMSE |
+| --- | --- | --- |
+| STES-AE&SE | 4.49e-04 | 4.96e-04 |
+| STES-E&AE  | 4.52e-04 | 4.93e-04 |
+| STES-E&SE  | 4.50e-04 | 4.95e-04 |
+| ES         | 4.64e-04 | 4.99e-04 |
 
 ## Conclusion and Next Steps
 While I cannot exactly replicate the results in Liu et al (2020) on the simulated time series, the out-of-sample RMSE on SPY's realized variance is a bit better for the STES models. 
