@@ -18,9 +18,9 @@ tags: [nowcasting, tutorial]
 
 ## Introduction
 
-In this post, I will walk through the process of building one's own nowcasting models. I will follow closely the steps of the New York Fed's Nowcasting methodology, given that they already open-sourced their code on Github. However, the code is written in Matlab and is messy. Several other repos translate it to Python or simplify it to handle higher frequency data (with trade off in model complexity)
+In this post, I will walk through the process of building one's own nowcasting models. I will follow closely the steps of the New York Fed's Nowcasting methodology, given that they already open-sourced their code on Github. However, their code is written in Matlab and is not well documented. Several people have already either translated it to Python or modified it to handle even higher frequency data.
 
-The goal of this series of posts is to implement a nowcasting model from scratch, with mathematical derivations and code displayed side-by-side. There are plenty of research in the nowcasting literature, and there are quite a few repos with implementations, but there is a lack of tutorials on how to go from the mathematical derivation of the model and the actual implementation. This series aim to fill that gap.
+The goal of this series of posts is to implement a nowcasting model from scratch, with mathematical derivations and code intertwined together. There are many other nowcasting methodologies that does not use dynamic factor model framework, and nowcasting remains an active area of research. I found that there is a lack of tutorials on how to go from the mathematical derivation of the model to actually implementating a Nowcast model, and this series aim to fill that gap.
 
 ## Preliminaries
 

@@ -11,7 +11,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 ## Table of Contents
 
-41. [Vasicek Model](#vasicek-model)
+1. [Vasicek Model](#vasicek-model)
 
 ## Vasicek Model
 We continue our refresher series on the **short-rate models**. In the [previous post](https://steveya.github.io/posts/short-rate-models-1/), I introduced the Merton's model and the Euler-Maruyama method to simulate it. In this post, I will discuss the Vasicek model, which is one of the earliest and most influential term structure models after the Merton's model.
