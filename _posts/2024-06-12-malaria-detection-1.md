@@ -74,7 +74,7 @@ for image in X_train_rgb_normalized:
   X_train_hsv.append(hsv_image)
 ```
 
-![Figure 3. Histogram of HSV channels in Parasitized and Uninfected RBC Images](/assets/img/post_assets/Malaria-detection/rgb_channels.png)
+![Figure 3. Histogram of HSV channels in Parasitized and Uninfected RBC Images](/assets/img/post_assets/Malaria-detection/hsv_channels.png)
 
 Another preprocessing step is applying Gaussian blurring to each image to lessen the role of the edges. For some image classification, the edge is an important feature, but in our case, we want to isolate colour and downplay the importance of the edge features.
 
