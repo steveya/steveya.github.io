@@ -8,6 +8,7 @@ tags: [study-notes, machine-learning, data-science, cnn, deep-learning]
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
+The notebook for this post can be found [here](https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb).
 
 ## Table of Contents
 1. [Introduction](#introduction)
