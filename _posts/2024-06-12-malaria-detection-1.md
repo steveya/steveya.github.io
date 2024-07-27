@@ -57,11 +57,11 @@ After we imported the images, we found they all had different dimensions. A simp
 
 Now, we will display some images of parasitized and uninfected cells. The main distinguishing feature between parasitized and uninfected red blood cells (RBCs) is the presence of purple spots or circles on the parasitized RBCs.
 
-![Figure 1. Samples of Parasitized and Uninfected RBCs](/assets/img/post_assets/Malaria-detection/cell_images_sample.png)
+![Figure 1. Samples of Parasitized and Uninfected RBCs](/assets/img/post_assets/malaria-detection/cell_images_sample.png)
 
 Given that the presence of purple spots seems to differentiate the parasitised from the uninfected, this informaiton must also show up in the images' color informaiton. An RGB image has three channels, so let's plot the histogram of each channel
     
-![Figure 2. Histogram of RGB channels in Parasitized and Uninfected RBC Images](/assets/img/post_assets/Malaria-detection/rgb_channels.png)
+![Figure 2. Histogram of RGB channels in Parasitized and Uninfected RBC Images](/assets/img/post_assets/malaria-detection/rgb_channels.png)
 
 ## Data Preprocessing
 
@@ -74,7 +74,7 @@ for image in X_train_rgb_normalized:
   X_train_hsv.append(hsv_image)
 ```
 
-![Figure 3. Histogram of HSV channels in Parasitized and Uninfected RBC Images](/assets/img/post_assets/Malaria-detection/hsv_channels.png)
+![Figure 3. Histogram of HSV channels in Parasitized and Uninfected RBC Images](/assets/img/post_assets/malaria-detection/hsv_channels.png)
 
 Another preprocessing step is applying Gaussian blurring to each image to lessen the role of the edges. For some image classification, the edge is an important feature, but in our case, we want to isolate colour and downplay the importance of the edge features.
 
