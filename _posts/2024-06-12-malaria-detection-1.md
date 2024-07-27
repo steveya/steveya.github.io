@@ -74,6 +74,8 @@ for image in X_train_rgb_normalized:
   X_train_hsv.append(hsv_image)
 ```
 
+![Figure 3. Histogram of HSV channels in Parasitized and Uninfected RBC Images](/assets/img/post_assets/Malaria-detection/rgb_channels.png)
+
 Another preprocessing step is applying Gaussian blurring to each image to lessen the role of the edges. For some image classification, the edge is an important feature, but in our case, we want to isolate colour and downplay the importance of the edge features.
 
 ```python
@@ -91,7 +93,7 @@ def gaussian_blur(images, kernel_size=(3, 3), sigma=0, border_type=cv2.BORDER_DE
 X_train_blur_normalized = gaussian_blur(X_train_hsv)
 ```
 
-These preprocessing steps together can potentially enhance the features that distinguish parasitized from uninfected cells and reduce image noise. Below are the preprocessed images before normalization.
+These preprocessing steps together can potentially enhance the features that distinguish parasitized from uninfected cells and reduce image noise.
 
 ## Next Step
 In the next part of this series, we will dive into building and training our deep-learning models for Malaria detection. Stay tuned!
