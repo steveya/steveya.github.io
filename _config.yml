@@ -35,11 +35,11 @@ social:
   email: steveya@gmail.com # change to your email address
   links:
     # The first element serves as the copyright owner's link
-    - https://twitter.com/ai_in_reallifesuticchi_you # change to your twitter homepage
+    - https://twitter.com/suticchi_you # change to your twitter homepage
     - https://github.com/steveya # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
-    # - https://www.linkedin.com/in/username
+    - https://www.linkedin.com/in/steve-yang-cfa-532a77194/
 
 # Site Verification Settings
 webmaster_verifications:
@@ -58,7 +58,7 @@ analytics:
   google:
     id: # fill in your Google Analytics ID
   goatcounter:
-    id: # fill in your GoatCounter ID
+    id: steveya
   umami:
     id: # fill in your Umami ID
     domain: # fill in your Umami domain
@@ -70,7 +70,7 @@ analytics:
 
 # Pageviews settings
 pageviews:
-  provider: # now only supports 'goatcounter'
+  provider: 'goatcounter'
 
 # Prefer color scheme setting.
 #
