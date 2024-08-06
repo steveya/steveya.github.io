@@ -123,7 +123,7 @@ def build_model_1():
 |     | precision | recall | f1-score | support | 
 |-----|-----------|--------|----------|---------| 
 | Uninfected   | 0.98      | 0.98   | 0.98     | 1300    | 
-| 1   | 0.98      | 0.98   | 0.98     | 1300    | 
+| Parasitized   | 0.98      | 0.98   | 0.98     | 1300    | 
 | accuracy |          |        |  0.98    | 2600    | 
 | macro avg | 0.98  | 0.98   | 0.98     | 2600    | 
 | weighted avg | 0.98| 0.98   | 0.98     | 2600    |
