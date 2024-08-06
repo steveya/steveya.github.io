@@ -77,8 +77,8 @@ Table 1. and Figure 1. show the classification report and the confusion matrix o
 
 |        | Precision | Recall | F1-Score | Support | 
 |--------|-----------|--------|----------|---------| 
-| 0      | 0.99      | 0.98   | 0.98     | 1300    | 
-| 1      | 0.98      | 0.99   | 0.98     | 1300    | 
+| Uninfected      | 0.99      | 0.98   | 0.98     | 1300    | 
+| Parasitized     | 0.98      | 0.99   | 0.98     | 1300    |
 | accuracy|          |        | 0.98     | 2600    | 
 | macro Avg| 0.98    | 0.98   | 0.98     | 2600    | 
 | Weighted Avg| 0.98 | 0.98   | 0.98     | 2600    |
@@ -122,7 +122,7 @@ def build_model_1():
 
 |     | precision | recall | f1-score | support | 
 |-----|-----------|--------|----------|---------| 
-| 0   | 0.98      | 0.98   | 0.98     | 1300    | 
+| Uninfected   | 0.98      | 0.98   | 0.98     | 1300    | 
 | 1   | 0.98      | 0.98   | 0.98     | 1300    | 
 | accuracy |          |        |  0.98    | 2600    | 
 | macro avg | 0.98  | 0.98   | 0.98     | 2600    | 
@@ -188,8 +188,8 @@ LeakyReLU, on the other hand, was an attempt to solve the "dying ReLU" problem. 
 
 |        | Precision | Recall | F1-Score | Support | 
 |--------|-----------|--------|----------|---------| 
-| 0      | 0.99      | 0.98   | 0.98     | 1300    | 
-| 1      | 0.98      | 0.99   | 0.98     | 1300    | 
+| Uninfected      | 0.99      | 0.98   | 0.98     | 1300    | 
+| Parasitized      | 0.98      | 0.99   | 0.98     | 1300    | 
 | accuracy|           |        |    0.98    | 2600 |
 | macro avg| 0.98    | 0.98   | 0.98     | 2600    | 
 | weighted avg| 0.98 | 0.98   | 0.98     | 2600    |
@@ -230,8 +230,8 @@ I then take the trained `model_2` above and retrain on the combined dataset of t
 
 |         | precision | recall | f1-score | support | 
 |---------|-----------|--------|----------|---------| 
-| 0       | 0.99      | 0.98   | 0.99     | 1300    | 
-| 1       | 0.98      | 0.99   | 0.99     | 1300    | 
+| Uninfected       | 0.99      | 0.98   | 0.99     | 1300    | 
+| Parasitized      | 0.98      | 0.99   | 0.99     | 1300    |
 | accuracy|           |        | 0.99     | 2600    | 
 | macro avg| 0.99      | 0.99   | 0.99     | 2600    | 
 | weighted avg| 0.99   | 0.99   | 0.99     | 2600    |
