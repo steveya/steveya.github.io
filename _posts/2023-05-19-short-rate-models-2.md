@@ -17,7 +17,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 
 ## Simulating Merton's Model
-We first show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of discrete-time processes, each with a small time step. The following code simulates $$T$$ years of short rates, where each year is divided into $$N$$ time steps. ChatGPT writes this function and some functions in the next few posts on other simpler models. They will be our starting points for building a fuller-featured library of short-rate models in (short-rate-models)[https://github.com/steveya/short-rate-models].
+We introduced the Merton short rate model in the [previous post](https://steveya.github.io/posts/short-rate-models-1/). We now show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of discrete-time processes, each with a small time step. The following code simulates $$T$$ years of short rates, where each year is divided into $$N$$ time steps. ChatGPT writes this function and some functions in the next few posts on other simpler models. They will be our starting points for building a fuller-featured library of short-rate models in (short-rate-models)[https://github.com/steveya/short-rate-models].
 
 ```python
 # Euler-Maruyama Method to Simulate Merton Model
@@ -148,6 +148,6 @@ We now know the Merton model, a simple one-factor short-rate equilibrium model t
 
 In this post, We also learn how to simulate short rates with this model and how to calibrate its parameters from market-observed short rates. 
 
-We learn that the ZCB prices and yields are computed under the risk-neutral measure and calibrated to market-observed short rates yield parameters under the physical measure. However, the relationship of the parameters under these two measures still needs to be clarified, which prevents us from calibrating the model to market-observed yield curves. We will cover these topics much later, after introducing another popular short-rate model, the Vasicek model, in the next post.
+We learn that the ZCB prices and yields are computed under the risk-neutral measure and calibrated to market-observed short rates yield parameters under the physical measure. However, the relationship of the parameters under these two measures still needs to be clarified, which prevents us from calibrating the model to market-observed yield curves. We will cover these topics much later, after introducing another popular short-rate model, the Vasicek model, in the [next post](https://steveya.github.io/posts/short-rate-models-3/).
 
 

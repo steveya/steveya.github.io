@@ -20,7 +20,7 @@ The notebook for this post can be found [here](https://github.com/steveya/data-s
 7. [Wrapping Up](#wrapping-up)
 
 ## Recap
-In the first part of this series, we introduced the problem of Malaria detection and prepared and preprocessed our dataset. Now, let's build and train a few deep-learning models to see if we can detect Malaria with good accuracy and recall.
+In the [previous post](https://steveya.github.io/posts/malaria-detection-1/) of this series, we introduced the problem of Malaria detection and prepared and preprocessed our dataset. Now, let's build and train a few deep-learning models to see if we can detect Malaria with good accuracy and recall.
 
 ## Base Model
 We'll start with a CNN model as our baseline:
@@ -292,4 +292,4 @@ Table 5 and Figure 9 show that a finetuned VGG16 model can achieve competitive r
 ![Figure 9. The Confusion Matrix of Model 4 on Augmented Data](/assets/img/post_assets/malaria-detection/model_4_conf.png)
 
 ## Wrapping Up
-In the final part of this series, we'll discuss the results, draw insights, and explore potential improvements to our malaria detection system. Stay tuned!
+In the [next part](https://steveya.github.io/posts/malaria-detection-3/) of this series, we'll discuss the results, draw insights, and explore potential improvements to our malaria detection system. Stay tuned!

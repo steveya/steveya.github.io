@@ -14,7 +14,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 1. [Vasicek Model](#vasicek-model)
 
 ## Vasicek Model
-We continue our refresher series on the **short-rate models**. In the [previous post](https://steveya.github.io/posts/short-rate-models-1/), I introduced the Merton model and the Euler-Maruyama method to simulate it. This post will discuss the Vasicek model, one of the earliest and most influential term structure models after Merton's model.
+We continue our refresher series on the **short-rate models**. In the [previous post](https://steveya.github.io/posts/short-rate-models-2/), I introduced the Merton model and the Euler-Maruyama method to simulate it. This post will discuss the Vasicek model, one of the earliest and most influential term structure models after Merton's model.
 
 Introduced by Oldrich Vasicek in 1977, the Vasicek model relaxes the restriction on the short-rate process by letting it follow a mean-reverting Ornstein-Uhlenbeck process. This assumption ensures that the short rate does not go unbounded as in the Merton model and allows for an attachment of economic ideas such as the long-term equilibrium short rate. Because of this, many of the later extensions of the short-rate models are extensions to the Vasicek model.
 
