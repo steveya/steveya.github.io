@@ -46,4 +46,5 @@ My step-by-step guide to implement a nowcasting model (based on dynamic factor m
 ## Teaching Kids Math
 I have been teaching kids math ever since I have kids. I want to start writing down some of them and made them into videos if possible. I need a lot of help with the video part...
  - Blog Post: 
-   - [wIP Teaching Kids Math - Arcsin Law (Part 1: Intuition))](https://steveya.github.io/posts/teaching-kids-math-arcsin-law-1/)
+   - [Teaching Kids Math - Arcsin Law (Part 1: Intuition))](https://steveya.github.io/posts/teaching-kids-math-arcsin-law-1/)
+   - [WIP Teaching Kids Math - Arcsin Law (Part 2: Simulation))](https://steveya.github.io/posts/teaching-kids-math-arcsin-law-2/)

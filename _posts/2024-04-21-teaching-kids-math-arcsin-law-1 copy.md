@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Teaching Kids Math - Arcsin Law (Part 1)
+title: Teaching Kids Math - Arcsin Law (Part 1 - Inutition)
 date: 2024-04-21
 categories: [Teaching Kids Math]
 tags: [teaching-kids-math]
@@ -88,10 +88,6 @@ The arcsin law reminds us that in the world of probability, our intuitions can o
 
 Whether you're solving complex equations or just shooting hoops with a friend, the arcsin law is there, quietly shaping the patterns of chance in ways that continue to surprise and delight us. It helps explain why sports games can be so unpredictable and exciting, and why we should always expect the unexpected!
 
-
-
-
 ## Next Step
-
 The arcsin law is a prime example of how mathematical concepts can challenge our intuitions about randomness. Whether you're a mathematician studying Brownian motion, a sports fan analyzing game statistics, or a child playing a coin-flipping game, the arcsin law reveals surprising patterns in random processes. It reminds us that our intuitions can often lead us astray in probability, and careful analysis can reveal unexpected truths. In the [next post](https://steveya.github.io/posts/teaching-kids-math-arcsin-law-2/), we'll discuss how to use simulation to teach Monte Carlo simulations to children.
 
