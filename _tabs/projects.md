@@ -10,17 +10,9 @@ Projects marked with Work in Progress (WIP) are still in progress and may not be
 
 ## Volatility Forecasting
  - Blog Post: 
-   - [Volatility Forecasts (Part 1 - Baseline Model)](https://steveya.github.io/posts/volatility-forecast-1/)
+   - [Volatility Forecasts (Part 1 - ES vs STES Model)](https://steveya.github.io/posts/volatility-forecast-1/)
    - [Volatility Forecasts (Part 2 - XGBoost-STES)](https://steveya.github.io/posts/volatility-forecast-2/)
  - GitHub Repository: [volatility-forecast](https://github.com/steveya/volatility-forecast)
-
-## Short Rate Models
- - Blog Post: 
-   - [Short Rate Models (Part 1: Introducing Merton's Model)](https://steveya.github.io/posts/short-rate-models-1/)
-   - [Short Rate Models (Part 2: Simulating and Calibrating Merton's Model)](https://steveya.github.io/posts/short-rate-models-2/)
-   - [Short Rate Models (Part 3: Introducing Vasicek Model)](https://steveya.github.io/posts/short-rate-models-3/)
-   - [Short Rate Models (Part 4: Simulating and Calibrating Vasicek Model)](https://steveya.github.io/posts/short-rate-models-4/)
- - GitHub Repository: [short-rate-models](https://github.com/steveya/short-rate-models)
 
 ## Malaria Detection
  - Blog Post: 
@@ -29,10 +21,17 @@ Projects marked with Work in Progress (WIP) are still in progress and may not be
    - [Malaria Detection (Part 3: Results and Reflections)](https://steveya.github.io/posts/malaria-detection-3/)
  - GitHub Repository: [data-science](https://github.com/steveya/data-science)
 
- ## Nowcasting (WIP)
+## Short Rate Models
+ - Blog Post: 
+   - [Short Rate Models (Part 1: Introducing Merton's Model)](https://steveya.github.io/posts/short-rate-models-1/)
+   - [Short Rate Models (Part 2: Simulating and Calibrating Merton's Model)](https://steveya.github.io/posts/short-rate-models-2/)
+   - [Short Rate Models (Part 3: Introducing Vasicek Model)](https://steveya.github.io/posts/short-rate-models-3/)
+ - GitHub Repository: [short-rate-models](https://github.com/steveya/short-rate-models)
+
+## Nowcasting
  - Blog Post: 
    - [WIP Roll Your Own Nowcasts (Part 1)](https://steveya.github.io/posts/roll-your-own-nowcast-1/)
 
-## Education (WIP)
+## Teaching Kids Math
  - Blog Post: 
-   - [wIP Arcsin Law)](https://steveya.github.io/posts/education-1-arcsin-law/)
+   - [wIP Teaching Kids Math - Arcsin Law (Part 1: Intuition))](https://steveya.github.io/posts/teaching-kids-math-arcsin-law-1/)
