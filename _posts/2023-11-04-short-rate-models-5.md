@@ -13,7 +13,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 1. [The Problem with Calibrating to the Yield Curve](#the-problem-with-calibrating-to-the-yield-curve)
 2. [Risk Premium Assumptions](#risk-premium-assumptions)
-3. [Introducing the Affine Term-Structure Model](#affine-term-structure-model)
+3. [Introducing the Affine Term-Structure Model](#introducing-the-affine-term-structure-model)
 4. [Vasicek Model Revisited](#vasicek-model-revisited)
 
 ## The Problem with Calibrating to the Yield Curve

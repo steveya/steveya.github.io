@@ -1,8 +1,9 @@
 ---
+layout: post
 title: Teaching Kids Math - Arcsin Law (Part 1)
 date: 2024-04-21
-categories: [Education]
-tags: [education]
+categories: [Teaching Kids Math]
+tags: [teaching-kids-math]
 ---
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
