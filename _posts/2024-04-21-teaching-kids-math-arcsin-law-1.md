@@ -42,9 +42,9 @@ $$ F(x) = \frac{2}{\pi} \arcsin(\sqrt{x}), \quad 0 \leq x \leq 1 $$
 
 This is where the name "arcsin" comes from.
 
-All these laws say the same thing: the last exit time, the time of the maximum, and the occupation time of a symmetric Brownian motion on $[0, 1]$ tends to concentrate around 0 and 1. 
+All these laws say the same thing: the last exit time, the time of the maximum, and the occupation time of a symmetric Brownian motion on $[0, 1]$ tends to concentrate around 0 and 1. The proofs are too difficult for most children to understand, but should be leveraged if it helps them gain more profound understanding.
 
-Below is a work-in-progress of the script to the video I am making for this topic.
+Below is a work-in-progress of the audio script to the video I am making for this topic.
 
 ### WIP First Segment: Examples of the Arcsin Law
 
@@ -57,9 +57,7 @@ Imagine you and your best friend are having a basketball challenge. You're both 
 Now, let's see how this game can teach us about something called the "arcsin law" in a fun way!
 
 #### Who's in the Lead?
-You might think that in this long game, you'd be winning (in the lead) about half the time, and your friend would be winning the other half. But guess what? That's not usually what happens! 
-
-Most of the time, one of you will be in the lead for a really long time, like for 80 out of the 100 shots. It's like one player gets "hot" and stays ahead for most of the game. Even though you're both equally good, it often turns out that one person stays in the lead more often.
+You might think that in this long game, you'd be winning (in the lead) about half the time, and your friend would be winning the other half. But guess what? That's not usually what happens! In fact, it is the least likely scenario. The most likely scenario is that one of you will be in the lead for a really long time, like for 80 out of the 100 shots. In this case, the other player would be in the lead only for 20 shots. Even though you're both equally good, it often turns out that one person stays in the lead more often.
 
 #### The Last Tie
 Now, think about the last time the score is tied in your game. When do you think this usually happens? Surprisingly, it's most likely to be either at the very beginning (like after the first few shots) or at the very end (like in the last few shots). It's not usually going to be in the middle of the game. Isn't that strange?
@@ -68,9 +66,7 @@ Now, think about the last time the score is tied in your game. When do you think
 The same funny thing happens with the biggest lead in the game. Let's say at some point, one of you gets ahead by 10 points. When do you think this biggest lead usually happens? It's probably going to be either very early in the game or very late. It's not usually going to happen right in the middle.
 
 #### Why Does This Happen?
-So, why does the game work this way? It's because of how random things work in sports. When you're shooting baskets, sometimes you might get "in the zone" and score many times in a row. Other times, you might miss a few shots. These streaks of good or bad luck can make one player get ahead and stay ahead for a long time.
-
-It's like when a basketball player in a real game suddenly starts making every shot – they call it "getting hot." This can happen to either player at any time.
+So, why does the game work this way? After all, if the two players are equally good, wouldn't their scores stay close to each other throughout the game? But this means that out all the shots the players have taken so far, each has achieved the same score. This is less likely to happen than one might think. 
 
 #### The Excitement of the Game
 That's what makes games like this so thrilling! In a tightly matched basketcall game, such as in the semi-finals where the two teams are likely equally good, you never know what's going to happen next. Will you get on a hot streak and take a big lead? Or will your friend make an amazing comeback? It's all part of the game!
