@@ -168,14 +168,19 @@ I fit the model on the same data as in my (now updated) [last post](https://stev
 
 ## Results
 ### XGBoost-STES vs STES on Simulated Returns
-Table 1 shows the out-of-sample RMSE of the XGBoost-STES model on simulated returns compared with simpler models. The model performs poorly on the simulated GARCH data, which is not surprising as the GARCH model is a constant parameter model with some added outliers. On data like this, the more complex models (that deviate from the ground truth) cannot outperform the simpler model (ES) that is closer to the ground truth. 
+Table 1 shows the out-of-sample RMSE of the XGBoost-STES model on simulated returns compared with simpler models. The model performs poorly on the simulated GARCH data against the STES-E&AE&SE model that has the same set of transition variables. It is not surprising as the GARCH model is a constant parameter model with some added outliers. On simulated data like this, the more complex models (that deviate from the ground truth) cannot outperform the simpler model (ES) that is closer to the ground truth. 
 
 | Model | RMSE | (Liu et al 2020) |
 | --- | --- | --- |
-| STES-AE  | 2.85 | 2.43 |
+| STES-E&AE&SE | 2.80 | N.A |
+| STES-SE  | 2.82 | 2.44 |
 | ES       | 2.85 | 2.45 |
-| STES-SE  | 2.88 | 2.44 |
-| XGB-STES | 3.00 | N.A  |
+| STES-AE  | 2.88 | 2.43 |
+| XGB-STES | 2.91 | N.A  |
+| STES-E&AE | 2.91 | N.A |
+| STES-E&SE | 2.93 | N.A |
+| STES-AE&SE | 2.94 | N.A |
+
 
 [Table 1: Comparison of the STES and ES models on simulated data ($$\eta = 4$$).]
 
