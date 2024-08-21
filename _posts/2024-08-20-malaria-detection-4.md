@@ -75,13 +75,19 @@ class LoRAConv2D(tf.keras.layers.Layer):
         self.padding = padding
 
     def build(self, input_shape):
-        # Original convolution weights (frozen). Trainable=False to prevent updating the weights.
+        # Original convolution weights (frozen)
         self.conv_weight = self.add_weight(
             shape=(self.kernel_size[0], self.kernel_size[1], input_shape[-1], self.filters),
             initializer='glorot_uniform',
             trainable=False, name='conv_weight'
         )
-        
+        # Original bias weights (frozen)        
+        self.bias = self.add_weight(
+            shape=(self.filters,),
+            initializer='zeros',
+            trainable=False, name='bias'
+        )
+
         # Low-rank adaptation weights
         self.A = self.add_weight(
             shape=(
@@ -97,6 +103,7 @@ class LoRAConv2D(tf.keras.layers.Layer):
             trainable=True, name='B'
         )
 
+
     def call(self, inputs):
         # Original convolution operation
         original_output = tf.nn.conv2d(
@@ -107,7 +114,9 @@ class LoRAConv2D(tf.keras.layers.Layer):
         delta_output = tf.nn.conv2d(inputs, self.A, strides=(1, 1), padding='SAME')
         delta_output = tf.nn.conv2d(delta_output, self.B, strides=(1, 1), padding='SAME')
         
-        return original_output + delta_output
+        output = original_output + delta_output
+        output = tf.nn.bias_add(output, self.bias)
+        return output
 ```
 
 ## Application of LoRA to Finetuning VGG16 to Malaria Detection
@@ -115,51 +124,59 @@ We build a `model_5` that takes the VGG16 model and applies LoRA to the last thr
 
 ```python
 def build_model_5():
-  set_seed()
-  vgg16_model.trainable = False
-  transfer_layer = vgg16_model.get_layer('block4_pool')
-  b5_conv1 = vgg16_model.get_layer('block5_conv1')
-  b5_conv2 = vgg16_model.get_layer('block5_conv2')
-  b5_conv3 = vgg16_model.get_layer('block5_conv3')
-  b5_conv1_weight = b5_conv1.get_weights()[0]
-  b5_conv2_weight = b5_conv2.get_weights()[0]
-  b5_conv3_weight = b5_conv3.get_weights()[0]
-  x = LoRAConv2D(kernel_size=b5_conv1.kernel_size, filters=b5_conv1.filters, strides=b5_conv1.strides, padding=b5_conv1.padding, rank=5)(transfer_layer.output)
-  x = LoRAConv2D(kernel_size=b5_conv2.kernel_size, filters=b5_conv2.filters, strides=b5_conv2.strides, padding=b5_conv2.padding, rank=5)(x)
-  x = LoRAConv2D(kernel_size=b5_conv3.kernel_size, filters=b5_conv3.filters, strides=b5_conv3.strides, padding=b5_conv3.padding, rank=5)(x)
-  x = MaxPooling2D(pool_size=(2, 2))(x)
-  x = LeakyReLU(alpha=0.1)(x)
-  x = Flatten()(x)
-  x = Dense(512)(x)
-  x = BatchNormalization()(x)
-  x = LeakyReLU(alpha=0.1)(x)
-  x = Dropout(0.5)(x)
-  x = Dense(256)(x)
-  x = BatchNormalization()(x)
-  x = LeakyReLU(alpha=0.1)(x)
-  x = Dropout(0.5)(x)
-  pred = Dense(2, activation='softmax')(x)
-  model = Model(vgg16_model.input, pred)
-  model.get_layer('lo_ra_conv2d').conv_weight.assign(b5_conv1_weight)
-  model.get_layer('lo_ra_conv2d_1').conv_weight.assign(b5_conv2_weight)
-  model.get_layer('lo_ra_conv2d_2').conv_weight.assign(b5_conv3_weight)
-  return model
+    set_seed()
+    vgg16_model.trainable = False
+    transfer_layer = vgg16_model.get_layer('block4_pool')
+    b5_conv1 = vgg16_model.get_layer('block5_conv1')
+    b5_conv2 = vgg16_model.get_layer('block5_conv2')
+    b5_conv3 = vgg16_model.get_layer('block5_conv3')
+    b5_conv1_weight = b5_conv1.get_weights()[0]
+    b5_conv2_weight = b5_conv2.get_weights()[0]
+    b5_conv3_weight = b5_conv3.get_weights()[0]
+    b5_conv1_bias = b5_conv1.get_weights()[1]
+    b5_conv2_bias = b5_conv2.get_weights()[1]
+    b5_conv3_bias = b5_conv3.get_weights()[1]
+    x = LoRAConv2D(kernel_size=b5_conv1.kernel_size, filters=b5_conv1.filters, strides=b5_conv1.strides, padding=b5_conv1.padding, rank=5)(transfer_layer.output)
+    x = LoRAConv2D(kernel_size=b5_conv2.kernel_size, filters=b5_conv2.filters, strides=b5_conv2.strides, padding=b5_conv2.padding, rank=5)(x)
+    x = LoRAConv2D(kernel_size=b5_conv3.kernel_size, filters=b5_conv3.filters, strides=b5_conv3.strides, padding=b5_conv3.padding, rank=5)(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x = LeakyReLU(alpha=0.1)(x)
+    x = Flatten()(x)
+    x = Dense(512)(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.1)(x)
+    x = Dropout(0.5)(x)
+    x = Dense(256)(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(alpha=0.1)(x)
+    x = Dropout(0.5)(x)
+    pred = Dense(2, activation='softmax')(x)
+    model = Model(vgg16_model.input, pred)
+
+    model.get_layer('lo_ra_conv2d').conv_weight.assign(b5_conv1_weight)
+    model.get_layer('lo_ra_conv2d_1').conv_weight.assign(b5_conv2_weight)
+    model.get_layer('lo_ra_conv2d_2').conv_weight.assign(b5_conv3_weight)
+
+    model.get_layer('lo_ra_conv2d').bias.assign(b5_conv1_bias)
+    model.get_layer('lo_ra_conv2d_1').bias.assign(b5_conv2_bias)
+    model.get_layer('lo_ra_conv2d_2').bias.assign(b5_conv3_bias)
+    return model
 ```
 
 ## Results
 ### VGG16 with LoRA Finetuning
 
-Table 1 shows the classification report of the VGG16 model with LoRA finetuning (`model_5`). The LoRA finetuned VGG16 model does not perform as well as the traditionally finetuned VGG16 (`model_4`, results in Table 2). In `model_4`, we finetune with two convolutional layers and two dense layers. In `model_5`, we finetune with three LoRA convolutional layers and two dense layers.
+Table 1 shows the classification report of the VGG16 model with LoRA finetuning (`model_5`). The LoRA finetuned VGG16 model perform about as well as the traditionally finetuned VGG16 (`model_4`, results in Table 2). The recall metric on the parasitized cases is a bit lower but the model achieves the best precision thus far. In `model_4`, we finetune with two convolutional layers and two dense layers. In `model_5`, we finetune with the last three Conv2D layers with LoRA and two dense layers.
 
 **Table 1. The Classification Report of Model 5** 
 
 |     | precision | recall | f1-score | support | 
 |-----|-----------|--------|----------|---------| 
-| Uninfected    | 0.99      | 0.90   | 0.94     | 1300    | 
-| Parasitized   | 0.91      | 0.99   | 0.95     | 1300    | 
-| accuracy      |           |        | 0.95     | 2600    | 
-| macro avg     | 0.95      | 0.95   | 0.95     | 2600    | 
-| weighted avg  | 0.95      | 0.95   | 0.95     | 2600    |
+| Uninfected    | 0.97      | 0.99   | 0.98     | 1300    | 
+| Parasitized   | 0.99      | 0.97   | 0.98     | 1300    | 
+| accuracy      |           |        | 0.98     | 2600    | 
+| macro avg     | 0.98      | 0.98   | 0.98     | 2600    | 
+| weighted avg  | 0.98      | 0.98   | 0.98     | 2600    |
 
 
 **Table 2. The Classification Report of Model 4**
