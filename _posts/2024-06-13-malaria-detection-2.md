@@ -289,7 +289,7 @@ Table 5 and Figure 9 show that a finetuned VGG16 model can achieve competitive r
 | macro avg    | 0.98       | 0.98    | 0.98     | 2600    | 
 | weighted avg | 0.98       | 0.98    | 0.98     | 2600    |
 
-![Figure 9. The Confusion Matrix of Model 4 on Augmented Data](/assets/img/post_assets/malaria-detection/model_4_conf.png)
+![Figure 9. The Confusion Matrix of Model 4 on Original Data](/assets/img/post_assets/malaria-detection/model_4_conf.png)
 
 ## Wrapping Up
 In the [next part](https://steveya.github.io/posts/malaria-detection-3/) of this series, we'll discuss the results, draw insights, and explore potential improvements to our malaria detection system. Stay tuned!

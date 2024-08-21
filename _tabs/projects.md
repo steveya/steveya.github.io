@@ -22,6 +22,7 @@ My work on the Capstone Project for the certificate program Applied Data Science
    - [Malaria Detection (Part 1: Introduction and Data Preparation)](https://steveya.github.io/posts/malaria-detection-1/)
    - [Malaria Detection (Part 2: Model Building and Training)](https://steveya.github.io/posts/malaria-detection-2/)
    - [Malaria Detection (Part 3: Results and Reflections)](https://steveya.github.io/posts/malaria-detection-3/)
+   - [Malaria Detection (Part 4: Finetuning VGG16 with LoRA)](https://steveya.github.io/posts/malaria-detection-4/)
  - GitHub Repository: [data-science](https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb)
 
 ## Short Rate Models

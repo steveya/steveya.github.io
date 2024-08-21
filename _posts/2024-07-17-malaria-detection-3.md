@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Malaria Detection (Part 3: Results and Reflections)"
-date: 2024-06-18
+date: 2024-07-17
 categories: [Machine Learning]
 tags: [study-notes, machine-learning, data-science, cnn, deep-learning]
 ---
