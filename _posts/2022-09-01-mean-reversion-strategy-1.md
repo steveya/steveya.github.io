@@ -133,7 +133,7 @@ $$
 
 Figure 1 shows the asymptotic expected Sharpe ratio as a function of the mean reversion speed $$\theta$$. We produce the simulation results (shown in orange) by generating 1000 PnL paths of the strategy with $$t=100$$ and $$\sigma=0.1$$. Each path is discretized into 252 trading days in a year. Different $$\sigma$$ values are also tried and yield the same result.
 
-![Figure 1. Asumptotic Expected Sharpe Ratio of Mean Reversion Strategy](/assets/img/post_assets/mean-reversion-strategy/rv_sharp_ratio.png)
+![Figure 1. Asymptotic Expected Sharpe Ratio of Mean Reversion Strategy](/assets/img/post_assets/mean-reversion-strategy/rv_sharp_ratio.png)
 
 
 # Observations

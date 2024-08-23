@@ -17,46 +17,92 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 
 ## Simulating Merton's Model
-We introduced the Merton short rate model in the [previous post](https://steveya.github.io/posts/short-rate-models-1/). We now show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of discrete-time processes, each with a small time step. The following code simulates $$T$$ years of short rates, where each year is divided into $$N$$ time steps. ChatGPT writes this function and some functions in the next few posts on other simpler models. They will be our starting points for building a fuller-featured library of short-rate models in (short-rate-models)[https://github.com/steveya/short-rate-models].
+We introduced the Merton short rate model in the [previous post](https://steveya.github.io/posts/short-rate-models-1/). We now show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of small time steps. The following code simulates $$t$$ years of short rates at time steps of size $$dt$$.
 
 ```python
-# Euler-Maruyama Method to Simulate Merton Model
-def merton_simulate(r0, mu, sigma, T=10, N=252):
+def simulate_merton_short_rates(r0, mu, sigma, t, dt, seed=None):
     """
- Simulates the Merton model using the Euler-Maruyama method.
+    Simulates the Merton short rates model using the 
+    Euler-Maruyama discretization. As the drift does 
+    not depend on the short rate, each increment can 
+    be simulated independently.
     
- Parameters:
- r0 (float): Initial short rate.
- mu (float): Annualized drift of the short rate.
- sigma (float): Annualized volatility of the short rate.
- T (int): Number of years to simulate.
- N (int): Number of time steps per year.
+    Parameters:
+    r0 (float): Initial (current) short rate.
+    mu (float): Annualized drift of the short rate process.
+    sigma (float): Annualized volatility of the short rate process.
+    t (float): Number of years to simulate.
+    dt (float): Time step size.
     
- Returns:
- t (np.ndarray): Time steps.
- r (np.ndarray): Simulated short rates.
- """
- dt = 1 / N
- t = np.linspace(0, T, (T * N) + 1)
- r = np.zeros((T * N) + 1)
- r[0] = r0
- drift = mu * dt
- diffustion = sigma * np.random.normal(0, np.sqrt(dt), (N))
-    for i in range(1, N+1):
- dr = drift + diffustion[i-1]
- r[i] = r[i-1] + dr
+    Returns:
+    times (np.ndarray): Time steps.
+    rates (np.ndarray): Simulated short rates.
+    """
+    np.random.seed(seed)
+
+    nd = int(t / dt)
     
-    return t, r
+    drift = mu * dt
+    diffusion = sigma * np.random.normal(0, np.sqrt(dt), nd - 1)
+
+    dr = drift + diffusion
+
+    times = np.linspace(0, t, nd)
+    rates = np.array(list(accumulate(dr, initial=r0)))
+    
+    return times, rates
 ```
 
-In general, this discretization is only an approximation because it ignores errors from time aggregation, which become more pronounced when there is mean-reversion in the short rates. We will discuss and demonstrate this in more detail in the next post on the Vasicek model. However, as a teaser, a more accurate way to discretize a continuous-time process is first to solve the stochastic differential equation.
+In general, this discretization is only an approximation because it ignores errors from time aggregation, which become more pronounced when there is mean-reversion in the stochastic processes. A more accurate way to discretize a continuous-time process is first to solve the stochastic differential equation.
 
 $$\int_0^t dr_s = \int_0^t \mu ds + \int_0^t \sigma dW_s$$
 
-then discretize according to this solution. However, for Merton's model, the Euler-Maruyama discretization coincides with the more accurate discretization. 
+then discretize according to this solution. 
+
+$$\Delta r_t = \int_0^{\Delta t} \mu \Delta t + \int_0^t \sigma \epsilon_t $$
+
+For simple Merton model, the Euler-Maruyama discretization coincides with the more accurate discretization, but for a general stochastic process
+
+$$ dr_t = \mu(t, r_t) dt + \sigma(t, r_t) dW_t $$
+
+The term $$\int_0^{\Delta t} \mu(s, r_s) ds \neq \mu(t, r_t) \Delta t$$. We will discuss and demonstrate this in more detail in the the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/), when the level of the rate itself goes into the drift term.
+
+Using $$\mu = 0.02$$, $$\sigma = 0.02$$ and $$ r_0 = 0.05$$, Figure 1 shows a simulated path of the short rate process.
+
+![Figure 1. A Simulated Path of the Merton Short Rate Process](/assets/img/post_assets/short-rate-models-2/merton_short_rate_simulation.png)
+
+## Simulating Short Rates, Bond Yields and Term Structure from the Merton Model
+
+In the [previous post](https://steveya.github.io/posts/short-rate-models-1/), we derived the price of a ZCB from the short-rate model in two different ways: 1. directly solve the SDE, and 2. guess the form of the solution as $$A(t, T) \exp (-B(t, T) r_t)$$ and solve for $$A$$ and $$B$$. As it turns out, most common short-rate models have bond price solution in the form of $$A(t, T) \exp (-B(t, T) r_t)$$, so we will use this fact when we implement our short-rate models. Below is a simple Python implementation of the ZCB price and yields.
+
+```python
+def B(t, T):
+    return T - t
+
+def A(t, T, mu, sigma):
+    tau = T - t
+    return np.exp(-mu * tau**2 / 2 + (sigma**2 * tau**3) / 6)
+
+def zero_coupon_bond_price(t, T, r, mu, sigma):
+    return A(t, T, mu, sigma) * np.exp(-B(t, T) * r)
+
+def zero_coupon_yield(t, T, r, mu, sigma):
+    price = zero_coupon_bond_price(t, T, r, mu, sigma)
+    return -np.log(price) / (T - t)
+
+```
+
+We use the above formuloa to simulate the 5-, 10-, and 30-year yields using the above parameters, and Figure 2 shows the results.
+
+![Figure 2. A Simulated Path of the Merton Long Rate Processes](/assets/img/post_assets/short-rate-models-2/merton_long_rate_simulation.png)
+
+We can see that the three long-rates are all parallel shifts of one another and of the short rates. The simple Merton model is capable of generating only parallel shifts. We can also genererate its term structure with some combination of $$\mu$$ and $$\sigma$$, and Figure 3 shows the results.
+
+![Figure 3. Term Structures from the Merton Model](/assets/img/post_assets/short-rate-models-2/merton_term_structure.png)
+
+Unsurprisingly, when $$\sigma$$ is small relative to $$\mu$$, the term structure is dominated by the constant drift term and is upward sloping, almost in a straight line. When $$\sigma$$ is large, the long-end of term structure is dominated by the volatility term and is downward sloping by the convextiy term.
 
 Next, we will discuss calibrating the model to short rates, which differs from calibrating to the yield curves. The main difference stems from the fact that the short rates are observed under the physical measure, whereas the bond yields are observed under the risk-neutral measure. The parameters we calibrated from the short rates are those under the physical measure and cannot be used to price longer-term bonds.
-
 
 ## Calibration to Market Observed Short Rates
 There are at least two ways to calibrate Merton's model to market-observed short rates: maximum likelihood estimation (MLE) and the general method of moments (GMM). There are other ways, but I will cover only the MLE, which is by far the most popular method for estimating the short-rate model parameters from market data.
@@ -89,7 +135,7 @@ $$
 L\left(\mu, \sigma \vert r_0, ..., r_n\right) = \prod_{i=1}^n f\left(r_i \vert r_{i-1}, \mu, \sigma\right)
 $$
 
-Where $$f$$ is the probability density function of the normal distribution:
+where $$f$$ is the probability density function of the normal distribution:
 
 $$
 f\left(r_i \vert r_{i-1}, \mu, \sigma\right) = \frac{1}{\sigma\sqrt{2\pi\delta t_i}} \exp\left(-\frac{(r_i - r_{i-1} - \mu\delta t_i)^2}{2\sigma^2\delta t_i}\right)
@@ -103,7 +149,7 @@ $$
 
 #### Maximizing the Log-Likelihood
 
-To find the maximum likelihood estimates, we can find the values of $$\mu$$ and $$\sigma$$ that maximize this log-likelihood function. We take the partial derivatives of the log-likelihood with respect to $$\mu$$ and $$\sigma$$, setting them to zero, and solving the resulting equations.
+To find the maximum likelihood estimates, we can find the values of $$\mu$$ and $$\sigma$$ that maximize this log-likelihood function. We take the partial derivatives of the log-likelihood with respect to $$\mu$$ and $$\sigma$$, setting them to zero, and solving the resulting equations to get an analytical solution. 
 
 For the Merton model, we can derive closed-form solutions for the maximum likelihood estimators:
 
@@ -125,23 +171,25 @@ Numerical optimization techniques are often used to maximize the log-likelihood 
 With the above, we can now implement the MLE for the Merton model: 
 
 ```python
-import numpy as np
-from scipy.optimize import minimize
+def merton_log_likelihood(params, rates, dt):
+    mu, sigma = params
+    n = len(rates) - 1
+    ll = -0.5 * n * np.log(2 * np.pi * sigma**2 * dt)
+    ll -= np.sum((rates[1:] - rates[:-1] - mu * dt)**2) / (2 * sigma**2 * dt)
+    return -ll
 
-# Log-likelihood function for Gaussian models
-def log_likelihood(params, rates, dt):
- mu, sigma = params
- n = len(rates) - 1
- ll = -0.5 * n * np.log(2 * np.pi * sigma**2 * dt)
- ll -= np.sum((rates[1:] - rates[:-1] - mu * dt)**2) / (2 * sigma**2 * dt)
-    return -ll  # Minimize negative log-likelihood
-
-# Maximum Likelihood Estimation
-def mle_calibration(rates, dt):
- initial_guess = [0.01, 0.01]  # Initial guess for mu and sigma
- result = minimize(log_likelihood, initial_guess, args=(rates, dt), method='L-BFGS-B')
+def merton_mle_calibration(rates, dt):
+    initial_guess = [0.01, 0.01]
+    result = minimize(merton_log_likelihood, initial_guess, args=(rates, dt), method='L-BFGS-B')
     return result.x
+
 ```
+
+We generate 5000 paths of the short rate process using the same $$\mu = 0.02$$, $$\sigma = 0.02$$ and $$ r_0 = 0.05$$ for $$t=5$$ years, and apply the maximum likelihood to estimate the parameters from each path. Figure 4 shows the distribution of the MLE estinates for $$\mu$$ and $$\sigma$$.
+
+![Figure 4. Distribution of ML estimates of the Merton Model parameters](/assets/img/post_assets/short-rate-models-2/merton_term_structure.png)
+
+We can see immediately that the MLE estimates ofr $$\mu$$, while unbiased, has a high variance. This is consistent with the observation that the mean of a distribution is a lot harder to estimate precisely than the variance. This problem is even more pronouced for more complicated processes, such as the Vasicek model. We will discuss this in length in the [next next post](https://steveya.github.io/posts/short-rate-models-4/) on calibrating the Vasicek model. 
 
 ### Wrapping Up
 We now know the Merton model, a simple one-factor short-rate equilibrium model that is also an affine term-structure model. In the previous [post](https://steveya.github.io/posts/short-rate-models-1/), we derived the price of a ZCB from the short-rate model and wrote a simple Python implementation of the ZCB price and yields.
