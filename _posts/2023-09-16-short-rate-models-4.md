@@ -16,7 +16,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 A good tutorial on simulating and calibrating the Ornstein-Uhlenbeck (OU) process using classic methods (MLE, GMM) is the [Hudson and Thames tutorial on the OU process](https://hudsonthames.org/caveats-in-calibrating-the-ou-process/). In this post we discuss methods to simulate from the Vasicek model and calibrate it to the market observed short rates. Since the Vasicek model assumes the short rates follows an OU process, there is a significant overlap between this post and the Hudson and Thames tutorial. 
 
-They summarize recent results from [Bao et al (2015)] who derive the exact distribution of the maximum likelihood estimators of the OU process with various assumptions. They also cover the topic of estimation bias of $$\kappa$$ in finite sample, which is also important in the context of short-rate models. While they also cover the topic of the two different discretization scheme used for simulating the Vasicek model, I do not agree with their conclusion that 
+They summarize recent results from [Bao et al (2015)] who derive the exact distribution of the maximum likelihood estimators of the OU process with various assumptions. They also cover the topic of estimation bias of $$\kappa$$ in finite sample, which is also important in the context of short-rate models. While they also cover the topic of the two different discretization scheme used for simulating the Vasicek model, I cannot reproduce their simulation results (Experiment 1) and I found the two methods to be quite close to each other.
 
 On my end, I will demonstrate how I calibrate the OU process via particle filtering, and how it compares to the maximum likelihood estimates.
 
@@ -124,5 +124,12 @@ def simulate_vasicek_short_rates_exact(r0, kappa, theta, sigma, t, dt, seed=None
 ```
 
 
-
 ## Calibration to Market Observed Short Rates
+
+### Maximum Likelihood Estimation
+
+### Particle Filtering
+
+### Comparison
+
+## Wrapping Up
