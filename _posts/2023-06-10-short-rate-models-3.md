@@ -56,59 +56,59 @@ Similar to the Merton model, we can derive the price of a zero-coupon bond in tw
 
 3. For a normally distributed variable $$X$$ with mean $$m$$ and variance $$v$$, we have:
 
- $$\mathbb{E}\left[\exp\left(-X\right)\right] = \exp\left(-m + \frac{1}{2}v\right)$$
+$$\mathbb{E}\left[\exp\left(-X\right)\right] = \exp\left(-m + \frac{1}{2}v\right)$$
 
 4. Calculate the mean and variance of $$\int_t^T r_s ds$$. Recall that in the derivation of the Merton model, we first derive an expression for $$r_s$$ for $$ s \ge t$$. To get this expression for the Vasicek model, we first multiply out the drift term:
 
- $$dr_t = \kappa\theta dt - \kappa r_t dt + \sigma dW_t$$
+$$dr_t = \kappa\theta dt - \kappa r_t dt + \sigma dW_t$$
 
 Notice that the second term $$dr_t + \kappa r_t dt = 0$$ is a standard first-order differential equation and can be solved by multiplying the integrating factor $$\exp\left(\kappa r_t\right)$$. Once we multiply it by all three terms, we can integrate and rearrange it to get 
 
- $$
-   \begin{equation}
-   r_s = r_t e^{-\kappa \left(s-t\right)} + \theta \left(1 - e^{-\kappa\left(s-t\right)}\right) + \sigma \int_t^s e^{-\kappa \left(u-t\right)} dW_u
-   \end{equation}
-   $$
+$$
+\begin{equation}
+r_s = r_t e^{-\kappa \left(s-t\right)} + \theta \left(1 - e^{-\kappa\left(s-t\right)}\right) + \sigma \int_t^s e^{-\kappa \left(u-t\right)} dW_u
+\end{equation}
+$$
 
- Now to get $$\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$ and $$\text{Var}_t^Q\left[\int_t^T r_s ds\right]$$, we need to again integrate $$\int_t^T r_s ds$$, which turns out to be
+Now to get $$\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$ and $$\text{Var}_t^Q\left[\int_t^T r_s ds\right]$$, we need to again integrate $$\int_t^T r_s ds$$, which turns out to be
 
- $$
-   \begin{equation}
-   \begin{aligned}
-   \int_{t}^{T} r_{s} du &= r_{t} \int_{t}^{T} e^{-\kappa(s-t)} ds + \theta \int_{t}^{T} \left( 1 - e^{-\kappa(s-t)} \right) ds + \sigma \int_{t}^{T} \int_{t}^{s} e^{-\kappa(s-u)} dW_u ds \\
-   &= r_{t} \left( \frac{e^{-\kappa(T-t)} - 1}{-\kappa} \right) + \theta \left[ \int_{t}^{T} du - \int_{t}^{T} e^{-\kappa(s-t)} ds \right] + \sigma \int_{t}^{T} \int_{u}^{T} e^{-\kappa(s-u)} ds dW_u\\
-   &= r_{t} \left( \frac{1 - e^{-\kappa(T-t)}}{\kappa} \right) + \theta \left[ (T-t) - \frac{1 - e^{-\kappa(T-t)}}{\kappa} \right] + \frac{\sigma}{\kappa} \int_{t}^{T} \left( 1 - e^{-\kappa(T-u)} \right) dW_u \\
-   \end{aligned}
-   \end{equation}
-   $$ 
+$$
+\begin{equation}
+\begin{aligned}
+\int_{t}^{T} r_{s} du &= r_{t} \int_{t}^{T} e^{-\kappa(s-t)} ds + \theta \int_{t}^{T} \left( 1 - e^{-\kappa(s-t)} \right) ds + \sigma \int_{t}^{T} \int_{t}^{s} e^{-\kappa(s-u)} dW_u ds \\
+&= r_{t} \left( \frac{e^{-\kappa(T-t)} - 1}{-\kappa} \right) + \theta \left[ \int_{t}^{T} du - \int_{t}^{T} e^{-\kappa(s-t)} ds \right] + \sigma \int_{t}^{T} \int_{u}^{T} e^{-\kappa(s-u)} ds dW_u\\
+&= r_{t} \left( \frac{1 - e^{-\kappa(T-t)}}{\kappa} \right) + \theta \left[ (T-t) - \frac{1 - e^{-\kappa(T-t)}}{\kappa} \right] + \frac{\sigma}{\kappa} \int_{t}^{T} \left( 1 - e^{-\kappa(T-u)} \right) dW_u \\
+\end{aligned}
+\end{equation}
+$$ 
 
- We can compute the $$\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$ and $$\text{Var}_t^Q\left[\int_t^T r_s ds\right]$$ by taking the expectation of the drift and diffusion terms, respectively:
+We can compute the $$\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$ and $$\text{Var}_t^Q\left[\int_t^T r_s ds\right]$$ by taking the expectation of the drift and diffusion terms, respectively:
 
- $$
-   \begin{equation}
-   \begin{aligned}
-   \mathbb{E}_t^Q\left[\int_t^T r_s ds\right] &= r_t \left(\frac{1 - e^{-\kappa\left(T-t\right)}}{\kappa}\right) + \theta \left(\left(T-t\right) - \frac{1 - e^{-\kappa\left(T-t\right)}}{\kappa}\right) \\
-   \text{Var}_t^Q\left[\int_t^T r_s ds\right] &= \text{Var}\left[\frac{\sigma}{\kappa}\int_t^T\left(1-e^{-\kappa\left(T-u\right)}\right)dW_u\right] \\
-   &=\frac{\sigma^2}{\kappa^2}\int_t^T\left(1-e^{-\kappa\left(T-u\right)}\right)^2du \quad \text{(by Itô's Isometry)} \\
-   &= \frac{\sigma^2}{\kappa^2}\int_t^T\left[1 + e^{-2\kappa\left(T-u\right)} - 2e^{-\kappa\left(T-u\right)}\right]du \\
-   &= \frac{\sigma^2\left(T-t\right)}{\kappa^2} + \frac{\sigma^2}{2\kappa^3}\left[1-e^{-2\kappa\left(T-u\right)}\right] - \frac{2\sigma^2}{\kappa^3}\left[1 - e^{-\kappa\left(T-u\right)}\right] \\
-   &= \frac{\sigma^2}{2\kappa^3}\left(2\kappa\left(T-t\right) - 3 - e^{2\kappa\left(T-t\right)} + 4e^{-2\kappa\left(T-t\right)}\right) \\
-   \end{aligned}
-   \end{equation}
-   $$
+$$
+\begin{equation}
+\begin{aligned}
+\mathbb{E}_t^Q\left[\int_t^T r_s ds\right] &= r_t \left(\frac{1 - e^{-\kappa\left(T-t\right)}}{\kappa}\right) + \theta \left(\left(T-t\right) - \frac{1 - e^{-\kappa\left(T-t\right)}}{\kappa}\right) \\
+\text{Var}_t^Q\left[\int_t^T r_s ds\right] &= \text{Var}\left[\frac{\sigma}{\kappa}\int_t^T\left(1-e^{-\kappa\left(T-u\right)}\right)dW_u\right] \\
+&=\frac{\sigma^2}{\kappa^2}\int_t^T\left(1-e^{-\kappa\left(T-u\right)}\right)^2du \quad \text{(by Itô's Isometry)} \\
+&= \frac{\sigma^2}{\kappa^2}\int_t^T\left[1 + e^{-2\kappa\left(T-u\right)} - 2e^{-\kappa\left(T-u\right)}\right]du \\
+&= \frac{\sigma^2\left(T-t\right)}{\kappa^2} + \frac{\sigma^2}{2\kappa^3}\left[1-e^{-2\kappa\left(T-u\right)}\right] - \frac{2\sigma^2}{\kappa^3}\left[1 - e^{-\kappa\left(T-u\right)}\right] \\
+&= \frac{\sigma^2}{2\kappa^3}\left(2\kappa\left(T-t\right) - 3 - e^{2\kappa\left(T-t\right)} + 4e^{-2\kappa\left(T-t\right)}\right) \\
+\end{aligned}
+\end{equation}
+$$
 
 5. Substitute the expression for $$\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$ and $$\text{Var}_t^Q\left[\int_t^T r_s ds\right]$$ into the bond price formula, and let $$\tau = T-t$$, and after some tedious algebra, we get
 
- $$
-   \begin{equation}
-   \begin{aligned}
-   P(t,T) &= \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right] \\
-   &= \exp\left[-\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]+\frac{1}{2}\text{Var}_t^Q\left[\int_t^T r_s ds\right]\right] \\
-   &= \exp\left[-r_t \left(\frac{1 - e^{-\kappa\tau}}{\kappa}\right) - \theta \left(\tau - \frac{1 - e^{-\kappa\tau}}{\kappa}\right)+ \frac{\sigma^2}{4\kappa^3}\left(2\kappa\tau - 3 - e^{2\kappa\tau} + 4e^{-2\kappa\tau}\right)\right]\\ 
-   &= \exp\left[-r_t \left(\frac{1 - e^{-\kappa\tau}}{\kappa}\right) + \left(\theta -\frac{\sigma^2}{\kappa^2}\right)\left[\frac{1-e^{-\kappa\tau}}{\kappa}-\tau\right] - \frac{\sigma^2}{4\kappa}\left[\frac{1 - e^{-\kappa\tau}}{\kappa}\right]^2\right]\\
-   \end{aligned}
-   \end{equation}
-   $$
+$$
+\begin{equation}
+\begin{aligned}
+P(t,T) &= \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right] \\
+&= \exp\left[-\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]+\frac{1}{2}\text{Var}_t^Q\left[\int_t^T r_s ds\right]\right] \\
+&= \exp\left[-r_t \left(\frac{1 - e^{-\kappa\tau}}{\kappa}\right) - \theta \left(\tau - \frac{1 - e^{-\kappa\tau}}{\kappa}\right)+ \frac{\sigma^2}{4\kappa^3}\left(2\kappa\tau - 3 - e^{2\kappa\tau} + 4e^{-2\kappa\tau}\right)\right]\\ 
+&= \exp\left[-r_t \left(\frac{1 - e^{-\kappa\tau}}{\kappa}\right) + \left(\theta -\frac{\sigma^2}{\kappa^2}\right)\left[\frac{1-e^{-\kappa\tau}}{\kappa}-\tau\right] - \frac{\sigma^2}{4\kappa}\left[\frac{1 - e^{-\kappa\tau}}{\kappa}\right]^2\right]\\
+\end{aligned}
+\end{equation}
+$$
 
 Notice that the term $$\kappa^{-1}\left(1-\exp\left(-\kappa\tau\right)\right)$$ keeps showing up in the solution to this model, such as the zero-coupon bond prices and yields. Mathematically, it comes from the integral of the exponential decay function $$e^{-\kappa\tau}$$ over time. It adjusts the average level of the short rate in the presence of mean reversion. The expected value and the variance of the short rate at future times are given by
 

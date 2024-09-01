@@ -53,7 +53,7 @@ def simulate_merton_short_rates(r0, mu, sigma, t, dt, seed=None):
     return times, rates
 ```
 
-In general, this discretization is only an approximation because it ignores errors from time aggregation, which become more pronounced when there is mean-reversion in the stochastic processes. A more accurate way to discretize a continuous-time process is first to solve the stochastic differential equation.
+In general, the Euler-Maruyama discretization is only an approximation because it ignores errors from time aggregation. A more accurate way to discretize a continuous-time process is first to solve the stochastic differential equation.
 
 $$\int_0^t dr_s = \int_0^t \mu ds + \int_0^t \sigma dW_s$$
 
@@ -65,7 +65,7 @@ For simple Merton model, the Euler-Maruyama discretization coincides with the mo
 
 $$ dr_t = \mu(t, r_t) dt + \sigma(t, r_t) dW_t $$
 
-The term $$\int_0^{\Delta t} \mu(s, r_s) ds \neq \mu(t, r_t) \Delta t$$. We will discuss and demonstrate this in more detail in the the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/), when the level of the rate itself goes into the drift term.
+The term $$\int_0^{\Delta t} \mu(s, r_s) ds \neq \mu(t, r_t) \Delta t$$. We will discuss this in more detail in the the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/). However, the error from time aggregation is small and does not accumulate if the process is mean-reverting.
 
 Using $$\mu = 0.02$$, $$\sigma = 0.02$$ and $$ r_0 = 0.05$$, Figure 1 shows a simulated path of the short rate process.
 
