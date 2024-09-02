@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "WIP - Short Rate Models (Part 4: Simulating and Calibrating Vasicek Model)"
-date: 2023-07-16
+title: "Short Rate Models (Part 4: Simulating and Calibrating Vasicek Model)"
+date: 2024-09-01
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
 ---
@@ -14,14 +14,16 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 1. [Simulating Vasicek Model](#simulating-vasicek-model)
 2. [Calibration to Market Observed Short Rates](#calibration-to-market-observed-short-rates)
 
-A good tutorial on simulating and calibrating the Ornstein-Uhlenbeck (OU) process using classic methods (MLE, GMM) is the [Hudson and Thames tutorial on the OU process](https://hudsonthames.org/caveats-in-calibrating-the-ou-process/). In this post we discuss methods to simulate from the Vasicek model and calibrate it to the market observed short rates. Since the Vasicek model assumes the short rates follows an OU process, there is a significant overlap between this post and the Hudson and Thames tutorial. 
+We introduced the Vasicek model in the [previous post](https://steveya.github.io/posts/short-rate-models-3/). We now discuss methods to simulate the Vasicek model and estimate the model parameters from the market observed short rates. Since the Vasicek model assumes the short rates follow an Ornstein Uhlenbeck (OU) process, the simulation of short rates and the parameter estimation are the same as those of the OU process.
 
-They summarize recent results from [Bao et al (2015)] who derive the exact distribution of the maximum likelihood estimators of the OU process with various assumptions. They also cover the topic of estimation bias of $$\kappa$$ in finite sample, which is also important in the context of short-rate models. While they also cover the topic of the two different discretization scheme used for simulating the Vasicek model, I cannot reproduce their simulation results (Experiment 1) and I found the two methods to be quite close to each other.
+Given the extensive study of the OU process in finance and physics literature, we will only demonstrate how to simulate it using two different methods and compare their results. Then, we will cover the maximum likelihood estimator for the OU process and show its problems on finite samples. More importantly, we will introduce an alternative method that has shown promising results in our empirical studies.
 
-On my end, I will demonstrate how I calibrate the OU process via particle filtering, and how it compares to the maximum likelihood estimates.
+In [Part 2](https://steveya.github.io/posts/short-rate-models-2/), we mentioned that the Euler-Maruyama discretization is only a (first-order) approximation to the underlying stochastic differential equations (SDE) and how we should discretize the solution of the SDE directly to get a more accurate path. The two methods yield the same results for the Merton model, but they do not for the Vasicek model. We will show they are very close, and the difference between these two methods is bounded.
+
+We then derive the maximum likelihood estimator for the Vasicek model parameters for parameter estimation. We estimate the parameters from our simulated OU processes and show that the $$\kappa$$ parameter estimates are biased and have significant variance on finite samples. We then propose the use of particle filtering that results in both smaller bias and variance for $$\kappa$$
 
 ## Simulating Vasicek Model
-We introduced the Vasicek model in the [previous post](https://steveya.github.io/posts/short-rate-models-3/), and just as we did in [Part 2](https://steveya.github.io/posts/short-rate-models-2/) of this series, we can simulate the Vasicek short-rate process directly from the Euler-Maruyama discretization of its stochastic differential equation (SDE). However, as we pointed out that this method can introduce time-aggregation error when there is strong mean-reversion, a better approach is apply Euler-Maruyama discretization to the solution of the SDE. More specifically, if we discretize the Vasicek SDE, we get
+Just as we did to the Merton model in [Part 2](https://steveya.github.io/posts/short-rate-models-2/) of this series, we can simulate the Vasicek short-rate process directly using the Euler-Maruyama discretization of its stochastic differential equation (SDE). However, this method is a first-order approximation and can introduce time-aggregation error when there is strong mean-reversion, a problem not shared by the Merton model. A better approach is apply Euler-Maruyama discretization to the solution of the SDE. More specifically, if we discretize the Vasicek SDE, we get
 
 $$
 \begin{equation}
@@ -45,7 +47,21 @@ $$
 \end{equation}
 $$
 
-As $$\kappa$$ or $$\Delta t$$ gets larger, the difference between $$\kappa \Delta t$$ and $$\left(1 - e^{-\kappa \Delta t}\right)$$ also grows larger; similarly, the difference between $$\sigma \sqrt{\Delta t}$$ and $$\sqrt{\frac{ \sigma^2 \left(1 - e^{-2 \kappa \Delta t} \right) }{ 2 \kappa } }$$ also grows larger. We can illustrate this by plotting the same short rate path generated from these two methods `simulate_vasicek_short_rates_euler` and `simulate_vasicek_short_rates_exact` in the following figure.
+As $$\kappa$$ or $$\Delta t$$ gets larger, the difference between $$\kappa \Delta t$$ and $$\left(1 - e^{-\kappa \Delta t}\right)$$ also grows larger; similarly, the difference between $$\sigma \sqrt{\Delta t}$$ and $$\sqrt{\frac{ \sigma^2 \left(1 - e^{-2 \kappa \Delta t} \right) }{ 2 \kappa } }$$ also grows larger.
+
+In practice these differences are not large and will tend to zero as $$t$$ increases. The difference between the drift term is 
+
+$$
+\begin{equation}
+\begin{aligned}
+\left(1 - e^{-\kappa \Delta t} - \kappa \Delta t\right) \left(\theta - r_t\right) 
+&= \left(1 - \left(1 - \kappa \Delta t + \frac{\left(-\kappa\Delta t\right)^2}{2} + \hdots\right) - \kappa\right) \left(\theta - r_t\right) \\
+&= \mathcal{O}\left(\kappa^3 \Delta t^3\right) \left(\theta - r_t\right) \\
+\end{aligned}
+\end{equation}
+$$
+
+We can illustrate this by plotting the same short rate path generated from these two methods `simulate_vasicek_short_rates_euler` and `simulate_vasicek_short_rates_exact` in the following figure.
 
 
 ```python
@@ -125,6 +141,11 @@ def simulate_vasicek_short_rates_exact(r0, kappa, theta, sigma, t, dt, seed=None
 
 
 ## Calibration to Market Observed Short Rates
+As Hansen Pei pointed out in the [Hudson and Thames tutorial](https://hudsonthames.org/caveats-in-calibrating-the-ou-process/), the estimation of the Ornstein Uhlenbeck model parameters from finite sample data is challenging: the variance around the maximum likelihood estimates of $$\kappa$$ can be quite large, and the bias of $$\kappa$$ is also high. In this section we briefly cover the basics of Vasicek model parameter estimation using traditional methods such as the MLE. We will then show the size of the estimation bias and variance through simulations. 
+
+Long time ago I was working on calibrating the CEV model to the volatility surfaces. At first I estimate the 2 parameters of the model by minimizing the mean squared error (MSE) between the observed and model volatility surfaces. However, with this approach the estimated parameters are not stable over time because there are generally multipl local minima. My boss at that time suggested that I can use the particle filter to estimate the parameters. This allows us to track multiple minimas over time and take their averages. This resulted in a much smoother estimates over time.
+
+With the Vasicek model parameter estimation, we have a different problem, but I suspect that particle filtering can be used to solve the problem of large variance as well.
 
 ### Maximum Likelihood Estimation
 
