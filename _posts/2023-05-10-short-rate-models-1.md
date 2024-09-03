@@ -16,13 +16,13 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 3. [Merson's Model](#mertons-model-1973)
 
 ## Introduction
-Welcome to my refresher series on short-rate models, dear reader! These mathematical marvels are not just academic curiosities, but crucial tools in the world of finance. They are among the main workhorses of interest rate modelling, used both in the ivory towers of academic research and by the fast-paced world of Wall Street desk quants. This refresher series aims to help you understand, formulate, and solve these models by deriving and implementing well-known versions of varying complexity and generality.
+Welcome to my refresher series on short-rate models, dear reader! These mathematical marvels are not just academic curiosities but crucial tools in finance. They are among the main workhorses of interest rate modelling, used in the ivory towers of academic research and by the fast-paced world of Wall Street desk quants. This refresher series aims to help you understand, formulate, and solve these models by deriving and implementing well-known versions of varying complexity and generality.
 
-Short-rate models, despite their seeming simplicity, are incredibly versatile tools for modelling interest rates. They specify how the instantaneous spot interest rate (our 'short rate') evolves, which is the rate at which you can borrow money for an infinitesimally short period. This versatility makes them a key component of many financial models and strategies. 
+Despite their seeming simplicity, short-rate models are incredibly versatile tools for modelling interest rates. They specify how the instantaneous spot interest rate (our 'short rate') evolves, which is the rate at which you can borrow money for an infinitesimally short period. This versatility makes them a key component of many financial models and strategies. 
 
-The short rate is assumed to evolve over time according to a stochastic process that captures the observed or theorized price of market behaviours. Once we've nailed down this evolution, the no-arbitrage principle can help us determine rates for longer borrowing periods.
+The short rate is assumed to evolve according to a stochastic process that captures the observed or theorized price of market behaviours. Once we've nailed down this evolution, the no-arbitrage principle can help us determine rates for longer borrowing periods.
 
-In this first post, we start with some preliminaries. These are the foundational concepts and tools that we'll need to understand and implement the short-rate models. We'll then go step-by-step to derive the price of a zero-coupon bond and the simulation of the model. It is then followed by Python implementations of the short-rate process simulation and the zero coupon bond pricing. Code snippets included in these posts (and more) can be found in the [Github repository](https://github.com/steveya/short-rate-models/notebook/merton_model.ipynb). The code library will evolve with the series as we build out more and more types of models that can benefit from more abstraction.
+In this first post, we start with some preliminaries. These are the foundational concepts and tools we'll need to understand and implement the short-rate models. We'll then go step-by-step to derive the price of a zero-coupon bond and the model simulation. It is then followed by Python implementations of the short-rate process simulation and the zero coupon bond pricing. Code snippets included in these posts (and more) can be found in the [Github repository](https://github.com/steveya/short-rate-models/notebook/merton_model.ipynb). The code library will evolve with the series as we build out more and more types of models that can benefit from more abstraction.
 
 
 ## Preliminaries
@@ -46,13 +46,13 @@ $$y\left(t, T\right) = \frac{1}{T-t}\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$
 
 $$P\left(t, T\right) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]$$
 
-These fundamental relationships will be used to calculate the price and yield of ZCB from the short-rate process. Readers familiar with asset pricing will notice that the price of a ZCB is calculated with respect to the risk-neutral measure $$Q$$. We will not concern ourselves with the risk-neutral and physical measures just yet. All measures are assumed to be risk-neutral unless otherwise indicated. A fuller treatment will be postponed to a later post on model calibration to the observed yield curve.
+These fundamental relationships will be used to calculate the price and yield of ZCB from the short-rate process. Readers familiar with asset pricing will notice that the price of a ZCB is calculated with respect to the risk-neutral measure $$Q$$. We will not be concerned with risk-neutral and physical measures just yet. All measures are assumed to be risk-neutral unless otherwise indicated. A fuller treatment will be postponed to a later post on model calibration to the observed yield curve.
 
 ## Merton's Model (1973)
 Merton's model is one of the first short-rate models and is arguably the simplest one; it laid the foundation for many subsequent short-rate models. It was introduced in 1973 by the renowned economist Robert C. Merton, who extended the concepts of equity option pricing to the bond market by modelling short-rate dynamics as a simple Gaussian process.
 
 ### Model Specification
-Merton's model is defined by the following stochastic differential equation:
+The following stochastic differential equation defines Merton's model:
 
 $$dr_t = \mu dt + \sigma dW^Q_t$$
 
@@ -78,14 +78,7 @@ The price of a $$T$$-year ZCB is given by:
 
 $$P(t,T) = \exp\left(-(T-t)r_t - \frac{\mu \left(T-t\right)^2}{2} + \frac{\sigma^2\left(T-t\right)^3}{6}\right)$$
 
-We will derive this formula two different ways. The first is to solve stochastic integral directly and the second is to "guess" the form of the solution and solve it by matching the bond price formula to the guessed solution. Even though I call the second way the "guessed" solution, it is actually based on the observation that the Merton model falls in the category of the affine term-structure model, whose prices are all of the form $$A(t, T)exp(-B(t, T) r_t)$$. This will be covered in later posts.
-
-### Derivation of the Bond Pricing in Merton's Model
-The price of a $$T$$-year ZCB is given by:
-
-$$P(t,T) = \exp\left(-(T-t)r_t - \frac{\mu \left(T-t\right)^2}{2} + \frac{\sigma^2\left(T-t\right)^3}{6}\right)$$
-
-We will derive this formula in two different ways. The first is to solve stochastic integral directly, and the second is to "guess" the form of the solution and solve it by matching the bond price formula to the guessed solution. Even though I call the second way the "guessed" solution, it is actually based on the observation that the Merton model falls in the category of the affine term-structure model, whose prices are all of the form $$A(t, T)exp(-B(t, T) r_t)$$. This will be covered in later posts.
+We will derive this formula in two different ways. The first is to solve stochastic integral directly, and the second is to "guess" the form of the solution and solve it by matching the bond price formula to the guessed solution. Even though I call the second way the "guessed" solution, it is based on the observation that the Merton model falls in the category of the affine term-structure model, whose prices are all of the form $$A(t, T)exp(-B(t, T) r_t)$$. This will be covered in later posts.
 
 #### Direct Solution
 1. Start with the general bond pricing equation:
@@ -146,7 +139,7 @@ We will derive this formula in two different ways. The first is to solve stochas
 
 5. Solve for $$B\left(t,T\right)$$
 
- From $$-\frac{\partial B}{\partial t} = 1$$, we get $$B\left(t,T\right) = T - t$$. We need the boundary condition for $$B\left(T,T\right)$$ to arrive at this result. Can you deduce what it is from the assumed bond price formula from point 1 above?
+ From $$-\frac{\partial B}{\partial t} = 1$$, we get $$B\left(t,T\right) = T - t$$. We need the boundary conditions for $$B\left(T,T\right)$$ to arrive at this result. Can you deduce what it is from the assumed bond price formula from point 1 above?
 
 6. Solve for $$A\left(t,T\right)$$
 
@@ -160,7 +153,7 @@ We will derive this formula in two different ways. The first is to solve stochas
 
  Where $$C$$ is a constant of integration.
 
-7. Apply the boundary condition $$P\left(T,T\right) = 1$$
+7. Apply the boundary conditionstion $$P\left(T,T\right) = 1$$
 
  $$1 = A\left(T,T\right)exp\left(-B\left(T,T\right)r\right) = A\left(T,T\right)$$
 

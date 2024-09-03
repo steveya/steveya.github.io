@@ -39,7 +39,7 @@ Mean reversion is the tendency of a process to "pull back" towards its long-term
 The speed of mean reversion $$\kappa$$ is a critical parameter in the Vasicek model. It controls the speed of mean-reversion and influences the volatility of the short rate on top of the $$\sigma$$ parameter. The higher the $$\kappa$$, the faster the mean-reversion speed, and the lower the volatility of the short rate, and vice versa.
 
 #### Ornstein-Uhlenbeck Process
-The model assumes that the short rate follows an Ornstein-Uhlenbeck process, a well-established method for representing mean-reverting behavior. This modelling choice is more consistent with empirical results. Similar to Merton's model, the short rate can still go negative, and the volatility is still independent of the short rate's level.
+The model assumes that the short rate follows an Ornstein-Uhlenbeck process, a well-established method for representing mean-reverting behaviour. This modelling choice is more consistent with empirical results. Like the Merton model, the short rate can still go negative, and the volatility is still independent of the short rate's level.
 
 #### Equilibrium Short-Rate Model
 Like the Merton model, the Vasicek model also belongs to a subclass of the short-rate model called the *Equilibrium short-rate model*. The Arbitrage-Free counterpart to the Vasicek model is the **Hull-White Model**, which allows $$\theta$$ to be deterministically time-varying.
@@ -123,7 +123,7 @@ $$
 \end{equation}
 $$
 
-The expected value is a weighted average of the current short and long rates. As $$s-t$$ gets larger, the weight of the current short rate gets exponentially smaller. Also note that in the price formula, only one term is multiplied by the short rate $$r_t$$. Therefore, the zero coupon price sensitivity to the short rate is determined by this exponential decay adjustment term. The longer the tenor, the less sensitivity it has to the short rate. 
+The expected value is a weighted average of the current short and long rates. As $$s-t$$ gets larger, the weight of the current short rate gets exponentially smaller. Also note that in the price formula, only one term is multiplied by the short rate $$r_t$$. Therefore, this exponential decay adjustment term determines the zero coupon price sensitivity to the short rate. The longer the tenor, the less sensitivity it has to the short rate. 
 
 Even though we are skipping the "guessed" solution derivation here, from the solution above, one can see that the $$A(t,T)$$ and $$B(t,T)$$ functions are 
 
