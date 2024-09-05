@@ -79,8 +79,8 @@ $$
 &= \sqrt{ \sigma^2 \left( \Delta t - (\kappa \Delta t^2) + \frac{2}{3} (\kappa \Delta t)^2 \Delta t - \cdots \right) } - \sigma \sqrt{\Delta t} \\
 &= \sigma \sqrt{ \Delta t \left( 1 - \kappa \Delta t + \frac{2}{3} \kappa^2 \Delta t^2 - \cdots \right) } - \sigma \sqrt{\Delta t} \\
 &= \sigma \sqrt{\Delta t} \left( 1 - \frac{\kappa \Delta t}{2} - \frac{ (\kappa \Delta t)^2 }{8} + \frac{2}{3} \kappa^2 \Delta t^2 \cdot \frac{1}{2} + \cdots - 1 \right) \quad \text{by Taylor expandion of } \sqrt{1 + x}  \\
-&= \sigma \sqrt{\Delta t} \left( \frac{\kappa \Delta t}{2} + \left( \frac{\kappa^2 \Delta t^2}{3} - \frac{ (\kappa \Delta t)^2 }{8} \right) + \cdots \right) \\
-&= \sigma \sqrt{\Delta t} \left( \frac{\kappa \Delta t}{2} + \frac{ (\kappa \Delta t)^2 }{24 } + \cdots \right) \\
+&= \sigma \sqrt{\Delta t} \left( - \frac{\kappa \Delta t}{2} + \left( \frac{\kappa^2 \Delta t^2}{3} - \frac{ (\kappa \Delta t)^2 }{8} \right) + \cdots \right) \\
+&= \sigma \sqrt{\Delta t} \left( - \frac{\kappa \Delta t}{2} + \frac{ (\kappa \Delta t)^2 }{24 } + \cdots \right) \\
 &= - \frac{\sigma \kappa \Delta t^{3/2}}{2} + \frac{ \sigma \kappa^2 \Delta t^{5/2} }{24 } + \cdots
 \end{aligned}
 \end{equation}
