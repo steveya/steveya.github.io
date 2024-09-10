@@ -23,7 +23,7 @@ In [Part 2](https://steveya.github.io/posts/short-rate-models-2/), we mentioned 
 We then derive the maximum likelihood estimator for the Vasicek model parameters for parameter estimation. We estimate the parameters from our simulated OU processes and show that the $$\kappa$$ parameter estimates are biased and have significant variance on finite samples. We then propose the use of particle filtering that results in both smaller bias and variance for $$\kappa$$
 
 ## Simulating Vasicek Model
-Just as we did to the Merton model in [Part 2](https://steveya.github.io/posts/short-rate-models-2/) of this series, we can simulate the Vasicek short-rate process directly using the Euler-Maruyama discretization of its stochastic differential equation (SDE). However, this method is a first-order approximation and can introduce time-aggregation error when there is strong mean-reversion, a problem not shared by the Merton model. A better approach is to apply Euler-Maruyama discretization to the solution of the SDE. More specifically, if we discretize the Vasicek SDE, we get
+Just as we did to the Merton model in [Part 2](https://steveya.github.io/posts/short-rate-models-2/) of this series, we can simulate the Vasicek short-rate process directly using the Euler-Maruyama discretization of its stochastic differential equation (SDE). However, this method is a first-order approximation and can introduce time-aggregation error when the discretization step size is large. A better approach is to apply Euler-Maruyama discretization to the solution of the SDE. More specifically, if we discretize the Vasicek SDE, we get
 
 $$
 \begin{equation}
@@ -49,49 +49,7 @@ $$
 
 As $$\kappa$$ or $$\Delta t$$ gets larger, the difference between $$\kappa \Delta t$$ and $$\left(1 - e^{-\kappa \Delta t}\right)$$ also grows larger; similarly, the difference between $$\sigma \sqrt{\Delta t}$$ and $$\sqrt{\frac{ \sigma^2 \left(1 - e^{-2 \kappa \Delta t} \right) }{ 2 \kappa } }$$ also grows larger.
 
-In practice, these differences are insignificant. More concretely, the difference between the drift terms of the two methods $$\Delta_D$$ is 
-
-$$
-\begin{equation}
-\begin{aligned}
-\Delta_D &= \left(1 - e^{-\kappa \Delta t}\right) \left(\theta - r_t\right) - \left(\kappa \Delta t\right) \left(\theta - r_t\right) \\
-&= \left(1 - e^{-\kappa \Delta t} - \kappa \Delta t\right) \left(\theta - r_t\right) \\
-&= \left(1 - 1 + \kappa \Delta t - \frac{(\kappa \Delta t)^2}{2} + \frac{(\kappa \Delta t)^3}{6} - \cdots - \kappa \Delta t \right)(\theta - r_t)  \quad \text{by Taylor expansion of } e^{-x} \\
-&= \left( - \frac{(\kappa \Delta t)^2}{2} + \frac{(\kappa \Delta t)^3}{6} - \cdots \right)(\theta - r_t) \\
-&= - \frac{\kappa^2 \Delta t^2}{2} (\theta - r_t) + \frac{\kappa^3 \Delta t^3}{6} (\theta - r_t) - \cdots
-\end{aligned}
-\end{equation}
-$$
-
-and the magnitude of the difference is approximately
-
-$$
-|\Delta_D| \approx \frac{\kappa^2 \Delta t^2}{2} | \theta - r_t |
-$$
-
-Similarly, the difference between the diffusion terms of the two methods $$\Delta_S$$ is
-
-$$
-\begin{equation}
-\begin{aligned}
-\Delta_S& = \sqrt{\frac{\sigma^2 (1 - e^{-2\kappa \Delta t})}{2\kappa}} - \sigma \sqrt{\Delta t} \\
-&= \sqrt{ \frac{ \sigma^2 \left(2\kappa \Delta t - 2(\kappa \Delta t)^2 + \frac{4}{3}(\kappa \Delta t)^3 - \cdots \right) }{2\kappa} } - \sigma \sqrt{\Delta t} \quad \text{by Taylor expansion of } e^{-x} \\
-&= \sqrt{ \sigma^2 \left( \Delta t - (\kappa \Delta t^2) + \frac{2}{3} (\kappa \Delta t)^2 \Delta t - \cdots \right) } - \sigma \sqrt{\Delta t} \\
-&= \sigma \sqrt{ \Delta t \left( 1 - \kappa \Delta t + \frac{2}{3} \kappa^2 \Delta t^2 - \cdots \right) } - \sigma \sqrt{\Delta t} \\
-&= \sigma \sqrt{\Delta t} \left( 1 - \frac{\kappa \Delta t}{2} - \frac{ (\kappa \Delta t)^2 }{8} + \frac{2}{3} \kappa^2 \Delta t^2 \cdot \frac{1}{2} + \cdots - 1 \right) \quad \text{by Taylor expandion of } \sqrt{1 + x}  \\
-&= \sigma \sqrt{\Delta t} \left( - \frac{\kappa \Delta t}{2} + \left( \frac{\kappa^2 \Delta t^2}{3} - \frac{ (\kappa \Delta t)^2 }{8} \right) + \cdots \right) \\
-&= \sigma \sqrt{\Delta t} \left( - \frac{\kappa \Delta t}{2} + \frac{ (\kappa \Delta t)^2 }{24 } + \cdots \right) \\
-&= - \frac{\sigma \kappa \Delta t^{3/2}}{2} + \frac{ \sigma \kappa^2 \Delta t^{5/2} }{24 } + \cdots
-\end{aligned}
-\end{equation}
-$$
-
-and the magnitude of the difference is approximately
-
-$$
-|\Delta_S| \approx \frac{\sigma \kappa \Delta t^{3/2}}{2}
-$$
-
+In practice, these differences are insignificant. We will first demonstrate by comparing the simulated path of the OU process under the Euler-Maruyama method and the exact method, and show mathematically that the Euler Maruyama method applied to the OU process converges to the exact solution. 
 
 In the following figure, we can illustrate this by plotting the same short rate path generated from these two methods, `simulate_vasicek_short_rates_euler` and `simulate_vasicek_short_rates_exact`.
 
@@ -170,6 +128,33 @@ def simulate_vasicek_short_rates_exact(r0, kappa, theta, sigma, t, dt, seed=None
 
 
 ```
+
+### Strong Convergence of the Euler-Maruyama Method Applied to the OU process
+Let's first define what strong convergence of a discretization method means. If the numerical method $$M$$ has **strong convergence of order $$\alpha$$** to the exact solution for a stochastic process $$X_t$$, then the expected absolute error satisfies 
+
+$$
+\begin{equation}
+\mathbb{E} \left[  \underset{0 \leq t \leq T}{\sup} \left| X_t - X_t^M \right| \right] = \mathcal{O}(\Delta t^{\alpha})
+\end{equation}
+$$
+
+where $$X_T$$ is the exact solution of the SDE and $$X_T^n$$ is the numerical solution. As we have shown earlier for the OU process, the Euler Maruyama discretization gives the difference equation
+
+$$
+\begin{equation}
+\Delta r_t = \kappa \left(\theta - r_t \right) \Delta t + \sigma \sqrt{\Delta t} \epsilon_t
+\end{equation}
+$$
+
+whereas the exact solution gives the equation
+
+$$
+\begin{equation}
+r_{t+\Delta t} = r_t e^{-\kappa \left(\Delta t\right)} + \theta \left(1 - e^{-\kappa\left(\Delta t\right)}\right) + \sigma \int_t^{t + \Delta t} e^{-\kappa \left(u-t\right)} dW_u
+\end{equation}
+$$
+
+Let's denote the error $$e_{n+1} = r(t_n)
 
 
 ## Calibration to Market Observed Short Rates

@@ -79,7 +79,7 @@ def simulate_merton_short_rates(r0, mu, sigma, t, dt, seed=None):
     return times, rates
 ```
 
-The Euler-Maruyama discretization is only an approximation because it ignores errors from time aggregation. A more accurate way to discretize a continuous-time process is first to solve the stochastic differential equation
+The **Euler-Maruyama discretization** is only an approximation because it ignores errors from time aggregation. A more accurate way to discretize a continuous-time process is first to solve the stochastic differential equation
 
 $$\int_0^t dr_s = \int_0^t \mu ds + \int_0^t \sigma dW_s$$
 
@@ -87,11 +87,11 @@ then discretize according to this solution.
 
 $$\Delta r_t = \int_0^{\Delta t} \mu \Delta t + \int_0^t \sigma \epsilon_t $$
 
-For the simple Merton model, the Euler-Maruyama discretization coincides with the more accurate discretization, but for a general stochastic process
+We call this the **exact method for diecretization**. For the simple Merton model, the Euler-Maruyama discretization coincides with the more accurate discretization, but for a general stochastic process
 
 $$ dr_t = \mu(t, r_t) dt + \sigma(t, r_t) dW_t $$
 
-The term $$\int_0^{\Delta t} \mu(s, r_s) ds \neq \mu(t, r_t) \Delta t$$. We will discuss this in more detail in the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/). However, the error from time aggregation is small and does not accumulate if the process is mean-reverting.
+The term $$\int_0^{\Delta t} \mu(s, r_s) ds \neq \mu(t, r_t) \Delta t$$. However, the error from time aggregation is "small" for "well-behaved" processes.We will discuss this in more detail in the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/). 
 
 Using $$\mu = 0.02$$, $$\sigma = 0.02$$ and $$ r_0 = 0.05$$, Figure 1 shows a simulated path of the short rate process.
 
