@@ -14,7 +14,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 1. [Vasicek Model](#vasicek-model)
 
 ## Vasicek Model
-We continue our refresher series on the **short-rate models**. In the [previous post](https://steveya.github.io/posts/short-rate-models-2/), I introduced the Merton model and the Euler-Maruyama method to simulate it. This post will discuss the Vasicek model, one of the earliest and most influential term structure models after Merton's model.
+We continue our refresher series on the **short-rate models**. In the [previous post](https://steveya.github.io/posts/short-rate-models-2/), I introduced the Merton model and the Euler-Maruyama method to simulate it. Now we are ready to tackle slightly more complicated models! This post will discuss the Vasicek model, one of the earliest and most influential term structure models. It may seem like a small step from the Merton model, but the Vasicek model forms the backbone of many of the later extensions of the short-rate models.
 
 Introduced by Oldrich Vasicek in 1977, the Vasicek model relaxes the restriction on the short-rate process by letting it follow a mean-reverting Ornstein-Uhlenbeck process. This assumption ensures that the short rate does not go unbounded as in the Merton model and allows for an attachment of economic ideas such as the long-term equilibrium short rate. Because of this, many of the later extensions of the short-rate models are extensions to the Vasicek model.
 
@@ -62,7 +62,7 @@ $$\mathbb{E}\left[\exp\left(-X\right)\right] = \exp\left(-m + \frac{1}{2}v\right
 
 $$dr_t = \kappa\theta dt - \kappa r_t dt + \sigma dW_t$$
 
-Notice that the second term $$dr_t + \kappa r_t dt = 0$$ is a standard first-order differential equation and can be solved by multiplying the integrating factor $$\exp\left(\kappa r_t\right)$$. Once we multiply it by all three terms, we can integrate and rearrange it to get 
+Notice that the second term $$dr_t + \kappa r_t dt = 0$$ is a standard first-order differential equation and can be solved by multiplying the integrating factor $$\exp\left(\kappa r_t\right)$$. Once we multiply it by all three terms, we can integrate and rearrange it to get the solution 
 
 $$
 \begin{equation}

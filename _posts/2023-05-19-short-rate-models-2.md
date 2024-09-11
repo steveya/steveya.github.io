@@ -17,7 +17,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 
 ## Simulating Merton's Model
-We introduced the Merton short rate model in the [previous post](https://steveya.github.io/posts/short-rate-models-1/). We now show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of small time steps. It is a first-order numerical method for approximating stochastic differential equations (SDEs). We will assume the readers already know what it is. As a recap, consider a general $$d$$-dimensional SDE of the form:
+We introduced the Merton short rate model in the [previous post](https://steveya.github.io/posts/short-rate-models-1/). We now show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of small time steps. It is a first-order numerical method for approximating stochastic differential equations (SDEs). As a recap, consider a general $$d$$-dimensional SDE of the form:
 
 $$
 dX_t = a(X_t, t) dt + b(X_t, t) dW_t
@@ -87,11 +87,11 @@ then discretize according to this solution.
 
 $$\Delta r_t = \int_0^{\Delta t} \mu \Delta t + \int_0^t \sigma \epsilon_t $$
 
-We call this the **exact method for diecretization**. For the simple Merton model, the Euler-Maruyama discretization coincides with the more accurate discretization, but for a general stochastic process
+We call this more accurate method the **exact method for diecretization**. For the simple Merton model, the Euler-Maruyama discretization coincides with the more accurate discretization, but for a general stochastic process
 
 $$ dr_t = \mu(t, r_t) dt + \sigma(t, r_t) dW_t $$
 
-The term $$\int_0^{\Delta t} \mu(s, r_s) ds \neq \mu(t, r_t) \Delta t$$. However, the error from time aggregation is "small" for "well-behaved" processes.We will discuss this in more detail in the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/). 
+The term $$\int_0^{\Delta t} \mu(s, r_s) ds \neq \mu(t, r_t) \Delta t$$. However, the error from time aggregation is "small" for "well-behaved" processes.We will discuss this in greater detail in the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/). 
 
 Using $$\mu = 0.02$$, $$\sigma = 0.02$$ and $$ r_0 = 0.05$$, Figure 1 shows a simulated path of the short rate process.
 
