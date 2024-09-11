@@ -12,7 +12,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Preliminaries](#preliminaries)
+2. [Recap of Bond Pricing from Short Rate Models](#recap-of-bond-pricing-from-short-rate-models)
 3. [Merson's Model](#mertons-model-1973)
 
 ## Introduction

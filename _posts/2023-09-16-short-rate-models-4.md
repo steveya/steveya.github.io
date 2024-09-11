@@ -136,7 +136,7 @@ Using $$r_0 = 0.05$$, $$\kappa = 0.15$$, $$\theta = 0.03$$, $$\sigma = 0.01$$, $
 
 
 ## Calibration to Market Observed Short Rates
-Estimating the Ornstein Uhlenbeck model parameters from finite sample data is challenging because the variance around the maximum likelihood estimates of $$\kappa$$ and $$\theta$$ can be quite large, and their biases are also high. This section briefly covers the basics of Vasicek model parameter estimation using traditional methods such as the MLE. We will then show the size of the estimation bias and variance through simulations. 
+This section covers the basics of Vasicek model (OU process) parameter estimation using traditional methods such as the maximum likelihood estimation (MLE). We demonstrate through simulations that the MLE parameter estimates from finite samples are rather problematic, and discuss the source of the problem. We then introduce a particle filtering method to estimate the model parameters that empirically improves the parameter estimation.
 
 ### Maximum Likelihood Estimation
 Just as we did for the Merton model, we can derive the log-likelihood function for the Vasicek model by noting that conditional on the short rate at time $$t$$, the short rate at time $$t+\Delta t$$ is normally distributed. Using the Euler method to discretize the OU process, the log-likelihood function is given by
@@ -171,8 +171,8 @@ def vasicek_log_likelihood(params, rates, dt):
     return -logL
 
 def calibrate_vasicek_mle(rates, dt):
-    initial_params = [1, np.mean(rates), np.std(np.diff(rates)) * np.sqrt(1/dt)]
-    bounds = [(0, None), (None, None), (1e-8, None)]
+    initial_params = [np.random.uniform(0, 1), np.mean(rates), np.std(np.diff(rates)) * np.sqrt(1/dt)]
+    bounds = [(None, None), (None, None), (1e-8, None)]
     
     result = minimize(
         vasicek_log_likelihood, initial_params, 
@@ -184,11 +184,24 @@ def calibrate_vasicek_mle(rates, dt):
 
 ```
 
-We generate 5000 paths of the short rate process using the same $$\kappa = 0.15$$, $$\theta = 0.03$$, $$\sigma = 0.01$$ and $$ r_0 = 0.05$$ for $$t=5$$ years, and apply the maximum likelihood to estimate the parameters from each path. Figure 3 shows the distribution of the MLE estimates for $$\kappa$$, $$\theta$$, and $$\sigma$$ against the true value.
+We generate 5000 paths of the short rate process using the same $$\kappa = 0.15$$, $$\theta = 0.03$$, $$\sigma = 0.01$$ and $$ r_0 = 0.05$$ for $$t=5$$ years, and apply the maximum likelihood to estimate the parameters from each path. Figure 3, 4, and 5 show the distribution of the MLE estimates for $$\kappa$$, $$\theta$$, and $$\sigma$$ against their true values. The $$\kappa$$ and $$\theta$$ median estimates from the 5-year simulated samples are quite different from the true values, and the variance of the estimates are quite large, as 
 
 ![Figure 3. MLE Estimates for the Vasicek Model Parameters ($$\kappa$$)](/assets/img/post_assets/short-rate-models-4/kappa_mle_bootstrap.png)
 ![Figure 4. MLE Estimates for the Vasicek Model Parameters ($$\theta$$)](/assets/img/post_assets/short-rate-models-4/theta_mle_bootstrap.png)
 ![Figure 5. MLE Estimates for the Vasicek Model Parameters ($$\sigma$$)](/assets/img/post_assets/short-rate-models-4/sigma_mle_bootstrap.png)
+
+There are several reasons estimating the OU process parameters $$\kappa$$ and $$\theta$$ from finite sample data is challenging.
+
+- Identification: for the $$\kappa$$ estimates, when true $$\kappa$$ is small, the OU process behaves almost like a random walk, meaning the process is barely mean-reverting within a finite sample. In this situation, the term $$e^{-\theta \Delta t}$$ approaches 1, making it difficult to distinguish the contribution of $$\kappa$$ and $$\theta$$. This causes the parameters to be poorly identified in small samples. Moreover, looking at the log-likelihood function, we notice that $$\kappa$$ and $$\theta$$ show up together in the term $$\theta \left(1 - e^{-\kappa \Delta t}\right)$$, and for small sample sizes, there is high correlation between these parameters: a slight change in $$\theta$$ can often be compensated by a change in $$\kappa$$. As a result, the likelihood surface can be flat or ill-conditioned for both $$\kappa$$ and $$\theta$$, making it hard for MLE to find the true values.
+
+- Bias: In addition, in short finite samples, the process may not have enough time to revert significantly to its mean, making it difficult to observe the true behavior of the mean-reversion process. If the sample path has not had enough realizations of reversion toward $$theta$$, the estimates of $$\theta$$ will be biased toward the initial value of the process. This is particularly problematic for processes that start far from $$\theta$$. Since the estimate of $$\kappa$$ depends critically on $$\theta$$. If one is estimated poorly (e.g., due to small sample size or near-unit root behavior), then the other will also be inaccurate. This compounding effect makes $$\theta$$ hard to estimate independently when $$\kappa$$ is small or uncertain. The MLE $$\kappa$$ estimate is biased. The bias occurs because the likelihood function is nonlinear in $$\kappa$$, and small-sample variability causes the MLE to overestimate $$\kappa$$. This bias becomes significant when the sample size is small or when $$\kappa \Delta t$$ is small (i.e., for slow mean-reversion).
+
+- Variance: the variance term in the likelihood function is inversely proportional to $$\kappa$$. As $$\kappa \to 0$$, the variance of the process becomes very large, leading to a larger confidence interval and higher uncertainty in the parameter estimates. 
+
+If we remove the need to estimate $$\theta$$ and $$\sigma$$, we can get much better $$\kappa$$ estimates. Figure 6 shows the histogram of the MLE $$\kappa$$ estimates when $$\theta$$ and $$\sigma$$ are known and fixed at their true values. It is still biased upward due to nonlinear likelihood function in small sample, but the variance is significantly smaller.
+
+![Figure 6. MLE Estimates for the Vasicek Model Parameters ($$\kappa$$) When $$\theta$$ and $$\sigma$$ are Known](/assets/img/post_assets/short-rate-models-4/kappa_mle_bootstrap_1.png)
+
 
 ### Particle Filtering
 
