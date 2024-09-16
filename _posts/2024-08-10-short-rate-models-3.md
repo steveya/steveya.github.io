@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Short Rate Models (Part 3: Introducing Vasicek Model)"
-date: 2023-06-10
+date: 2024-08-10
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
 ---

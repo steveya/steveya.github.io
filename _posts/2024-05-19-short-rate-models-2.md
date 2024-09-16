@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Short Rate Models (Part 2: Simulating and Calibrating the Merton Model)"
-date: 2023-05-19
+date: 2024-05-19
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
 ---

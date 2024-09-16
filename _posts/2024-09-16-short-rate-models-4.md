@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Short Rate Models (Part 4: Simulating and Calibrating the Vasicek Model)"
-date: 2023-09-16
+date: 2024-09-16
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
 ---
