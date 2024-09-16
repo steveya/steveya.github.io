@@ -1,7 +1,7 @@
 ---
 layout: post
 title: WIP Teaching Kids Math - Arcsin Law (Part 2 - Intuition)
-date: 2024-08-06
+# date: 2024-08-06
 categories: [Teaching Kids Math]
 tags: [teaching-kids-math]
 ---
