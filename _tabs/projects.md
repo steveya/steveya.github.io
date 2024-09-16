@@ -31,7 +31,7 @@ I have been planning on writing a series on some of the interesting short-rate m
    - [Short Rate Models (Part 1: Introducing Merton's Model)](https://steveya.github.io/posts/short-rate-models-1/)
    - [Short Rate Models (Part 2: Simulating and Calibrating Merton's Model)](https://steveya.github.io/posts/short-rate-models-2/)
    - [Short Rate Models (Part 3: Introducing Vasicek Model)](https://steveya.github.io/posts/short-rate-models-3/)
-   - [WIP Short Rate Models (Part 4: Simulating and Calibrating Vasicek Model)](https://steveya.github.io/posts/short-rate-models-4/)
+   - [Short Rate Models (Part 4: Simulating and Calibrating Vasicek Model)](https://steveya.github.io/posts/short-rate-models-4/)
    - [WIP Short Rate Models (Part 5: Introduction to Affine Term-Structure Model)](https://steveya.github.io/posts/short-rate-models-5/)
    - [WIP Short Rate Models (Part 6: Pinning Down the Risk Premium - Kim-Orphanides (2008))](https://steveya.github.io/posts/short-rate-models-6/)
    - [WIP Short Rate Models (Part 7: How About Macro? Ang and Piazzesi (2003))](https://steveya.github.io/posts/short-rate-models-7/)
