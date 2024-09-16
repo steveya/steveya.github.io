@@ -292,11 +292,11 @@ As we proceed through the particle filtering algorithm, this initial diverse set
 
 For each time step, we use the current parameter estimates to predict the next state of the Ornstein-Uhlenbeck (OU) process. In the OU process, the transition density from one state to the next follows a Gaussian distribution:
 
-$$ X_t | X_{t-1}, \kappa, \theta, \sigma \sim \mathcal{N}(\mu_t, \Sigma_t) $$
+$$ r_t | r_{t-1}, \kappa, \theta, \sigma \sim \mathcal{N}(\mu_t, \Sigma_t) $$
 
 Where the mean and variance are given by:
 
-$$ \mu_t = X_{t-1}e^{-\kappa\Delta t} + \theta(1 - e^{-\kappa\Delta t}) $$
+$$ \mu_t = r_{t-1}e^{-\kappa\Delta t} + \theta(1 - e^{-\kappa\Delta t}) $$
 $$ \Sigma_t = \frac{\sigma^2}{2\kappa}(1 - e^{-2\kappa\Delta t}) $$
 
 These equations should look familiar from our earlier derivation of the Vasicek model's analytical solution. They are also the same as the likelihood function used in MLE.
@@ -319,13 +319,13 @@ In the next step (the update step), we'll use these predicted states to update t
 
 In the update step we adjust our belief about the parameters based on new observations. It involves updating the weights of our particles to reflect how well each particle's parameters explain the observed data. For each new observation, we update the weight of each particle based on the likelihood of the new observation given the parameters:
 
-$$ w_t^i \propto w_{t-1}^i \cdot p(X_t | X_{t-1}, \kappa_i, \theta_i, \sigma_i) $$
+$$ w_t^i \propto w_{t-1}^i \cdot p(r_t | r_{t-1}, \kappa_i, \theta_i, \sigma_i) $$
 
-Here, $$w_t^i$$ is the updated weight for particle $$i$$ at time $$t$$, $$w_{t-1}^i$$ is its previous weight, and $$p(X_t | X_{t-1}, \kappa_i, \theta_i, \sigma_i)$$ is the likelihood of observing the current short rate $$X_t$$ given the previous rate $$X_{t-1}$$ and the parameters of particle $$i$$.
+Here, $$w_t^i$$ is the updated weight for particle $$i$$ at time $$t$$, $$w_{t-1}^i$$ is its previous weight, and $$p(r_t | r_{t-1}, \kappa_i, \theta_i, \sigma_i)$$ is the likelihood of observing the current short rate $$r_t$$ given the previous rate $$r_{t-1}$$ and the parameters of particle $$i$$.
 
 The likelihood is computed using the probability density function of the normal distribution:
 
-$$ p(X_t | X_{t-1}, \kappa, \theta, \sigma) = \frac{1}{\sqrt{2\pi\Sigma_t}} \exp\left(-\frac{(X_t - \mu_t)^2}{2\Sigma_t}\right) $$
+$$ p(r_t | r_{t-1}, \kappa, \theta, \sigma) = \frac{1}{\sqrt{2\pi\Sigma_t}} \exp\left(-\frac{(r_t - \mu_t)^2}{2\Sigma_t}\right) $$
 
 Where $$\mu_t$$ and $$\Sigma_t$$ are the mean and variance of the transition density, as defined in the prediction step.
 
@@ -333,14 +333,14 @@ We implement this update process in two functions: `compute_likelihood` and `upd
 
 ```python
 @njit
-def compute_likelihood(x_prev, x_curr, kappa, theta, sigma, dt):
-    mean = x_prev * np.exp(-kappa * dt) + theta * (1 - np.exp(-kappa * dt))
+def compute_likelihood(r_prev, r_curr, kappa, theta, sigma, dt):
+    mean = r_prev * np.exp(-kappa * dt) + theta * (1 - np.exp(-kappa * dt))
     var = (sigma**2 / (2 * kappa)) * (1 - np.exp(-2 * kappa * dt))
-    return np.exp(-0.5 * ((x_curr - mean)**2 / var)) / np.sqrt(2 * np.pi * var)
+    return np.exp(-0.5 * ((r_curr - mean)**2 / var)) / np.sqrt(2 * np.pi * var)
 
 @njit
-def update(particles, weights, x_prev, x_curr, dt):
-    likelihoods = compute_likelihood(x_prev, x_curr, particles[:, 0], particles[:, 1], particles[:, 2], dt) # compute the likelihood of the new observation given the parameters of each particle
+def update(particles, weights, r_prev, r_curr, dt):
+    likelihoods = compute_likelihood(r_prev, r_curr, particles[:, 0], particles[:, 1], particles[:, 2], dt) # compute the likelihood of the new observation given the parameters of each particle
     weights *= likelihoods # update the weights by multiplying the likelihoods
     weights /= np.sum(weights) # renormalize the weights
     ... # continue to the next step
@@ -390,13 +390,13 @@ This method ensures that particles are selected proportionally to their weights 
 ```python
 
 @njit
-def update(particles, weights, x_prev, x_curr, dt):
+def update(particles, weights, r_prev, r_curr, dt):
     ... # continue from previous step
 
     if 1 / np.sum(weights**2) < len(particles) / 2:
         particles = weighted_resample(particles, weights)
         weights = np.ones(len(weights)) / len(weights)
-        particles = mcmc_move(particles, weights, x_prev, x_curr, dt)
+        particles = mcmc_move(particles, weights, r_prev, r_curr, dt)
     
     return particles, weights
 
@@ -440,7 +440,7 @@ In our implementation, the Metropolis-Hastings MCMC steps are specialized as fol
    We use a multivariate normal distribution centered at the current particle position, with an adaptive covariance matrix. This allows the proposal distribution to adjust to the shape of the target distribution, improving efficiency.
 
 2. Compute the acceptance ratio:
-   $$ \alpha = \min\left(1, \frac{p(X_t | X_{t-1}, \kappa', \theta', \sigma')}{p(X_t | X_{t-1}, \kappa, \theta, \sigma)}\right) $$
+   $$ \alpha = \min\left(1, \frac{p(r_t | r_{t-1}, \kappa', \theta', \sigma')}{p(r_t | r_{t-1}, \kappa, \theta, \sigma)}\right) $$
 
    The acceptance ratio compares the likelihood of the proposed state to the current state. If the proposed state is more likely (ratio > 1), we always accept it. If it's less likely, we may still accept it with some probability. This allows the algorithm to explore less likely but potentially important regions of the parameter space.
 
@@ -465,14 +465,14 @@ def adaptive_kernel(particles, weights):
     return h * cov
 
 @njit
-def mcmc_move(particles, weights, x_prev, x_curr, dt):
+def mcmc_move(particles, weights, r_prev, r_curr, dt):
     cov = adaptive_kernel(particles, weights)
     new_particles = np.empty_like(particles)
     for i in range(len(particles)):
         proposal = multivariate_normal(particles[i], cov)
         if proposal[0] > 0 and proposal[2] > 0:
-            log_prob_old = np.log(compute_likelihood(x_prev, x_curr, particles[i, 0], particles[i, 1], particles[i, 2], dt))
-            log_prob_new = np.log(compute_likelihood(x_prev, x_curr, proposal[0], proposal[1], proposal[2], dt))
+            log_prob_old = np.log(compute_likelihood(r_prev, r_curr, particles[i, 0], particles[i, 1], particles[i, 2], dt))
+            log_prob_new = np.log(compute_likelihood(r_prev, r_curr, proposal[0], proposal[1], proposal[2], dt))
             if np.log(np.random.random()) < log_prob_new - log_prob_old:
                 new_particles[i] = proposal
             else:
@@ -530,15 +530,15 @@ In our [next post](https://steveya.github.io/posts/short-rate-models-5/), we'll 
 ## Optional: Strong Convergence of the Euler-Maruyama Method Applied to the OU process
 In this section, we show that the Euler-Maruyama method has strong convergence of order 0.5 to the exact solution of the OU process.
 
-Let's first define what strong convergence of a discretization method means. A numerical method $$M$$ has **strong convergence of order $$\alpha$$** to the exact solution for a stochastic process $$X_t$$ if the expected absolute error satisfies 
+Let's first define what strong convergence of a discretization method means. A numerical method $$M$$ has **strong convergence of order $$\alpha$$** to the exact solution for a stochastic process $$r_t$$ if the expected absolute error satisfies 
 
 $$
 \begin{equation}
-\mathbb{E} \left[  \underset{0 \leq t \leq T}{\sup} \left| X_t - X_t^M \right| \right] = \mathcal{O}(\Delta t^{\alpha})
+\mathbb{E} \left[  \underset{0 \leq t \leq T}{\sup} \left| r_t - r_t^M \right| \right] = \mathcal{O}(\Delta t^{\alpha})
 \end{equation}
 $$
 
-where $$X_T$$ is the exact solution of the SDE and $$X_T^M$$ is the numerical approximation. As we have shown earlier, the Euler Maruyama (EM) discretization of the OU process gives the approximation
+where $$r_T$$ is the exact solution of the SDE and $$r_T^M$$ is the numerical approximation. As we have shown earlier, the Euler Maruyama (EM) discretization of the OU process gives the approximation
 
 $$
 \begin{equation}
