@@ -12,6 +12,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 ## Table of Contents
 
 1. [Vasicek Model](#vasicek-model)
+2. [Wrapping Up](#wrapping-up)
 
 ## Vasicek Model
 We continue our refresher series on the **short-rate models**. In the [previous post](https://steveya.github.io/posts/short-rate-models-2/), I introduced the Merton model and the Euler-Maruyama method to simulate it. Now we are ready to tackle slightly more complicated models! This post will discuss the Vasicek model, one of the earliest and most influential term structure models. It may seem like a small step from the Merton model, but the Vasicek model forms the backbone of many of the later extensions of the short-rate models.
@@ -196,5 +197,13 @@ While the carry/rolldown term $$\left(y_t - r_t\right)/\tau$$ is the same, the c
 
 Recall that in the Vasicek model, $$B\left(t, T\right) = \kappa^{-1}\left(1-\exp\left(-\kappa\tau\right)\right)$$, and as $$\tau$$ increases, $$B$$ tends to the constant $$1 / \kappa$$. Therefore both $$B^2/\tau$$ and $$B/\tau$$ tend to 0 as $$\tau$$ increases. Therefore, longer rates have diminishing volatility and convexity adjustment, and as the tenor increases, carry/rolldown become the dominant driver of the expected yield change.
 
-### Wrapping Up
-The Vasicek model added mean-reversion to the drift term, which limits the range in which the average short rate moves as the tenor goes up, driving down the volatility of the long rates. The volatility curve has to be downward sloping and tends to 0, whereas it is constant under the Merton model.
+## Wrapping Up
+The Vasicek model represents a significant leap forward in short-rate modeling by introducing mean-reversion to the drift term. This addition constrains the range of short-rate movements, offering a more realistic portrayal of interest rate behavior compared to the pure random walk of the Merton model.
+
+However, this features comes with its own set of challenges. The mean-reversion mechanism, while beneficial in many respects, also suppresses the long-rate volatility. This results in a downward-sloping volatility curve that approaches zero as tenor increases—a stark contrast to the Merton model's constant volatility. In this aspect, neither model accurately captures the volatility patterns observed in real markets.
+
+A further limitation of the Vasicek model is its assumption of constant short-rate volatility ($$\sigma$$), independent of the rate level $$r_t$$. This simplification diverges from empirical evidence, which suggests a more complex relationship between rates and volatility.
+
+To address these shortcomings, researchers developed more sophisticated models, such as the Cox-Ingersoll-Ross (CIR) model. While we won't delve into the specifics of the CIR model in this series, we will explore a broader framework in [Post 5](https://steveya.github.io/posts/short-rate-models-5/). This framework, known as the affine term structure model, encompasses the Merton, Vasicek, and CIR models as special cases, offering a more comprehensive approach to interest rate modeling.
+
+It's worth noting that the practical application of these models presents significant challenges, particularly in parameter estimation. We'll examine these difficulties in greater detail in our [next post](https://steveya.github.io/posts/short-rate-models-4/), shedding light on the complexities of implementing these theoretical models in real-world scenarios.

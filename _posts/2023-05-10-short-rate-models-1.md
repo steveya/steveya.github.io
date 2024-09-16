@@ -14,13 +14,15 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 1. [Introduction](#introduction)
 2. [Recap of Bond Pricing from Short Rate Models](#recap-of-bond-pricing-from-short-rate-models)
 3. [Merson's Model](#mertons-model-1973)
+4. [Wrapping Up](#wrapping-up)
+5. [Optional: Technical Definition of the Solution to SDE](#optional-technical-definition-of-the-solution-to-sde)
 
 ## Introduction
-Welcome to my refresher series on short-rate models, dear reader! These mathematical marvels are not just academic curiosities but crucial tools in finance. They are among the main workhorses of interest rate modelling, used in the ivory towers of academic research and by the fast-paced world of Wall Street desk quants. This refresher series aims to help you understand, formulate, and solve these models by deriving and implementing well-known versions of varying complexity and generality. Code snippets included in these posts (and more) can be found in the [Github repository](https://github.com/steveya/short-rate-models/notebook/merton_model.ipynb). The code library will evolve with the series as we build out more types of models and can exploit benefit from more abstraction.
+Welcome to my refresher series on short-rate models, dear reader! These mathematical marvels are not just academic curiosities but crucial tools in finance. They are among the main workhorses of interest rate modelling, used in the ivory towers of academic research and by the fast-paced world of Wall Street desk quants. This refresher series aims to help you understand, formulate, and solve these models by deriving and implementing well-known and newer models of varying complexity and generality. Code snippets included in this post (and more) can be found in the [Github repository](https://github.com/steveya/short-rate-models/notebook/merton_model.ipynb). The code library will evolve with the series as we build out more types of models and can exploit the benefits of more abstraction.
 
-Despite their seeming simplicity, short-rate models are incredibly versatile tools for modelling interest rates. The short rate is also known as  the instantaneous spot interest rate, which is the rate at which one can borrow money for an infinitesimally short period in the market. A short rate model specifies the evolution of the short rate according to a stochastic differential equation (SDE), which is then used to derive the price of a zero-coupon bond and other interest rate derivatives using the no-arbitrage principle. The wide array of stochastic processes one can articulate make the short rate models a highly versatile tool and a key component of many financial models and strategies. 
+Despite their seeming simplicity, short-rate models are incredibly versatile for modelling interest rates. The short rate is also known as the instantaneous spot interest rate, at which one can borrow money for an infinitesimally short period in the market. A short-rate model specifies the evolution of the short rate according to a stochastic differential equation (SDE). Using the no-arbitrage principle, we can then use its solution to derive the price of a zero-coupon bond and other interest-rate derivatives. The wide array of stochastic processes one can articulate makes the short-rate models a highly versatile tool and a key component of many financial models and strategies. 
 
-In this first post, we start with some preliminaries. These are the foundational concepts and tools we will need to understand and implement the short-rate models. We'll then go step-by-step to derive the solution of the short rates and the price of a zero-coupon bond for one of the simplest short-rate models, the Merton model. By the end of this post, we will have a good grasp of the basic concepts and tools needed to understand and implement the short-rate models.
+In this first post, we start with some preliminaries. These are the foundational concepts and tools we will need to understand and implement the short-rate models. We'll then go step-by-step to derive the solution of the short rates and the price of a zero-coupon bond for one of the simplest short-rate models: the Merton model. By the end of this post, we will have a good grasp of the basic concepts and tools needed to understand and implement the short-rate models.
 
 ## Recap of Bond Pricing from Short Rate Models
 Zero-coupon bonds (ZCB) form the foundation of term structure modelling. The price of a $$T$$-year ZCB at time $$t$$ ($$P(t, T)$$) is the risk-adjusted present value of 1-dollar in $$T$$-years. The (continuously compounded) yield-to-maturity (YTM) $$y(t, T)$$ at time $$t$$ is given by
@@ -43,7 +45,7 @@ $$y\left(t, T\right) = \frac{1}{T-t}\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$
 
 $$P\left(t, T\right) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]$$
 
-These fundamental relationships will be used to calculate the price and yield of ZCB from our specific short-rate process. Readers familiar with asset pricing will notice that the price of a ZCB is calculated with respect to the risk-neutral measure $$Q$$. We will not be concerned with risk-neutral and physical measures just yet. For the first 4 posts, we assume the risk-neutral in the context of bond pricing, and assume the physical measure in the context of short-rate simulation and parameter estimation. A fuller treatment will be postponed to [Post 5](https://steveya.github.io/posts/short-rate-models-5/) where we establish the relationship between the risk-neutral and physical measures.
+These fundamental relationships will be used to calculate the price and yield of ZCB using our specific short-rate process. Readers familiar with asset pricing will notice that the price of a ZCB is calculated with respect to the risk-neutral measure $$Q$$. We will not be concerned with risk-neutral and physical measures just yet. For the first four posts, we assume the risk-neutral measure in bond pricing and the physical measure in the context of short-rate simulation and parameter estimation. A fuller treatment will be postponed to [Post 5](https://steveya.github.io/posts/short-rate-models-5/), where we establish the relationship between the risk-neutral and physical measures.
 
 
 ## Merton's Model (1973)
@@ -71,7 +73,7 @@ The model assumes that the short rate follows a Gaussian process, allowing for p
 #### Equilibrium Short-Rate Model
 Merton's model belongs to a subclass of the short-rate model called the **equilibrium model**. This class of model cannot fit to the initial term structure exactly. This is because the yield curve generated by some short-rate models can assume only certain forms. There is another class of short-rate models called the **arbitrage-free model**. which allows both the drift $$\mu = \mu_t$$ and $$\sigma = \sigma_t$$ to depend on time. For the Merton model, if we let $$mu$$ to a deterministic function of time, we obtain the **Ho-Lee Model** that can fit the initial term structure exactly by varying $$\mu_t$$ deterministically over time.
 
-### Derivation of solution to the short rate model
+### Derivation of the solution to the short-rate model
 The short rate is assumed to follow the SDE:
 
 $$dr_t = \mu dt + \sigma dW^Q_t$$
@@ -80,11 +82,13 @@ The solution to the SDE used by the Merton model is given by
 
 $$r_t = r_s  + \mu (t-s) + \int_s^t \sigma dW^Q_u$$
 
-We can verify this solution satisfies the SDE by applying Itô's lemma to the solution. As a recap, the Itô's lemma applied to a function $$f(t, r_t)$$ of time and the short rate is given by
+We can verify this solution satisfies the SDE by applying Itô's lemma. As a refresher, Itô's lemma is a fundamental result in stochastic calculus. It determines how a function $$f(t, r_t)$$ evolves. It allows us to derive the SDE for $$f$$ given the SDE of $$r_t$$.
 
-$$df = \left[\frac{\partial f}{\partial t} + \mu\frac{\partial f}{\partial r} + \frac{1}{2}\sigma^2\frac{\partial^2 f}{\partial r^2}\right]dt + \sigma \frac{\partial f}{\partial r} dW_t$$
+Mathematically, if $$r_t = \mu(t, r_t)dt + \sigma(t, r_t) dW_t$$, Itô's lemma says that the dynamic of $$f$$ is
 
-To verify our solution, we apply Itô's lemma to the function $$f(t, r_t) = r_t$$:
+$$df(t, r_t) = \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial r_t} dr_t + \frac{1}{2}\sigma(t, r_t)^2\frac{\partial^2 f}{\partial r_t^2} dt$$
+
+To verify our solution, we apply Itô's lemma to the function $$f(t, r_t) = r_t$$ and expand to get
 
 $$dr_t = \left[\frac{\partial f}{\partial t} + \mu\frac{\partial f}{\partial r} + \frac{1}{2}\sigma^2\frac{\partial^2 f}{\partial r^2}\right]dt + \sigma \frac{\partial f}{\partial r} dW_t$$
 
@@ -94,7 +98,7 @@ $$dr_t = \mu dt + \sigma dW_t$$
 
 which is the same as the SDE of the short rate. 
 
-We will not be overly concerned with the technical definition of the solution to a stochastic differential equation, there are plenty of resources offering rigorous treatment of this topic. However, we will include more technical details in the optional section at the end of each post.
+We will not be overly concerned with the technical definition of the solution to a stochastic differential equation. There are plenty of resources offering rigorous treatment of this topic. However, we will include more technical details in the [optional section](#optional-technical-definition-of-the-solution-to-sde) at the end of each post.
 
 ### Derivation of the Bond Pricing in Merton's Model
 The price of a $$T$$-year ZCB is given by:
@@ -212,11 +216,11 @@ $$dy = \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\tau\sigma^2\right] dt + \sigma
 
 The drift term can be interpreted as the sum of the annualized carry/rolldown $$\left(y_t - r_t\right)/\tau$$ and the convexity adjustment term $$\frac{1}{2}\tau\sigma^2$$. The diffusion term is the volatility of the short rate $$\sigma$$, which is the same regardless of $$\tau$$. This is inconsistent with empirical observation: the short rates are much more volatile than long rates in general. For short-rate models that include mean-reversion, such as the Vasicek model, tend to have the opposite problem where long-rate volatility is too low. As we will see when we introduce the Vasicek model.
 
-### Wrapping Up
+## Wrapping Up
 While simplistic in its assumptions, Merton's model serves as an excellent starting point for understanding short-rate models in terms of technicality and historical development. It already exhibits some of the key features and limitations of short-rate models. In the [next post](https://steveya.github.io/posts/short-rate-models-2/), we'll review how to simulate short rates from $$\mu$$ and $$\sigma$$, as well as how to calibrate Merton's model to market observed short rates.
 
 
-### Optional: Technical Definition of the Solution to SDE
+## Optional: Technical Definition of the Solution to SDE
 This section is adapted from the [lecture notes](https://users.wpi.edu/~zzhang7/apma2811z/lec4.pdf)
 
 Let $$\mu(t, r_t)$$ and $$\sigma(t, r_t)$$ be the drift and diffusion terms of the SDE:

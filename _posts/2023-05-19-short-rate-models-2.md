@@ -12,12 +12,16 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 ## Table of Contents
 
-1. [Simulating Merton Model](#simulating-mertons-model)
-2. [Calibration to Market Observed Short Rates](#calibration-to-market-observed-short-rates)
+1. [Introduction](#introduction)
+2. [Simulating Merton Model](#simulating-mertons-model)
+3. [Calibration to Market Observed Short Rates](#calibration-to-market-observed-short-rates)
+4. [Wrapping Up](#wrapping-up)
 
+## Introduction
+Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the [previous post](https://steveya.github.io/posts/short-rate-models-1/). In this post, we will show how to simulate short rates from the Merton model and how to calibrate its parameters to market-observed short rates. Whereas the previous post deals with the mathematical aspects, this post deals with the computational ones. 
 
 ## Simulating Merton's Model
-We introduced the Merton short rate model in the [previous post](https://steveya.github.io/posts/short-rate-models-1/). We now show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of small time steps. It is a first-order numerical method for approximating stochastic differential equations (SDEs). As a recap, consider a general $$d$$-dimensional SDE of the form:
+We now show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of small time steps. It is a first-order numerical method for approximating stochastic differential equations (SDEs). As a refresher, consider a general $$d$$-dimensional SDE of the form:
 
 $$
 dX_t = a(X_t, t) dt + b(X_t, t) dW_t
@@ -79,25 +83,41 @@ def simulate_merton_short_rates(r0, mu, sigma, t, dt, seed=None):
     return times, rates
 ```
 
-The **Euler-Maruyama discretization** is only an approximation because it ignores errors from time aggregation. A more accurate way to discretize a continuous-time process is first to solve the stochastic differential equation
+The **Euler-Maruyama discretization** is only an approximation because it ignores errors from time aggregation. The error due to time aggregation arises because the Euler-Maruyama method assumes that the drift and diffusion terms remain constant over each discrete time step, which is generally not true for most stochastic processes.
 
-$$\int_0^t dr_s = \int_0^t \mu ds + \int_0^t \sigma dW_s$$
-
-then discretize according to this solution. 
-
-$$\Delta r_t = \int_0^{\Delta t} \mu \Delta t + \int_0^t \sigma \epsilon_t $$
-
-We call this more accurate method the **exact method for diecretization**. For the simple Merton model, the Euler-Maruyama discretization coincides with the more accurate discretization, but for a general stochastic process
+Consider a more general SDE:
 
 $$ dr_t = \mu(t, r_t) dt + \sigma(t, r_t) dW_t $$
 
-The term $$\int_0^{\Delta t} \mu(s, r_s) ds \neq \mu(t, r_t) \Delta t$$. However, the error from time aggregation is "small" for "well-behaved" processes.We will discuss this in greater detail in the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/). 
+The Euler-Maruyama discretization approximates this as:
 
+$$
+X_{t+\Delta t} \approx X_t + \mu(X_t, t)\Delta t + \sigma(X_t, t)\sqrt{\Delta t}Z_t
+$$
+
+where $$Z_t \sim N(0,1)$$.
+
+However, this approximation effectively assumes that $$\mu(X_s, s) \approx \mu(X_t, t)$$ and $$\sigma(X_s, s) \approx \sigma(X_t, t)$$ for all $$s \in [t, t+\Delta t]$$, which introduces an error.
+
+The true solution involves integrating over the interval:
+
+$$
+X_{t+\Delta t} = X_t + \int_t^{t+\Delta t} \mu(X_s, s)ds + \int_t^{t+\Delta t} \sigma(X_s, s)dW_s
+$$
+
+The difference between this true solution and the Euler-Maruyama approximation is the time aggregation error. We call the true solution the **exact method for discretization**.
+
+For simple processes like the Merton model, where $$\mu$$ and $$\sigma$$ are constant, the two methods coincide and this error is zero. However, for more complex models with state-dependent drift or diffusion terms, the term $$\int_0^{\Delta t} \mu(s, r_s) ds \neq \mu(t, r_t) \Delta t$$, and this error can be significant, especially when using larger time steps.
+
+Higher-order numerical schemes, such as the Milstein scheme or stochastic Runge-Kutta methods, can reduce this error by incorporating additional terms that account for the variation of $$\mu$$ and $$\sigma$$ over the time step. However, these methods are often more computationally intensive and may require the calculation of additional derivatives.
+
+In practice, the choice between Euler-Maruyama and higher-order methods involves a trade-off between computational simplicity and accuracy, depending on the specific requirements of the problem at hand. Nevertheless, the error from time aggregation is "small" for "well-behaved" stochastic processes. We will discuss this in greater detail in the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/). 
+ 
 Using $$\mu = 0.02$$, $$\sigma = 0.02$$ and $$ r_0 = 0.05$$, Figure 1 shows a simulated path of the short rate process.
 
 ![Figure 1. A Simulated Path of the Merton Short Rate Process](/assets/img/post_assets/short-rate-models-2/merton_short_rate_simulation.png)
 
-## Simulating Short Rates, Bond Yields and Term Structure from the Merton Model
+### Simulating Short Rates, Bond Yields and Term Structure from the Merton Model
 
 In the [previous post](https://steveya.github.io/posts/short-rate-models-1/), we derived the price of a ZCB from the short-rate model in two different ways: 1. directly solve the SDE, and 2. guess the form of the solution as $$A(t, T) \exp (-B(t, T) r_t)$$ and solve for $$A$$ and $$B$$. As it turns out, most common short-rate models have bond price solutions in the form of $$A(t, T) \exp (-B(t, T) r_t)$$, so we will use this fact when we implement our short-rate models. Below is a simple Python implementation of the ZCB price and yields.
 
@@ -122,34 +142,32 @@ We use the above formula to simulate the 5-, 10-, and 30-year yields using the a
 
 ![Figure 2. A Simulated Path of the Merton Long Rate Processes](/assets/img/post_assets/short-rate-models-2/merton_long_rate_simulation.png)
 
-We can see that the three long rates are all parallel shifts of one another and the short rates. The simple Merton model is capable of generating only parallel shifts. We can also generate its term structure with some combination of $$\mu$$ and $$\sigma$$, and Figure 3 shows the results.
+We can see that the three long rates are all parallel shifts of one another and the short rates. The simple Merton model is capable of generating only parallel shifts. We can also simulate its term structure with some combination of $$\mu$$ and $$\sigma$$, and Figure 3 shows the results.
 
 ![Figure 3. Term Structures from the Merton Model](/assets/img/post_assets/short-rate-models-2/merton_term_structure.png)
 
-Unsurprisingly, when $$\sigma$$ is small relative to $$\mu$$, the constant drift term dominates the term structure and is upward-sloping, almost in a straight line. When $$\sigma$$ is large, the long end of the term structure is dominated by the volatility term and is downward sloping due to the convexity effects.
+When $$\sigma$$ is small relative to $$\mu$$, the constant drift term dominates the term structure and is upward-sloping, almost in a straight line. When $$\sigma$$ is large, the long end of the term structure is dominated by the volatility term and is downward sloping due to the convexity effects.
 
-Next, we will discuss calibrating the model to short rates, which differs from calibrating the yield curves. The main difference stems from the short rates being observed under the physical measure, whereas the bond yields are observed under the risk-neutral measure. The parameters we calibrated from the short rates are those under the physical measure and cannot be used to price longer-term bonds.
+Now that we can simulate the short rates from the Merton model, we can learn about the reverse process, that is, the process of inferring the model parameters from the simulated short rates or market-observed short rates. This process is known as calibration. Note that we are yet not talking about calibrating the model to the cross-sectional yield curve. For a short-rate model, only the short-rates are assumed to be observed under the physical measure, and all longer-tenor yields are observed under the risk-neutral measure. The parameters we calibrated from the market-observed short rates are those under the physical measure and cannot be used directly to price longer-term bonds. Said differently, the parameters calibrated from the yield curves are those under the risk-neutral measure and cannot be used to forecast the short rates.
 
 ## Calibration to Market Observed Short Rates
-There are at least two ways to calibrate Merton's model to market-observed short rates: maximum likelihood estimation (MLE) and the general method of moments (GMM). There are other ways, but we will cover only the MLE, which is by far the most popular method for estimating the short-rate model parameters from market data.
+There are at least two ways to calibrate Merton's model to market-observed short rates: `maximum likelihood estimation (MLE)` and the `general method of moments (GMM)`. We will cover only MLE method in this post. As MLE is taught in most introductory statistics and econometrics courses, we will only provide a brief review of the method then move on to its application to the Merton model.
 
 ### Brief Review of the Maximum Likelihood Estimation
 
-#### Principles of Maximum Likelihood Estimation
+Maximum Likelihood Estimation (MLE) is a method for estimating the parameters of a statistical model given observations. The idea is to find the model parameters that make the observed data most probable. 
 
-Maximum Likelihood Estimation (MLE) is a method for estimating the parameters of a statistical model given observations. Its fundamental principle is finding the parameter values that make the observed data most probable.
+The MLE can be calculated in the following steps:
 
-The critical steps in MLE are:
-
-1. Define the likelihood function, the probability of observing the data given the model parameters.
-2. Take the logarithm of the likelihood function to obtain the log-likelihood.
+1. Derive the likelihood function, the probability of observing the data given model parameters. The likelihood function is the product of the probabilities of observing each data point, as data is assumed to be independent and identically distributed.
+2. Take the logarithm of the likelihood function to obtain the log-likelihood, this turns the product of many small probabilities into a sum of logarithms of these probabilities, which is easier to compute.
 3. Find the parameter values that maximize the log-likelihood function.
 
 The likelihood function is often denoted as $$L\left(\theta \vert x\right)$$, where $$\theta$$ represents the model parameters and $$x$$ represents the observed data.
 
-#### Deriving the Likelihood for the Merton Model
+### Deriving the Likelihood for the Merton Model
 
-To derive the likelihood function for the Merton model, we need to consider the probability distribution of the changes in the short rate. As we derived above, under the Merton model, these changes follow a normal distribution:
+To derive the likelihood function for the Merton model, we need to consider the probability distribution of the changes in the short rate. As we derived above, under the Merton model, these changes are independent and identically normal distributed:
 
 $$
 \delta r_t = r_\left(t+Δt\right) - r_t \sim N\left(\mu\delta t, \sigma^2\delta t\right)
@@ -173,7 +191,7 @@ $$
 ln(L(\mu, \sigma \vert r_0, ..., r_n)) = \sum_{i=1}^n \left[-ln(\sigma) - 0.5ln\left(2\pi\delta t_i\right) - \left(r_i - r_{i-1} - \mu\delta t_i\right)^2 / (2\sigma^2\delta t_i)\right]
 $$
 
-#### Maximizing the Log-Likelihood
+### Maximizing the Log-Likelihood
 
 To find the maximum likelihood estimates, we can find the values of $$\mu$$ and $$\sigma$$ that maximize this log-likelihood function. We take the partial derivatives of the log-likelihood with respect to $$\mu$$ and $$\sigma$$, setting them to zero, and solving the resulting equations to get an analytical solution. 
 
@@ -217,11 +235,9 @@ We generate 5000 paths of the short rate process using the same $$\mu = 0.02$$, 
 
 We can see immediately that the MLE estimates of $$\mu$$, while unbiased, have a high variance. This is consistent with the observation that the mean of a distribution is a lot harder to estimate precisely than the variance. This problem is even more pronounced for the more complicated processes, such as the Vasicek model. We will discuss this in length in the [next next post](https://steveya.github.io/posts/short-rate-models-4/) on calibrating the Vasicek model. 
 
-### Wrapping Up
+## Wrapping Up
 We now know the Merton model, a simple one-factor short-rate equilibrium model that is also an affine term-structure model. In the previous [post](https://steveya.github.io/posts/short-rate-models-1/), we derived the price of a ZCB from the short-rate model and wrote a simple Python implementation of the ZCB price and yields.
 
 In this post, We also learn how to simulate short rates with this model and how to calibrate its parameters from market-observed short rates. 
 
 We learn that the ZCB prices and yields are computed under the risk-neutral measure and calibrated to market-observed short rates yield parameters under the physical measure. However, the relationship of the parameters under these two measures still needs to be clarified, which prevents us from calibrating the model to market-observed yield curves. We will cover these topics much later, after introducing another popular short-rate model, the Vasicek model, in the [next post](https://steveya.github.io/posts/short-rate-models-3/).
-
-
