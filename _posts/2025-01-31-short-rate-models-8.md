@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "WIP - Short Rate Models (Part 8: Short-Rate and Taylor Rule. Smith and Taylor (2008))"
-date: 2023-09-02
+#date: 2023-09-02
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
 ---
