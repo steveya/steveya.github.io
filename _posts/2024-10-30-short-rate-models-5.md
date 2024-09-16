@@ -1,13 +1,14 @@
 ---
 layout: post
 title: "WIP - Short Rate Models (Part 5: Introduction to Affine Term-Structure Model)"
-date: 2023-09-02
+#date: 2024-10-30
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
 ---
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
+This is a work-in-progress post, please stay tuned.
 
 ## Table of Contents
 
