@@ -43,10 +43,10 @@ I have been planning on writing a series on some of the interesting short-rate m
 ## Nowcasting
 My step-by-step guide to implement a nowcasting model (based on dynamic factor model framework) from scratch in Python.
  - Blog Post: 
-   - [WIP Roll Your Own Nowcasts (Part 1)]()
+   - [WIP Roll Your Own Nowcasts (Part 1)](https://steveya.github.io/posts/roll-your-own-nowcast-1/)
 
 ## Teaching Kids Math
 I have been teaching kids math ever since I have kids. I want to start writing down some of them and made them into videos if possible. I need a lot of help with the video part...
  - Blog Post: 
-   - [WIP Teaching Kids Math - Arcsin Law (Part 1: Examples))]()
-   - [WIP Teaching Kids Math - Arcsin Law (Part 2: Intuition))]()
+   - [WIP Teaching Kids Math - Arcsin Law (Part 1: Examples)](https://steveya.github.io/posts/teaching-kids-math-arcsin-law-1/)
+   - [WIP Teaching Kids Math - Arcsin Law (Part 2: Intuition)](https://steveya.github.io/posts/teaching-kids-math-arcsin-law-2/)
