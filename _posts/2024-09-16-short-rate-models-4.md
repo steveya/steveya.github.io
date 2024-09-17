@@ -247,9 +247,15 @@ Particle filtering is computationally more expensive, so code and execution opti
 
 The first step in our particle filtering algorithm is to initialize a set of $$N$$ particles. For our Vasicek model, each particle represents a possible parameter set $$(\kappa, \theta, \sigma)$$. These particles are sampled from our prior distributions of each parameter of the Vasicek model:
 
-$$ \kappa_i \sim \text{Gamma}(a_\kappa, b_\kappa) $$
-$$ \theta_i \sim \mathcal{N}(\mu_\theta, \sigma_\theta^2) $$
-$$ \sigma_i \sim \text{Gamma}(a_\sigma, b_\sigma) $$
+$$
+\begin{equation}
+\begin{aligned}
+\kappa_i &\sim \text{Gamma}(a_\kappa, b_\kappa) \\
+\theta_i &\sim \mathcal{N}(\mu_\theta, \sigma_\theta^2) \\
+\sigma_i &\sim \text{Gamma}(a_\sigma, b_\sigma) \\
+\end{aligned}
+\end{equation}
+$$
 
 1. $$\kappa$$ (mean reversion speed): We use a Gamma distribution because $$\kappa$$ must be positive. Moreover, from the histogram of MLE estimates for $$\kappa$$ above, the Gamma distribution looks to be a decent approximation.
 
@@ -288,8 +294,14 @@ $$ r_t | r_{t-1}, \kappa, \theta, \sigma \sim \mathcal{N}(\mu_t, \Sigma_t) $$
 
 Where the mean and variance are given by:
 
-$$ \mu_t = r_{t-1}e^{-\kappa\Delta t} + \theta(1 - e^{-\kappa\Delta t}) $$
-$$ \Sigma_t = \frac{\sigma^2}{2\kappa}(1 - e^{-2\kappa\Delta t}) $$
+$$
+\begin{equation}
+\begin{aligned}
+\mu_t &= r_{t-1}e^{-\kappa\Delta t} + \theta(1 - e^{-\kappa\Delta t}) \\
+\Sigma_t &= \frac{\sigma^2}{2\kappa}(1 - e^{-2\kappa\Delta t}) \\
+\end{aligned}
+\end{equation}
+$$
 
 These equations should look familiar from our earlier derivation of the Vasicek model's analytical solution. They are also the same as the likelihood function used in MLE.
 
@@ -311,9 +323,9 @@ In the next step (the update step), we will use these predicted states to update
 
 In the update step, we adjust our belief about the parameters based on new observations. It involves updating the weights of our particles to reflect how well each particle's parameters explain the observed data. For each new observation, we update the weight of each particle based on the likelihood of the new observation given the parameters:
 
-$$ w_t^i \propto w_{t-1}^i \cdot p(r_t | r_{t-1}, \kappa_i, \theta_i, \sigma_i) $$
+$$ w_t^i \propto w_{t-1}^i \cdot p(r_t \vert r_{t-1}, \kappa_i, \theta_i, \sigma_i) $$
 
-Here, $$w_t^i$$ is the updated weight for particle $$i$$ at time $$t$$, $$w_{t-1}^i$$ is its previous weight, and $$p(r_t | r_{t-1}, \kappa_i, \theta_i, \sigma_i)$$ is the likelihood of observing the current short rate $$r_t$$ given the previous rate $$r_{t-1}$$ and the parameters of particle $$i$$.
+Here, $$w_t^i$$ is the updated weight for particle $$i$$ at time $$t$$, $$w_{t-1}^i$$ is its previous weight, and $$p(r_t \vert r_{t-1}, \kappa_i, \theta_i, \sigma_i)$$ is the likelihood of observing the current short rate $$r_t$$ given the previous rate $$r_{t-1}$$ and the parameters of particle $$i$$.
 
 The likelihood is the probability density function of the normal distribution:
 
@@ -426,11 +438,13 @@ The Metropolis-Hastings algorithm works by constructing a Markov chain with the 
 We implement the Metropolis-Hastings steps as follows:
 
 1. Propose a new particle position:
+
    $$ (\kappa', \theta', \sigma') \sim \mathcal{N}((\kappa, \theta, \sigma), \Sigma_{\text{adaptive}}) $$
 
    We use a multivariate normal distribution centred at the current particle position with an adaptive covariance matrix. The distribution of the proposed particle would be similar to the target distribution.
 
 2. Compute the acceptance ratio:
+
    $$ \alpha = \min\left(1, \frac{p(r_t | r_{t-1}, \kappa', \theta', \sigma')}{p(r_t | r_{t-1}, \kappa, \theta, \sigma)}\right) $$
 
    The acceptance ratio compares the likelihood of the proposed state to the current state. If the proposed state is more likely (ratio > 1), we always accept it. If it is less likely, we may still accept it with some probability. This way, the algorithm can explore less likely but potentially important regions of the parameter space.
