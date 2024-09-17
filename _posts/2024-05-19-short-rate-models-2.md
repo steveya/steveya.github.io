@@ -14,7 +14,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 1. [Introduction](#introduction)
 2. [Simulating Merton Model](#simulating-mertons-model)
-3. [Calibration to Market Observed Short Rates](#calibration-to-market-observed-short-rates)
+3. [Model Estimation](#model-estimation)
 4. [Wrapping Up](#wrapping-up)
 
 ## Introduction
@@ -150,7 +150,7 @@ When $$\sigma$$ is small relative to $$\mu$$, the constant drift term dominates 
 
 Now that we can simulate the short rates from the Merton model, we can learn about the reverse process, that is, the process of inferring the model parameters from the simulated short rates or market-observed short rates. This process is known as calibration. Note that we are yet not talking about calibrating the model to the cross-sectional yield curve. For a short-rate model, only the short-rates are assumed to be observed under the physical measure, and all longer-tenor yields are observed under the risk-neutral measure. The parameters we calibrated from the market-observed short rates are those under the physical measure and cannot be used directly to price longer-term bonds. Said differently, the parameters calibrated from the yield curves are those under the risk-neutral measure and cannot be used to forecast the short rates.
 
-## Calibration to Market Observed Short Rates
+## Model Estimation
 There are at least two ways to calibrate Merton's model to market-observed short rates: `maximum likelihood estimation (MLE)` and the `general method of moments (GMM)`. We will cover only MLE method in this post. As MLE is taught in most introductory statistics and econometrics courses, we will only provide a brief review of the method then move on to its application to the Merton model.
 
 ### Brief Review of the Maximum Likelihood Estimation

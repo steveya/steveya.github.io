@@ -13,7 +13,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 1. [Recap](#recap)
 2. [Simulating Vasicek Model](#simulating-vasicek-model)
-3. [Calibration to Market Observed Short Rates](#calibration-to-market-observed-short-rates)
+3. [Model Estimation](#model-estimation)
 
 The code for this post is on [my Github](https://github.com/steveya/short-rate-models/blob/main/notebook/vasicek_model.ipynb).
 
@@ -132,7 +132,7 @@ Using $$r_0 = 0.05$$, $$\kappa = 0.15$$, $$\theta = 0.03$$, $$\sigma = 0.01$$, $
 ![Figure 1. Simulated Paths Using the Euler and the Exact Methods](/assets/img/post_assets/short-rate-models-4/discretization_comp.png)
 
 
-## Calibration to Market Observed Short Rates
+## Model Estimation
 Now that we can simulate short rates from the Vasicek model with specific OU process parameters. We can ask ourselves if we can estimate or recover these parameters from the simulated short rates. The OU process's parameters can be estimated using traditional methods such as the `maximum likelihood estimation (MLE)`. There are other techniques based on regression and GMM, but we will not go through them here. Interested readers are referred [here](https://hudsonthames.org/caveats-in-calibrating-the-ou-process/) and other online resource. We also use this opportunity to introduce the `quasi maximum likelihood estimation (QMLE)`, which relates the likelihood function to discretization schemes in our context. After these introductions, we demonstrate through simulations that the MLE parameter estimates from finite samples are problematic and discuss the source of the problem. We then introduce a particle filtering method to estimate the model parameters that empirically improve the parameter estimation.
 
 ### Maximum Likelihood Estimation
