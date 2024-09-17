@@ -15,15 +15,13 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 2. [Simulating Vasicek Model](#simulating-vasicek-model)
 3. [Calibration to Market Observed Short Rates](#calibration-to-market-observed-short-rates)
 
-Code for this post can be found on [my Github](https://github.com/steveya/short-rate-models/blob/main/notebook/vasicek_model.ipynb).
+The code for this post is on [my Github](https://github.com/steveya/short-rate-models/blob/main/notebook/vasicek_model.ipynb).
 
 ## Recap
 
-In our [previous post](https://steveya.github.io/posts/short-rate-models-3/) we introduced the Vasicek model, exploring how it uses the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short rates. We then derived solutions for both the OU process and bond prices. Building on this foundation, we now turn our attention to more practical aspects: simulating the Vasicek model and estimating its parameters from observed short rates.
+In our [previous post](https://steveya.github.io/posts/short-rate-models-3/), we introduced the Vasicek model that used the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short rates. We then derived solutions for both the OU process and bond prices. We can now focus on the more practical aspects: simulating the Vasicek model and estimating its parameters from market-observed short rates.
 
-Given the extensive study of the OU process in finance and physics literature, our focus will be on introducing other important concepts within the context of the Vasicek model. By introducing how we simulate from the OU process, we discuss the more theoretical aspects of the Euler-Maruyama discretization. The different discretization also give rises to the distinction between the likelihood function and the quasi-likelihood function, leading us to the section of parameter estimation using the maximum likelihood method. We'll then address the limitation of the maximum likelihood estimator on finite samples. To overcome these issues, we'll introduce an alternative method—particle filtering—which has shown promising results in our empirical studies.
-
-I really enjoyed writing this post, as it helps me learn a lot of things along the way, and I hope it helps you in some way too.
+Given the extensive study of the OU process in finance and physics literature, we will focus on introducing other essential concepts related to simulating and estimating the Vasicek model. When introducing how we simulate the OU process, we also discuss the convergence of the Euler-Maruyama discretization to the exact discretization. The different discretization is also the distinquishment between the likelihood and the quasi-likelihood function, leading us to the section on parameter estimation using the maximum likelihood methods. We will then demonstrate and discuss the limitation of the maximum likelihood estimator on finite samples. To overcome these issues, we introduce a particle filtering estimation method which has shown promising results in our empirical studies.
 
 ## Simulating Vasicek Model
 We can simulate the Vasicek short-rate process directly applying the Euler-Maruyama discretization to its stochastic differential equation (SDE). This method can introduce time-aggregation error when the discretization step $$\Delta t$$ is large. A better approach when $$\Delta t$$ is large is to apply Euler-Maruyama discretization to the solution of the SDE. More specifically, if we discretize the Vasicek SDE, we get
@@ -34,7 +32,7 @@ $$
 \end{equation}
 $$
 
-and if we discretize the solution of the Vasicek SDE, as derived from [Post 2](https://steveya.github.io/posts/short-rate-models-2/)
+and if we discretize the solution of the Vasicek SDE, as derived from [Post 3](https://steveya.github.io/posts/short-rate-models-3/)
 
 $$
 \begin{equation}
@@ -50,10 +48,9 @@ $$
 \end{equation}
 $$
 
-As $$\kappa$$ or $$\Delta t$$ gets larger, the difference between $$\kappa \Delta t$$ and $$\left(1 - e^{-\kappa \Delta t}\right)$$ also grows larger; similarly, the difference between $$\sigma \sqrt{\Delta t}$$ and $$\sqrt{\frac{ \sigma^2 \left(1 - e^{-2 \kappa \Delta t} \right) }{ 2 \kappa } }$$ also grows larger. In practice, these differences are insignificant, and we will demonstrate this by comparing the simulated path of the OU process under the Euler-Maruyama method and the exact method. In the [optional section](#optional-strong-convergence-of-the-euler-maruyama-method-applied-to-the-ou-process) below we will show that the differences are bounded by $$\mathcal{O}(\Delta t^2)$$. 
+As $$\kappa$$ or $$\Delta t$$ gets larger, the difference between $$\kappa \Delta t$$ and $$\left(1 - e^{-\kappa \Delta t}\right)$$ also grows larger; similarly, the difference between $$\sigma \sqrt{\Delta t}$$ and $$\sqrt{\frac{ \sigma^2 \left(1 - e^{-2 \kappa \Delta t} \right) }{ 2 \kappa } }$$ also grows larger. In practice, these differences are insignificant, and we will demonstrate this by comparing the simulated path of the OU process under the Euler-Maruyama method and the exact method. In the [optional section](#optional-strong-convergence-of-the-euler-maruyama-method-applied-to-the-ou-process) below, we will show that the differences are bounded by $$\mathcal{O}(\Delta t^2)$$. 
 
-In the following figure, we can illustrate this by plotting the same short rate path generated from these two methods, `simulate_vasicek_short_rates_euler` and `simulate_vasicek_short_rates_exact`.
-
+The following figure illustrates this by plotting the same short rate path generated from these two methods, `simulate_vasicek_short_rates_euler` and `simulate_vasicek_short_rates_exact`.
 
 ```python
 def simulate_vasicek_short_rates_euler(r0, kappa, theta, sigma, t, dt, seed=None):
@@ -129,13 +126,14 @@ def simulate_vasicek_short_rates_exact(r0, kappa, theta, sigma, t, dt, seed=None
 
 
 ```
+
 Using $$r_0 = 0.05$$, $$\kappa = 0.15$$, $$\theta = 0.03$$, $$\sigma = 0.01$$, $$t = 5$$, $$\Delta t = 1 / 252$$, we plot the simulated short rate paths from the two methods below in Figure 1 top panel and their differences in the bottom panel.
 
 ![Figure 1. Simulated Paths Using the Euler and the Exact Methods](/assets/img/post_assets/short-rate-models-4/discretization_comp.png)
 
 
 ## Calibration to Market Observed Short Rates
-Now that we can simulate short rates from the Vasicek model with specific OU process parameters. We can ask ourselves if we can estimate or recover these parameters from the simulated short rates. For the OU process, its parameters can be estimated using traditional methods such as the `maximum likelihood estimation (MLE)`. There are a few other similar techniques based on regression and GMM, but we will not go through them here. Interested readers are referred [here](https://hudsonthames.org/caveats-in-calibrating-the-ou-process/) and other online resource. Wealso use this opportunity to introduce the `quasi maximum likelihood estimation (QMLE)`, which in our context relates the likelihood function to discretization schemes. After these introductions, we demonstrate through simulations that the MLE parameter estimates from finite samples are rather problematic, and discuss the source of the problem. We then introduce a particle filtering method to estimate the model parameters that empirically improves the parameter estimation.
+Now that we can simulate short rates from the Vasicek model with specific OU process parameters. We can ask ourselves if we can estimate or recover these parameters from the simulated short rates. The OU process's parameters can be estimated using traditional methods such as the `maximum likelihood estimation (MLE)`. There are other techniques based on regression and GMM, but we will not go through them here. Interested readers are referred [here](https://hudsonthames.org/caveats-in-calibrating-the-ou-process/) and other online resource. We also use this opportunity to introduce the `quasi maximum likelihood estimation (QMLE)`, which relates the likelihood function to discretization schemes in our context. After these introductions, we demonstrate through simulations that the MLE parameter estimates from finite samples are problematic and discuss the source of the problem. We then introduce a particle filtering method to estimate the model parameters that empirically improve the parameter estimation.
 
 ### Maximum Likelihood Estimation
 Just as we did for the Merton model, we can derive the log-likelihood function for the Vasicek model by noting that conditional on the short rate at time $$t$$, the short rate at time $$t+\Delta t$$ is Gaussian distributed. 
@@ -149,10 +147,9 @@ $$
 \end{equation}
 $$
 
-We can calculate $$p \left(r_i \vert r_{i-1}\right)$$ analytically, in which the conditional distribution of $$r_{i+1}$$ given $$r_i$$ is Gaussian with mean $$e^{-\kappa \Delta t} r_{i-1} + \left(1 - e^{-\kappa \Delta t}\right)\theta + r_{i-1}$$ and variance $$\frac{\sigma^2 \left(1 - e^{-2\kappa \Delta t}\right)}{2\kappa}$$. Alternatively, it is also tempting to just use the Euler-Maruyama method to discretize the OU process, then calculate the likelihood as Gaussian distributed with mean $$\kappa\left(\theta - r_{i-1}\right) \Delta t + r_{i-1}$$ and variance $$\sigma^2$$. Since the second likelihood function is an approximation to the first, it is called the quasi log-likelihood function, and methods based on maximizing the quasi log-likelihood function are called quasi maximum likelihood estimation (QMLE). As with our simulation study in the previous section, where we bound the difference between the two discretization methods; it is easy to show that the difference between the mean and variance used in MLE and QMLE for the Vasicek model also converge as $$\Delta t \to 0$$. At $$\Delta t = 1/252$$ (a typical value for financial applications), the difference is negligible and MLE and QMLE yield very similar results. 
+We can calculate $$p \left(r_i \vert r_{i-1}\right)$$ analytically, in which the conditional distribution of $$r_{i+1}$$ given $$r_i$$ is Gaussian with mean $$e^{-\kappa \Delta t} r_{i-1} + \left(1 - e^{-\kappa \Delta t}\right)\theta + r_{i-1}$$ and variance $$\frac{\sigma^2 \left(1 - e^{-2\kappa \Delta t}\right)}{2\kappa}$$. Alternatively, it is also tempting to just use the Euler-Maruyama method to discretize the OU process, then calculate the likelihood as Gaussian distributed with mean $$\kappa\left(\theta - r_{i-1}\right) \Delta t + r_{i-1}$$ and variance $$\sigma^2$$. Since the second likelihood function approximates the first, it is called the quasi-log-likelihood function, and methods based on maximizing the quasi-log-likelihood function are called quasi-maximum likelihood estimation (QMLE). As with our simulation study in the previous section, where we bound the difference between the two discretization methods, it is easy to show that the difference between the mean and variance used in MLE and QMLE for the Vasicek model also converge as $$\Delta t \to 0$$. The difference is negligible at $$\Delta t = 1/252$$ (a typical value for financial applications), and MLE and QMLE yield similar results. 
 
-For general stochastic process, the conditional distribution might not have a closed form. In such case, we can approximate the likelihood function numerically. In these cases, we need to recognize that QMLE is not consistent at any $$\Delta t$$ and its variance does not converge to the Cramér-Rao lower bound. 
-
+The conditional distribution might not have a closed form for a more complex stochastic process. In such a case, we can approximate the likelihood function numerically. In these cases, we need to recognize that QMLE is not consistent at any $$\Delta t$$, and its variance does not converge to the Cramér-Rao lower bound. 
 
 Below is the Python implementation of the MLE and QMLE for the Vasicek model.
 
@@ -215,40 +212,40 @@ def calibrate_vasicek_mle(rates, dt):
 
 ```
 
-We generate 5000 paths of the short rate process using the same $$\kappa = 0.15$$, $$\theta = 0.03$$, $$\sigma = 0.01$$ and $$ r_0 = 0.05$$ for $$t=5$$ years, and apply the maximum likelihood to estimate the parameters from each path. Figure 3, 4, and 5 show the distribution of the MLE estimates for $$\kappa$$, $$\theta$$, and $$\sigma$$ against their true values. The $$\kappa$$ and $$\theta$$ median estimates from the 5-year simulated samples are quite different from the true values, and the variance of the estimates are quite large. For the $$\kappa$$ estimates, we also include the estimates from the QMLE. The results show that for the Vasicek model, MLE and QMLE are very similar. 
+We generate 5000 paths of the short rate process using the same $$\kappa = 0.15$$, $$\theta = 0.03$$, $$\sigma = 0.01$$ and $$ r_0 = 0.05$$ for $$t=5$$ years, and apply the maximum likelihood to estimate the parameters from each path. Figures 3, 4, and 5 show the distribution of the MLE estimates for $$\kappa$$, $$\theta$$, and $$\sigma$$ against their true values. The $$\kappa$$ and $$\theta$$ median estimates from the 5-year simulated samples are quite different from the true values, and the estimates' variance is quite large. For the $$\kappa$$ estimates, we also include the estimates from the QMLE. The results show that MLE and QMLE are very similar for the Vasicek model. 
 
 ![Figure 3. MLE Estimates for the Vasicek Model Parameters ($$\kappa$$)](/assets/img/post_assets/short-rate-models-4/kappa_mle_bootstrap.png)
 ![Figure 4. MLE Estimates for the Vasicek Model Parameters ($$\theta$$)](/assets/img/post_assets/short-rate-models-4/theta_mle_bootstrap.png)
 ![Figure 5. MLE Estimates for the Vasicek Model Parameters ($$\sigma$$)](/assets/img/post_assets/short-rate-models-4/sigma_mle_bootstrap.png)
 
 ### Why is it so hard to estimate the OU process parameters?
-There are several reasons estimating the OU process parameters $$\kappa$$ and $$\theta$$ from finite sample data is challenging.
+Estimating the OU process parameters $$\kappa$$ and $$\theta$$ from finite sample data is challenging for several reasons
 
-- Identification: for the $$\kappa$$ estimates, when true $$\kappa$$ is small, the OU process behaves almost like a random walk, meaning the process is barely mean-reverting within a finite sample. In this situation, the term $$e^{-\theta \Delta t}$$ approaches 1, making it difficult to distinguish the contribution of $$\kappa$$ and $$\theta$$. This causes the parameters to be poorly identified in small samples. Moreover, looking at the log-likelihood function, we notice that $$\kappa$$ and $$\theta$$ show up together in the term $$\theta \left(1 - e^{-\kappa \Delta t}\right)$$, and for small sample sizes, there is high correlation between these parameters: a slight change in $$\theta$$ can often be compensated by a change in $$\kappa$$. As a result, the likelihood surface can be flat or ill-conditioned for both $$\kappa$$ and $$\theta$$, making it hard for MLE to find the true values.
+- Identification: For the $$\kappa$$ estimates, when true $$\kappa$$ is small, the OU process behaves almost like a random walk, meaning the process is barely mean-reverting within a finite sample. In this situation, the term $$e^{-\theta \Delta t}$$ approaches 1, making it difficult to distinguish the contribution of $$\kappa$$ and $$\theta$$. Moreover, looking at the log-likelihood function, we notice that $$\kappa$$ and $$\theta$$ show up together in the term $$\theta \left(1 - e^{-\kappa \Delta t}\right)$$, and for small sample sizes, there is high correlation between these parameters: a slight change in $$\theta$$ can often be compensated by a change in $$\kappa$$. As a result, the likelihood surface can be flat or ill-conditioned for both $$\kappa$$ and $$\theta$$, making it hard for MLE to find the true values.
 
-- Bias: In addition, in short finite samples, the process may not have enough time to revert significantly to its mean, making it difficult to observe the true behavior of the mean-reversion process. If the sample path has not had enough realizations of reversion toward $$theta$$, the estimates of $$\theta$$ will be biased toward the initial value of the process. This is particularly problematic for processes that start far from $$\theta$$. Since the estimate of $$\kappa$$ depends critically on $$\theta$$. If one is estimated poorly (e.g., due to small sample size or near-unit root behavior), then the other will also be inaccurate. This compounding effect makes $$\theta$$ hard to estimate independently when $$\kappa$$ is small or uncertain. The MLE $$\kappa$$ estimate is biased. The bias occurs because the likelihood function is nonlinear in $$\kappa$$, and small-sample variability causes the MLE to overestimate $$\kappa$$. This bias becomes significant when the sample size is small or when $$\kappa \Delta t$$ is small (i.e., for slow mean-reversion).
+- Bias: In addition, in short, finite samples, the process may not have enough time to revert significantly to its mean, making it difficult to observe the true behaviour of the mean-reversion process. If the sample path has not had enough realizations of reversion toward $$theta$$, the estimates of $$\theta$$ will be biased toward the initial value of the process. This bias is particularly problematic for processes that start far from $$\theta$$. Since the estimate of $$\kappa$$ depends critically on $$\theta$$. If one is estimated poorly (e.g., due to a small sample size or near-unit root behaviour), the other will also be inaccurate. This compounding effect makes $$\theta$$ hard to estimate independently when $$\kappa$$ is small or uncertain. The MLE $$\kappa$$ estimate is biased. The bias occurs because the likelihood function is non-linear in $$\kappa$$, and small-sample variability causes the MLE to overestimate $$\kappa$$. This bias becomes significant when the sample size is small or when $$\kappa \Delta t$$ is small (i.e., for slow mean-reversion).
 
 - Variance: the variance term in the likelihood function is inversely proportional to $$\kappa$$. As $$\kappa \to 0$$, the variance of the process becomes very large, leading to a larger confidence interval and higher uncertainty in the parameter estimates. 
 
-Next we propose a particle filtering method to estimate the parameters of the Vasicek model. It helps address some of the problems mentioned above, and empirically improves the parameter estimation. Let's go!
+Next, we propose a particle filtering method to estimate the parameters of the Vasicek model. This method helps address some of the abovementioned problems and empirically improves the parameter estimation. Let's go!
 
 ### Particle Filtering
 
-I once was working on calibrating the Constant Elasticity of Variance (CEV) model to the volatility surfaces. At first, I estimate the two parameters of the model by minimizing the mean squared error (MSE) between the observed and model volatility surfaces. However, this approach makes the estimated parameters unstable. Upon further examination, we found that not only was the objective function non-linear, it was also flat and the model parameters are poorly identified: there was a non-linear region in the parameter space that all give low MSE and have multiple local minima. After some brainstorming, we used the particle filter to estimate the parameters. This allows us to track multiple minimas over time and take their averages as our parameter estimates. This has resulted in much smoother estimates over time.
+I once worked on calibrating the Constant Elasticity of Variance (CEV) model to daily volatility surfaces. At first, I estimate the two parameters of the model by minimizing the mean squared error (MSE) between the observed and model volatility surfaces. However, this approach makes the estimated parameters unstable. Upon further examination, we found that not only was the objective function non-linear, but it was also flat, and the model parameters were poorly identified. There was a non-linear region in the parameter space that all gave low MSE and had multiple local minima. After some brainstorming, we used the particle filter to estimate the parameters. The particle filtering also allows us to track multiple minimas over time and take their averages as our parameter estimates. The resulting parameter estimates were much smoother over time.
 
-We have similar challenges with calibrating the Vasicek model: the nonlinearity (in finite samples), the flat likelihood function, and the poor identification of the parameters ($$\kappa$$ and $$\theta$$). Therefore I suspect that the particle filtering can help improve the parameter estimation. Particle filtering, a sequential Monte Carlo method, addresses these challenges by approximating the posterior distribution of the parameters given the observations. We briefly go over each steps of our implementation of the particle filtering method below. These steps are
+We have similar challenges with calibrating the Vasicek model: the nonlinearity (in finite samples), the flat likelihood function, and the poor identification of the parameters ($$\kappa$$ and $$\theta$$). Therefore, we suspect that particle filtering can help improve the parameter estimation. Particle filtering, a sequential Monte Carlo method, addresses these challenges by approximating the posterior distribution of the parameters given the observations. Below, we briefly review each step of implementing the particle filtering method. These steps are
 
 1. Initialization
 2. Prediction
 3. Update
 4. Resampling
-5. MCMC Move
+5. MCMC
 
-Particle filtering is computationally more expensive so code and execution optimization is necessary. We use Numba to JIT compile our functions and that means some key functions from scipy need to be rewritten.
+Particle filtering is computationally more expensive, so code and execution optimization is necessary. We use Numba to JIT compile our functions, and that means some functions from `scipy` need to be rewritten.
 
 #### 1. Initialization
 
-The first step in our particle filtering algorithm is to initialize a set of $$N$$ particles. Each particle represents a possible parameter set $$(\kappa, \theta, \sigma)$$ for our Vasicek model. These particles are sampled from our prior distributions of each parameter of the Vasicek model:
+The first step in our particle filtering algorithm is to initialize a set of $$N$$ particles. For our Vasicek model, each particle represents a possible parameter set $$(\kappa, \theta, \sigma)$$. These particles are sampled from our prior distributions of each parameter of the Vasicek model:
 
 $$ \kappa_i \sim \text{Gamma}(a_\kappa, b_\kappa) $$
 $$ \theta_i \sim \mathcal{N}(\mu_\theta, \sigma_\theta^2) $$
@@ -256,13 +253,13 @@ $$ \sigma_i \sim \text{Gamma}(a_\sigma, b_\sigma) $$
 
 1. $$\kappa$$ (mean reversion speed): We use a Gamma distribution because $$\kappa$$ must be positive. Moreover, from the histogram of MLE estimates for $$\kappa$$ above, the Gamma distribution looks to be a decent approximation.
 
-2. $$\theta$$ (long-term mean): We use a Normal distribution as $$\theta$$ can theoretically take any real value. In practice, it's often close to the average observed short rate.
+2. $$\theta$$ (long-term mean): We use a Normal distribution as $$\theta$$ can theoretically take any real value. In practice, it is often close to the average observed short rate.
 
 3. $$\sigma$$ (volatility): Like $$\kappa$$, $$\sigma$$ must be positive, so we again use a Gamma distribution.
 
-The specific parameters of these distributions ($$a_\kappa$$, $$b_\kappa$$, $$\mu_\theta$$, $$\sigma_\theta$$, $$a_\sigma$$, $$b_\sigma$$) should be chosen based on prior knowledge or preliminary analysis of the data. In our implementation, we used some reasonable default values, but these can be adjusted as needed. For example, we can use the sample mean and standard deviation to set the parameters of the Normal distribution for $$\theta$$.
+The specific parameters of these distributions ($$a_\kappa$$, $$b_\kappa$$, $$\mu_\theta$$, $$\sigma_\theta$$, $$a_\sigma$$, $$b_\sigma$$) should be chosen based on prior knowledge or preliminary analysis of the data. In our implementation, we used some reasonable default values, which can be adjusted as needed. For example, we can use the sample mean and standard deviation to set the parameters of the Normal distribution for $$\theta$$.
 
-Along with the particles, we initialize a set of weights. Initially, these weights are set to be uniform, giving each particle equal probability. As we process more data, these weights will be updated to reflect how well each particle explains the observed short rates.
+Along with the particles, we initialize their weights to be uniformly distributed, giving each particle equal probability. As we process more data, these weights will be updated to reflect how well each particle explains the observed short rates.
 
 In our code:
 
@@ -279,13 +276,13 @@ def initialize_particles(num_particles):
 
 ```
 
-It's worth noting the contrast between this initialization and that of maximum likelihood estimation (MLE). In MLE, we typically start with a single set of parameter estimates and iteratively refine them. Here, we begin with a diverse set of parameter combinations, allowing us to explore the parameter space more thoroughly. This approach is particularly beneficial when dealing with complex, potentially multimodal likelihood surfaces, where MLE might get stuck in local optima.
+We can compare and contrast the initialization of the particle filtering and the maximum likelihood estimation (MLE). In MLE, we typically start with a single set of parameter estimates and iteratively refine them. Here, we begin with a diverse set of parameter combinations, allowing us to explore the parameter space more thoroughly. This approach is particularly beneficial when dealing with complex, potentially multimodal likelihood surfaces, where MLE might get stuck in local optima.
 
-As we proceed through the particle filtering algorithm, this initial diverse set of particles will be refined based on their ability to explain the observed data, eventually converging towards the most probable parameter distributions.
+As we proceed through the particle filtering algorithm, this initial diverse set of particles will be refined based on their ability to explain the observed data, eventually converging toward the most probable parameter distributions.
 
 #### 2. Prediction
 
-For each time step, we use the current parameter estimates to predict the next state of the Ornstein-Uhlenbeck (OU) process. In the OU process, the transition density from one state to the next follows a Gaussian distribution:
+We use the current parameter estimates for each time step to predict the short rate in the next period. In the OU process, the transition density from one state to the next follows a Gaussian distribution:
 
 $$ r_t | r_{t-1}, \kappa, \theta, \sigma \sim \mathcal{N}(\mu_t, \Sigma_t) $$
 
@@ -306,23 +303,23 @@ def ou_transition(x, kappa, theta, sigma, dt):
     return np.random.normal(mean, np.sqrt(var))
 ```
 
-It is important to note that while this function returns a single sample, in the context of particle filtering, we'll be applying this transition to each particle. This allows us to propagate our entire set of parameter estimates forward in time, maintaining the diversity of our particle population.
+It is important to note that while this function returns a single sample, we will apply this transition to each particle in the context of particle filtering. This step propagates our entire set of parameter estimates forward in time, maintaining the diversity of our particle population.
 
-In the next step (the update step), we'll use these predicted states to update the weights of our particles based on how well they match the observed data. This back-and-forth between prediction and update is at the heart of the particle filtering algorithm, allowing us to sequentially refine our parameter estimates as we process more data.
+In the next step (the update step), we will use these predicted states to update the weights of our particles based on how well they match the observed data. This back-and-forth between prediction and update is at the heart of the particle filtering algorithm, allowing us to refine our parameter estimates sequentially as we process more data.
 
 #### 3. Update
 
-In the update step we adjust our belief about the parameters based on new observations. It involves updating the weights of our particles to reflect how well each particle's parameters explain the observed data. For each new observation, we update the weight of each particle based on the likelihood of the new observation given the parameters:
+In the update step, we adjust our belief about the parameters based on new observations. It involves updating the weights of our particles to reflect how well each particle's parameters explain the observed data. For each new observation, we update the weight of each particle based on the likelihood of the new observation given the parameters:
 
 $$ w_t^i \propto w_{t-1}^i \cdot p(r_t | r_{t-1}, \kappa_i, \theta_i, \sigma_i) $$
 
 Here, $$w_t^i$$ is the updated weight for particle $$i$$ at time $$t$$, $$w_{t-1}^i$$ is its previous weight, and $$p(r_t | r_{t-1}, \kappa_i, \theta_i, \sigma_i)$$ is the likelihood of observing the current short rate $$r_t$$ given the previous rate $$r_{t-1}$$ and the parameters of particle $$i$$.
 
-The likelihood is computed using the probability density function of the normal distribution:
+The likelihood is the probability density function of the normal distribution:
 
 $$ p(r_t | r_{t-1}, \kappa, \theta, \sigma) = \frac{1}{\sqrt{2\pi\Sigma_t}} \exp\left(-\frac{(r_t - \mu_t)^2}{2\Sigma_t}\right) $$
 
-Where $$\mu_t$$ and $$\Sigma_t$$ are the mean and variance of the transition density, as defined in the prediction step.
+where $$\mu_t$$ and $$\Sigma_t$$ are the mean and variance of the transition density, as defined in the prediction step.
 
 We implement this update process in two functions: `compute_likelihood` and `update`:
 
@@ -346,7 +343,7 @@ This update step marks a significant departure from traditional Maximum Likeliho
 
 1. Distribution vs. Point Estimate: In MLE, we iteratively refine a single set of parameters to maximize the likelihood. In particle filtering, we maintain a distribution of parameter sets (particles) and their associated probabilities (weights).
 
-2. Full Posterior Representation: The weights of the particles represent the full posterior distribution of the parameters given the observed data. This provides a richer view of the parameter space compared to the point estimate from MLE.
+2. Full Posterior Representation: The particle weights represent the parameters' full posterior distribution given the observed data. This provides a richer view of the parameter space compared to the point estimate from MLE.
 
 3. Sequential Update: Particle filtering allows for sequential updating as new data arrives, making it well-suited for online estimation problems. MLE typically requires recomputation using all available data.
 
@@ -354,16 +351,15 @@ This update step marks a significant departure from traditional Maximum Likeliho
 
 This approach allows us to capture the uncertainty in our parameter estimates and potentially explore multiple regions of high likelihood in the parameter space simultaneously. As we process more data, particles with parameters that consistently explain the observations well will gain more weight, while those that perform poorly will become less influential.
 
-
 #### 4. Resampling
 
-After several iterations, many particles may end up with negligible weights, effectively reducing the number of particles contributing to the estimation. This phenomenon, known as particle degeneracy, can lead to poor approximations of the posterior distribution. Resampling is a crucial step that addresses this problem. 
+After several iterations, many particles may end up with negligible weights, effectively reducing the number of particles contributing to the estimation. This phenomenon, known as particle degeneracy, can lead to poor approximations of the posterior distribution. Resampling is a way to address this problem. 
 
-To determine when to resample, we use the concept of effective sample size (ESS). The ESS is an estimate of how many particles are effectively contributing to the approximation:
+To determine when to resample, we measure the effective sample size (ESS) of our particles. The ESS is an estimate of how many particles are effectively contributing to the approximation:
 
 $$ N_{\text{eff}} = \frac{1}{\sum_{i=1}^N (w_t^i)^2} $$
 
-Where $$N$$ is the total number of particles and $$w_t^i$$ is the normalized weight of particle $$i$$ at time $$t$$. The ESS ranges from 1 (when one particle has all the weight) to $$N$$ (when all particles have equal weights).
+where $$N$$ is the total number of particles and $$w_t^i$$ is the normalized weight of particle $$i$$ at time $$t$$. The ESS ranges from 1 (when one particle has all the weight) to $$N$$ (when all particles have equal weights).
 
 We trigger resampling when the ESS falls below a certain threshold, typically half the number of particles:
 
@@ -371,7 +367,7 @@ $$ N_{\text{eff}} < \frac{N}{2} $$
 
 This condition balances the need to maintain particle diversity with the computational cost of frequent resampling.
 
-When resampling is triggered, we use a method called systematic resampling. This method is efficient and ensures that particles with higher weights are more likely to be selected. Here's how it works:
+When resampling is triggered, we use a method called systematic resampling. This efficient method ensures that particles with higher weights are more likely to be selected. It is implemented as follows:
 
 1. Compute the cumulative sum of weights.
 2. Generate a random starting point $$u_0 \sim U(0, \frac{1}{N})$$.
@@ -389,14 +385,14 @@ def update(particles, weights, r_prev, r_curr, dt):
     ... # continue from previous step
 
     if 1 / np.sum(weights**2) < len(particles) / 2:
-        particles = weighted_resample(particles, weights)
+        particles = systematic_resample(particles, weights)
         weights = np.ones(len(weights)) / len(weights)
-        particles = mcmc_move(particles, weights, r_prev, r_curr, dt)
+        particles = mcmc(particles, weights, r_prev, r_curr, dt)
     
     return particles, weights
 
 @njit
-def weighted_resample(particles, weights):
+def systematic_resample(particles, weights):
     N = len(weights)
     indices = np.zeros(N, dtype=np.int64)
     C = np.cumsum(weights) # compute the cumulative sum of the weights  
@@ -414,53 +410,49 @@ def weighted_resample(particles, weights):
 
 ```
 
-After resampling, we reset the weights to be uniform and apply the Markov-Chain Monte Carlo (MCMC)(discussed in the next section) to introduce additional diversity among the resampled particles. However, resampling also introduces some variance into the estimation process, so we only resample when necessary (as determined by the ESS.) In short, we follow resampling with an MCMC to reintroduce diversity among the particles.
+If the algorithm stops here, many particles would have the same values after a few resamples because resampling does not introduce any new particles; it simply selects particles with high weights more often, and we end up with many particles of the same value. To circumvent this, we apply the Markov-Chain Monte Carlo (MCMC)(discussed in the next section) to introduce additional diversity among the resampled particles. 
 
 #### 5. Markov-Chain Monte Carlo
 
-Markov Chain Monte Carlo (MCMC) is a class of algorithms for sampling from a probability distribution. We use MCMC in particle filtering to improve particle diversity and exploration of the parameter space. Specifically, we apply a Metropolis-Hastings MCMC step, which is a widely used MCMC algorithm.
+[Markov Chain Monte Carlo](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) (MCMC) is a class of algorithms primarily used for sampling from complex or high-dimensional probability distributions based on Markov chains. It can improve particle diversity and exploration of the parameter space. Specifically, we apply a Metropolis-Hastings algorithm to resample from the empirical (target) distribution.
 
-The Metropolis-Hastings algorithm works by constructing a Markov chain that has the desired distribution as its equilibrium distribution. It does this through a series of accept/reject steps:
+The Metropolis-Hastings algorithm works by constructing a Markov chain with the desired distribution as its equilibrium distribution. It does this through a series of accept/reject steps:
 
 1. Start with an initial state (in our case, the current particle).
 2. Propose a new state according to some proposal distribution.
 3. Calculate the probability of accepting the new state.
 4. Accept or reject the new state based on this probability.
 
-In our implementation, the Metropolis-Hastings MCMC steps are specialized as follows.
+We implement the Metropolis-Hastings steps as follows:
 
 1. Propose a new particle position:
    $$ (\kappa', \theta', \sigma') \sim \mathcal{N}((\kappa, \theta, \sigma), \Sigma_{\text{adaptive}}) $$
 
-   We use a multivariate normal distribution centered at the current particle position, with an adaptive covariance matrix. This allows the proposal distribution to adjust to the shape of the target distribution, improving efficiency.
+   We use a multivariate normal distribution centred at the current particle position with an adaptive covariance matrix. The distribution of the proposed particle would be similar to the target distribution.
 
 2. Compute the acceptance ratio:
    $$ \alpha = \min\left(1, \frac{p(r_t | r_{t-1}, \kappa', \theta', \sigma')}{p(r_t | r_{t-1}, \kappa, \theta, \sigma)}\right) $$
 
-   The acceptance ratio compares the likelihood of the proposed state to the current state. If the proposed state is more likely (ratio > 1), we always accept it. If it's less likely, we may still accept it with some probability. This allows the algorithm to explore less likely but potentially important regions of the parameter space.
+   The acceptance ratio compares the likelihood of the proposed state to the current state. If the proposed state is more likely (ratio > 1), we always accept it. If it is less likely, we may still accept it with some probability. This way, the algorithm can explore less likely but potentially important regions of the parameter space.
 
 3. Accept the proposal with probability $$\alpha$$:
+   We generate a random number between 0 and 1. If it is less than $$\alpha$$, we accept the proposed state; otherwise, we keep the current particle.
 
-   We generate a random number between 0 and 1. If it's less than $$\alpha$$, we accept the proposed state; otherwise, we keep the current state.
-
-The adaptive covariance $$\Sigma_{\text{adaptive}}$$ is computed using Scott's rule:
-
-$$ \Sigma_{\text{adaptive}} = h^2 \cdot \text{Cov}(\text{particles}) $$
-$$ h = \left(\frac{4}{N(d+2)}\right)^{\frac{1}{d+4}} $$
-
-Where $$N$$ is the number of particles as before and $$d$$ is the dimension of the parameter space. This adaptive scheme allows the proposal distribution to adjust to the shape of the target distribution as we gather more information about it through our particles.
-
-These functions are implemented in our `adaptive_kernel` and `mcmc_move` methods:
+The adaptive covariance $$\Sigma_{\text{adaptive}}$$ is computed using the [kernel-density estimate using Gaussian kernels](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html). We reimplemented here to be compatible with Numba. This adaptive scheme allows the proposal distribution to adjust to the shape of the target distribution as we gather more information about it through our particles.
+We implemented this idea in our `adaptive_kernel` and `mcmc` functions:
 
 ```python
 @njit
 def adaptive_kernel(particles, weights):
+    # reimplementation of 
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html
     cov = weighted_cov(particles, weights)
-    h = (4 / (len(particles) * (2 + 3))) ** (1/5)
+    d = cov.shape[0]
+    h = (4 / (len(particles) * (2 + d))) ** (1/(d+4))
     return h * cov
 
 @njit
-def mcmc_move(particles, weights, r_prev, r_curr, dt):
+def mcmc(particles, weights, r_prev, r_curr, dt):
     cov = adaptive_kernel(particles, weights)
     new_particles = np.empty_like(particles)
     for i in range(len(particles)):
@@ -477,13 +469,13 @@ def mcmc_move(particles, weights, r_prev, r_curr, dt):
     return new_particles
 ```
 
+The `mcmc` function proposes new positions for each particle, accepting or rejecting based on the Metropolis-Hastings criterion. We use log probabilities to avoid numerical underflow and ensure κ and σ remain positive. The condition `proposal[0] > 0 and proposal[2] > 0` ensures that we only consider valid proposals where κ and σ are positive, as required by the Vasicek model.
 
-
-The `mcmc_move` function proposes new positions for each particle, accepting or rejecting based on the Metropolis-Hastings criterion. We use log probabilities to avoid numerical underflow and ensure κ and σ remain positive. The condition `proposal[0] > 0 and proposal[2] > 0` ensures that we only consider valid proposals where κ and σ are positive, as required by the Vasicek model.
+The MCMC step replaces some particles with higher likelihoods, making the particle filtering more efficient at approximating the target distribution.
 
 #### Tying It All Together
 
-The complete particle filtering algorithm for calibrating the Vasicek model is implemented in two main functions:
+The `calibrate_vasicek_particle_filter` runs the complete particle filtering algorithm that calibrates the Vasicek model:
 
 ```python
 @njit
@@ -500,32 +492,31 @@ def calibrate_vasicek_particle_filter(data, dt, num_particles=1000):
     return estimate(particles, weights)
 ```
 
-We compute the parameter estimates as the weighted average of all the values. We can also try other estimates, such as the weighted median or the mode. We will leave that to interested readers yourselves. 
+In the `estimate` function, we compute the parameter estimates as the weighted average of all the values. We can also try other estimates, such as the weighted median or the mode, but we will leave that to interested readers. 
 
 
 ### Comparison
-Phew... after all that, let's compare the particle filter with maximum likelihood estimation. We repeat our previous experiement: simulate 5000 paths of the 5-year of short rate under the Vasicek model, and compare the estimated $$\kappa$$ from the two methods. The histograms below show the estimated $$\kappa$$ from the two methods. The mode of their respective distribution is plotted against the true value. 
+After all that, let us compare the results of particle filtering to those of the MLE. We repeat our previous experiment: simulate 5000 paths of the 5-year short rate under the Vasicek model and compare the estimated $$\kappa$$ from the two methods. The histograms below show the estimated $$\kappa$$ from MLE and particle filtering. Figure 6 plots the mode of their respective distribution against the true value. 
 
 ![Figure 6. Comparison of MLE and particle filter estimates of $$\kappa$$](/assets/img/post_assets/short-rate-models-4/kappa_estimates_comp.png)
 
-We see that the distribution of the particle filter estimate is much less dispersed than that of the MLE. The mode of the particle filter estimate is also much closer to the true value than the MLE estimate. 
+We see that the particle filter estimate's distribution is much less dispersed than that of the MLE. Its mode is also much closer to the true value than the MLE estimate's. 
 
 ## Wrapping Up and Looking Ahead
-In this post, we delved deep into the practical aspects of the Vasicek model, focusing on simulation and calibration techniques. We explored two methods for simulating the Vasicek short-rate process: the Euler-Maruyama discretization and the exact method. While these methods yield slightly different results, we demonstrated that their differences are negligible for commonly used discretization step sizes.
+In this post we cover the more practical aspects of the Vasicek model, focusing on simulation and estimation techniques. We explored two methods for simulating the Vasicek short-rate process: the Euler-Maruyama discretization and the exact method. While these methods yield slightly different results, we demonstrated that their differences are negligible for commonly used discretization step sizes and showed that the Euler-Maruyama discretization converge strongly to the exact solution.
 
-The challenge of parameter estimation for the Vasicek model became evident as we examined the maximum likelihood estimation (MLE) method. Our simulation study revealed significant biases and large variances in the MLE estimates, particularly for the mean-reversion parameter $$\kappa$$. These issues stem from the complex interplay between the model parameters and the finite sample sizes typically available in practice.
+The challenge of estimating the Vasicek model parameters became evident as we examined the maximum likelihood estimation (MLE) results. Our simulation study revealed significant biases and large variances in the MLE estimates, particularly for the mean-reversion parameter $$\kappa$$. These issues stem from the complex interplay between the model parameters and the finite sample sizes typically available in practice.
 
-To address these challenges, we introduced a particle filtering approach. This method showed promising results, producing more stable and accurate parameter estimates compared to MLE. The particle filter's ability to maintain multiple hypotheses and sequentially update parameter estimates makes it well-suited for the complexities of the Vasicek model.
+To address these challenges, we introduced a particle filtering approach and present a detailed implementation. This method showed promising results as it produces more stable and accurate parameter estimates than the MLE. The particle filter's ability to maintain multiple hypotheses and sequentially update parameter estimates makes it well-suited for online and adaptive situations we often desire in practice.
 
-There are a lot more we can do for both the Vasicek model and the particle filter. For example, we can take the paths of the particles and compute a time series of parameter estimates. If the parameters are stable (validated using simulated data for example) we can apply the model to real-world data, analyze the behaviour of each parameter in different economic regimes, and draw conclusion about how macro varialbe impact variables like $$\kappa$$ or $$\theta$$.
+There is a lot more we can do for both the Vasicek model and the particle filter. For example, we can take the paths of the particles and compute a time series of parameter estimates. If the parameters are stable (validated using simulated data, for example), we can apply the model to real-world data, analyze the behaviour of each parameter in different economic regimes, and draw conclusions about how macro variables impact variables like $$\kappa$$ or $$\theta$$.
 
-
-In our [next post](https://steveya.github.io/posts/short-rate-models-5/), we'll broaden our perspective by introducing the affine term structure model, a general framework that encompasses both the Merton and Vasicek models as special cases. This will provide a unified approach to understanding and comparing different short-rate models, setting the stage for more advanced applications in term-structure modelling.
+In our [next post](https://steveya.github.io/posts/short-rate-models-5/), we will broaden our perspective by introducing the affine term structure model, a general framework that encompasses both the Merton and Vasicek models as special cases. The affine term structure model provides a unified approach to understanding and comparing different short-rate models, setting the stage for more advanced applications in term-structure modelling.
 
 ## Optional: Strong Convergence of the Euler-Maruyama Method Applied to the OU process
-In this section, we show that the Euler-Maruyama method has strong convergence of order 0.5 to the exact solution of the OU process.
+In this section, we show that the Euler-Maruyama method has a strong convergence of order 0.5 to the exact solution of the OU process.
 
-Let's first define what strong convergence of a discretization method means. A numerical method $$M$$ has **strong convergence of order $$\alpha$$** to the exact solution for a stochastic process $$r_t$$ if the expected absolute error satisfies 
+Let us first define what strong convergence of a discretization method means. A numerical method $$M$$ has **strong convergence of order $$\alpha$$** to the exact solution for a stochastic process $$r_t$$ if the expected absolute error satisfies 
 
 $$
 \begin{equation}
@@ -589,7 +580,7 @@ $$
 \end{equation}
 $$
 
-The third part is the error from the diffusion term, and has a normal distribution with mean 0 and variance $$\sigma^2 \left(\frac{1 - e^{-2\kappa \Delta t}}{2\kappa} - \Delta t \right)$$. The variance can be simplified as
+The third part is the error from the diffusion term and has a normal distribution with mean 0 and variance $$\sigma^2 \left(\frac{1 - e^{-2\kappa \Delta t}}{2\kappa} - \Delta t \right)$$. The variance can be simplified as
 
 $$
 \begin{equation}
@@ -632,7 +623,7 @@ $$
 \end{equation}
 $$
 
-Here we introduce the a version of [Gronwall's inequality](https://math.stackexchange.com/questions/4090462/gronwall-lemma-for-system-of-linear-differential-inequalities), which is a useful tool to bound the solution of a differential or difference equations. It states that if $$f$$ is a non-negative function and satisfies $$\frac{d}{dt} f(t) \leq a_1 f(t) + a_0$$ for all $$t$$, then
+Here we introduce a version of [Gronwall's inequality](https://math.stackexchange.com/questions/4090462/gronwall-lemma-for-system-of-linear-differential-inequalities), which is a useful tool to bound the solution of a differential or difference equations. It states that if $$f$$ is a non-negative function and satisfies $$\frac{d}{dt} f(t) \leq a_1 f(t) + a_0$$ for all $$t$$, then
 
 $$
 \begin{equation}
@@ -654,7 +645,7 @@ $$
 \begin{equation}
 \begin{aligned}
 \mathbb{E} \left[ |e_{n+1}|^2 \right] &\leq \left(1 - 2 \kappa \Delta t\right) \mathbb{E} \left[ |e_n|^2 \right] + C_1 \Delta t^2 \\
-&\Longrightarrow \mathbb{E} \left[ |e_{n+1}|^2  - |e_{n}|^2 \right] \leq \left(- 2 \kappa \Delta t\right) \mathbb{E} \left[ |e_n|^2 \right] + C_1 \Delta t^2 \\
+&\Longrightarrow \mathbb{E} \left[ |e_{n+1}|^2 - |e_{n}|^2 \right] \leq \left(- 2 \kappa \Delta t\right) \mathbb{E} \left[ |e_n|^2 \right] + C_1 \Delta t^2 \\
 &\Longrightarrow \mathbb{E} \left[ |e_{n}|^2 \right] \leq \mathbb{E} \left[ |e_{0}|^2 \right] e^{-2 \kappa \Delta t n} + \frac{C_1 \Delta t^2}{2 \kappa\Delta t} \left(e^{-2 \kappa \Delta t n} - 1\right) \\
 &\Longrightarrow \mathbb{E} \left[ |e_{n}|^2 \right] \leq \mathbb{E} \left[ |e_{0}|^2 \right] e^{-2 \kappa \Delta t n} + C_2 \Delta t \\
 \end{aligned}
