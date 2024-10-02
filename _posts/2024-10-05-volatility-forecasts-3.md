@@ -72,7 +72,7 @@ we just need to constrain the scalar $$W_x$$ to be between 0 and 1. Substituting
 
 $$\sigma_t^2 = (1 - W_x) \sigma_{t-1}^2 + W_x r_{t-1}^2$$
 
-which is exactly the same formula as in the ES model where $$W_x = \alpha$$. Therefore, another way to generalize the ES model is to simply use a RNN model that replaces the restriction that current forecast $$h_t = \sigma_t^2$$ being a weighted average of current input $$X_t = r_{t-1}^2$$ and past forecast $$h_{t-1} = \sigma_{t-1|^2$$ with a more flexible non-linear function.
+which is exactly the same formula as in the ES model where $$W_x = \alpha$$. Therefore, another way to generalize the ES model is to simply use a RNN model that replaces the restriction that current forecast $$h_t = \sigma_t^2$$ being a weighted average of current input $$X_t = r_{t-1}^2$$ and past forecast $$h_{t-1} = \sigma_{t-1}^2$$ with a more flexible non-linear function.
 
 
 ## From STES to Gated Recurrent Unit (GRU)

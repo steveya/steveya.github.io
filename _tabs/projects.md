@@ -13,6 +13,7 @@ It was a rabbit hole that I accidentally got myself into.
  - Blog Post: 
    - [Volatility Forecasts (Part 1 - ES vs STES Model)](https://steveya.github.io/posts/volatility-forecast-1/)
    - [Volatility Forecasts (Part 2 - XGBoost-STES)](https://steveya.github.io/posts/volatility-forecast-2/)
+   - [Volatility Forecasts (Part 3 - Connection with Neural Network Models)](https://steveya.github.io/posts/volatility-forecast-3/)
  - Notebook: [volatility-forecast](https://github.com/steveya/volatility-forecast/blob/main/notebook/stes_volatility_forecast.ipynb)
  - WIP GitHub Repository: [volatility-forecast](https://github.com/steveya/volatility-forecast)
 
