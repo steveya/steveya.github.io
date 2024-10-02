@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Volatility Forecasts (Part 3 - Connection with Neural Network Models)"
-#date: 2024-10-05
+title: "WIP - Volatility Forecasts (Part 3 - Connection with Neural Network Models)"
+date: 2024-10-05
 categories: [Quantitative Finance]
 tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 ---
@@ -118,5 +118,7 @@ h_t &= (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t \\
 $$
 
 which is exactly the same as the STES model. In other words, the STES model is a special case of the GRU model where one never resets the candidate hidden state, which is set simply to the previous hidden state.
+
+$$
 
 
