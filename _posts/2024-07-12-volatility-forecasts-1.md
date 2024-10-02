@@ -23,7 +23,7 @@ The exponential smoothing (ES) model is a popular yet simple volatility forecast
 
 $$
 \begin{equation}\label{eq:expsmooth}
-    \hat{\sigma}^2_t = \alpha r^2_{t-1} + (1-\alpha)\hat{\sigma}^2_{t-1}
+    \hat{\sigma}_t^2 = \alpha r_{t-1}^2 + (1-\alpha)\hat{\sigma}_{t-1}^2
 \end{equation}
 $$
 
@@ -38,7 +38,7 @@ $$
 \begin{equation}\label{eq:stexpsmooth}
     \begin{aligned}
         \alpha_t &= \frac{1}{1+\exp\left(X_t \beta\right)} \\
-        \hat{\sigma}^2_t &= \alpha_{t-1} r^2_{t-1} + (1-\alpha_{t-1})\hat{\sigma}^2_{t-1}
+        \hat{\sigma}_t^2 &= \alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\hat{\sigma}_{t-1}^2
     \end{aligned}
 \end{equation}
 $$
