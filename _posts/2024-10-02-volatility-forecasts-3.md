@@ -82,10 +82,10 @@ From the above generalization of the ES model to simple RNN, we also noticed the
 $$
 \begin{equation}
 \begin{aligned}
-z_t &= \mathrm{sigmoid}\left(W_z x_t + U_z h_{t-1} + b_z\right) \quad \mathrm{Update Gate} \\
-s_t &= \mathrm{sigmoid}\left(W_r x_t + U_r h_{t-1} + b_r\right) \quad \mathrm{Reset Gate}\\
-\tilde{h}_t &= \tanh\left(W_h x_t + U_h (s_t \odot h_{t-1}) + b_h\right) \quad \mathrm{Candidate Hidden State} \\
-h_t &= (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t \quad \mathrm{Hidden State} \\
+z_t &= \mathrm{sigmoid}\left(W_z x_t + U_z h_{t-1} + b_z\right) \quad \textrm{Update Gate} \\
+s_t &= \mathrm{sigmoid}\left(W_r x_t + U_r h_{t-1} + b_r\right) \quad \textrm{Reset Gate}\\
+\tilde{h}_t &= \tanh\left(W_h x_t + U_h (s_t \odot h_{t-1}) + b_h\right) \quad \textrm{Candidate Hidden State} \\
+h_t &= (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t \quad \textrm{Hidden State} \\
 \end{aligned}
 \end{equation}
 $$
