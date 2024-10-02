@@ -55,9 +55,9 @@ $$h_t = f(X_t, h_{t-1})$$
 
 where $$f$$ is often a neural network. For example, a simple RNN may compute the hidden state as:
 
-$$h_t = \text{sigmoid}\left(W_x x_t + W_h h_{t-1} + b_h\right)$$
+$$h_t = \mathrm{sigmoid}\left(W_x x_t + W_h h_{t-1} + b_h\right)$$
 
-where $$\text{sigmoid}$$ is the sigmoid activation function. The output $$y_t$$ is computed as a function of the hidden state $$h_t$$:
+where $$\mathrm{sigmoid}$$ is the sigmoid activation function. The output $$y_t$$ is computed as a function of the hidden state $$h_t$$:
 
 $$y_t = g(h_t)$$
 
@@ -82,10 +82,10 @@ From the above generalization of the ES model to simple RNN, we also noticed the
 $$
 \begin{equation}
 \begin{aligned}
-z_t &= \text{sigmoid}\left(W_z x_t + U_z h_{t-1} + b_z\right) \quad \textrm{Update Gate} \\
-s_t &= \text{sigmoid}\left(W_r x_t + U_r h_{t-1} + b_r\right) \quad \textrm{Reset Gate}\\
-\tilde{h}_t &= \tanh\left(W_h x_t + U_h (s_t \odot h_{t-1}) + b_h\right) \quad \textrm{Candidate Hidden State} \\
-h_t &= (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t \quad \textrm{Hidden State} \\
+z_t &= \mathrm{sigmoid}\left(W_z x_t + U_z h_{t-1} + b_z\right) \quad \mathrm{Update Gate} \\
+s_t &= \mathrm{sigmoid}\left(W_r x_t + U_r h_{t-1} + b_r\right) \quad \mathrm{Reset Gate}\\
+\tilde{h}_t &= \tanh\left(W_h x_t + U_h (s_t \odot h_{t-1}) + b_h\right) \quad \mathrm{Candidate Hidden State} \\
+h_t &= (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t \quad \mathrm{Hidden State} \\
 \end{aligned}
 \end{equation}
 $$
