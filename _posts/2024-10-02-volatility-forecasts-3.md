@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "WIP - Volatility Forecasts (Part 3 - Connection with Neural Network Models)"
-date: 2024-10-05
+date: 2024-10-02
 categories: [Quantitative Finance]
 tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 ---
