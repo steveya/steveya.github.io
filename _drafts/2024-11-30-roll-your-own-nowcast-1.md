@@ -3,6 +3,7 @@ title: "WIP - Roll Your Own Nowcast (Part 1 - Intuition)"
 #date: 2024-07-21
 categories: [Quantitative Finance]
 tags: [nowcasting, tutorial]
+published: false
 ---
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>

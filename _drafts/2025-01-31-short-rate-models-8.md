@@ -4,6 +4,7 @@ title: "WIP - Short Rate Models (Part 8: Short-Rate and Taylor Rule. Smith and T
 #date: 2023-09-02
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
+published: false
 ---
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>

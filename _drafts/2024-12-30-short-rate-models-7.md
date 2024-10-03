@@ -1,9 +1,10 @@
 ---
 layout: post
-title: "WIP - Short Rate Models (Part 6: Pinning Down the Risk Premium - Kim-Orphanides (2008))"
-# date: 2023-09-02
+title: "WIP - Short Rate Models (Part 7: How About Macro? Ang and Piazzesi (2003))"
+#date: 2023-09-02
 categories: [Quantitative Finance]
 tags: [study-notes, quantitative-finance, short-rate-models]
+published: false
 ---
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
@@ -11,14 +12,14 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 
 ## Table of Contents
 
-1. [The Term-Premium Estimation Problem](#the-term-premium-estimation-problem)
-2. [Kim and Orphanides (2008)](#kim-and-orphanides-2008)
+1. [Macro-Finance Model](#macro-finance-model)
+2. [Ang and Piazzesi (2003)](#ang-and-piazzesi-2003)
 3. [Model and Estimation](#model-and-estimation)
 4. [Results](#results)
 
-## The Term-Premium Estimation Problem
+## Macro-Finance Model
 
-## Kim and Orphanides (2008)
+## Ang and Piazzesi (2003) 
 
 ## Model and Estimation
 

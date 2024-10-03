@@ -4,6 +4,7 @@ title: WIP Teaching Kids Math - Arcsin Law (Part 1 - Examples)
 # date: 2024-04-21
 categories: [Teaching Kids Math]
 tags: [teaching-kids-math]
+published: false
 ---
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
