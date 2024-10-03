@@ -17,7 +17,7 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 5. [Wrapping Up](#wrapping-up)
 
 ## Recap
-In the [first post](https://steveya.github.io/posts/volatility-forecast-1/) of the [volatility forecasting series](https://steveya.github.io/tags/volatility-forecast/), we introduced the Smooth Transition Exponential Smoothing (STES) model [(Taylor, 2004)](https://doi.org/10.1016/j.ijforecast.2003.09.010) as a generalization of the simpler Exponential Smoothing (ES) model. The smoothing parameter $$\alpha$$ in ES is a constant, but in STES it is generalized to be a linear function of features $$X_t$$ inside the sigmoid function to restrict $$\alpha_t$$ within the interval $$[0, 1]$$.
+In the [first post]({% post_url 2024-07-12-volatility-forecasts-1 %}) of the [volatility forecasts series]({% post_url 2024-07-12-volatility-forecasts-1 %}), we introduced the Smooth Transition Exponential Smoothing (STES) model [(Taylor, 2004)](https://doi.org/10.1016/j.ijforecast.2003.09.010) as a generalization of the simpler Exponential Smoothing (ES) model. The smoothing parameter $$\alpha$$ in ES is a constant, but in STES it is generalized to be a linear function of features $$X_t$$ inside the sigmoid function to restrict $$\alpha_t$$ within the interval $$[0, 1]$$.
 
 $$
 \begin{equation}
@@ -28,7 +28,7 @@ $$
 \end{equation}
 $$
 
-where $$r_t^2$$ is the squared return at time $$t$$. This formulation allows the smoothing parameter $$\alpha$$ to be time-varying and be affected by other state variables, yet the model is still simple enough to be interpreted. In our [second post](https://steveya.github.io/posts/volatility-forecast-2/), we generalize the STES model further by introducing the XGBoost-STES model. Instead of using a linear function inside the sigmoid function, we used an Extreme Gradient Boosting (XGBoost) model $$\mathcal{F}$$ to learn the transition function $$f$$ inside the sigmoid function from features $$S_t$$. This allows discontinuity and non-linearity in the smoothing parameter depending on the states variables.
+where $$r_t^2$$ is the squared return at time $$t$$. This formulation allows the smoothing parameter $$\alpha$$ to be time-varying and be affected by other state variables, yet the model is still simple enough to be interpreted. In our [second post]({% post_url 2024-07-18-volatility-forecasts-2 %}), we generalize the STES model further by introducing the XGBoost-STES model. Instead of using a linear function inside the sigmoid function, we used an Extreme Gradient Boosting (XGBoost) model $$\mathcal{F}$$ to learn the transition function $$f$$ inside the sigmoid function from features $$S_t$$. This allows discontinuity and non-linearity in the smoothing parameter depending on the states variables.
 
 $$
 \begin{equation}
@@ -119,6 +119,9 @@ $$
 
 which is exactly the same as the STES model. In other words, the STES model is a special case of the GRU model where one never resets the candidate hidden state, which is set simply to the previous hidden state.
 
-$$
 
+
+## Results
+
+## Wrapping Up
 

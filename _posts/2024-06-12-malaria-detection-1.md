@@ -96,4 +96,4 @@ X_train_blur_normalized = gaussian_blur(X_train_hsv)
 These preprocessing steps together can potentially enhance the features that distinguish parasitized from uninfected cells and reduce image noise.
 
 ## Next Step
-In the [next part](https://steveya.github.io/posts/malaria-detection-2/) of this series, we will dive into building and training our deep-learning models for Malaria detection. Stay tuned!
+In the [next post]({% post_url 2024-06-13-malaria-detection-2 %}) of this series, we will dive into building and training our deep-learning models for Malaria detection. Stay tuned!

@@ -18,7 +18,7 @@ tags: [study-notes, quantitative-finance, short-rate-models]
 4. [Wrapping Up](#wrapping-up)
 
 ## Introduction
-Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the [previous post](https://steveya.github.io/posts/short-rate-models-1/). In this post, we will show how to simulate short rates from the Merton model and how to calibrate its parameters to market-observed short rates. Whereas the previous post deals with the mathematical aspects, this post deals with the computational ones. 
+Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the [previous post]({% post_url 2024-05-10-short-rate-models-1 %}). In this post, we will show how to simulate short rates from the Merton model and how to calibrate its parameters to market-observed short rates. Whereas the previous post deals with the mathematical aspects, this post deals with the computational ones. 
 
 ## Simulating Merton's Model
 We now show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of small time steps. It is a first-order numerical method for approximating stochastic differential equations (SDEs). As a refresher, consider a general $$d$$-dimensional SDE of the form:
@@ -111,7 +111,7 @@ For simple processes like the Merton model, where $$\mu$$ and $$\sigma$$ are con
 
 Higher-order numerical schemes, such as the Milstein scheme or stochastic Runge-Kutta methods, can reduce this error by incorporating additional terms that account for the variation of $$\mu$$ and $$\sigma$$ over the time step. However, these methods are often more computationally intensive and may require the calculation of additional derivatives.
 
-In practice, the choice between Euler-Maruyama and higher-order methods involves a trade-off between computational simplicity and accuracy, depending on the specific requirements of the problem at hand. Nevertheless, the error from time aggregation is "small" for "well-behaved" stochastic processes. We will discuss this in greater detail in the [simulation and calibration of the Vasicek model](https://steveya.github.io/posts/short-rate-models-4/). 
+In practice, the choice between Euler-Maruyama and higher-order methods involves a trade-off between computational simplicity and accuracy, depending on the specific requirements of the problem at hand. Nevertheless, the error from time aggregation is "small" for "well-behaved" stochastic processes. We will discuss this in greater detail in the [simulation and calibration of the Vasicek model]({% post_url 2024-09-16-short-rate-models-4 %}). 
  
 Using $$\mu = 0.02$$, $$\sigma = 0.02$$ and $$ r_0 = 0.05$$, Figure 1 shows a simulated path of the short rate process.
 
@@ -119,7 +119,7 @@ Using $$\mu = 0.02$$, $$\sigma = 0.02$$ and $$ r_0 = 0.05$$, Figure 1 shows a si
 
 ### Simulating Short Rates, Bond Yields and Term Structure from the Merton Model
 
-In the [previous post](https://steveya.github.io/posts/short-rate-models-1/), we derived the price of a ZCB from the short-rate model in two different ways: 1. directly solve the SDE, and 2. guess the form of the solution as $$A(t, T) \exp (-B(t, T) r_t)$$ and solve for $$A$$ and $$B$$. As it turns out, most common short-rate models have bond price solutions in the form of $$A(t, T) \exp (-B(t, T) r_t)$$, so we will use this fact when we implement our short-rate models. Below is a simple Python implementation of the ZCB price and yields.
+In the [previous post]({% post_url 2024-05-10-short-rate-models-1 %}), we derived the price of a ZCB from the short-rate model in two different ways: 1. directly solve the SDE, and 2. guess the form of the solution as $$A(t, T) \exp (-B(t, T) r_t)$$ and solve for $$A$$ and $$B$$. As it turns out, most common short-rate models have bond price solutions in the form of $$A(t, T) \exp (-B(t, T) r_t)$$, so we will use this fact when we implement our short-rate models. Below is a simple Python implementation of the ZCB price and yields.
 
 ```python
 def B(t, T):
@@ -233,11 +233,11 @@ We generate 5000 paths of the short rate process using the same $$\mu = 0.02$$, 
 
 ![Figure 4. Distribution of ML estimates of the Merton Model parameters](/assets/img/post_assets/short-rate-models-2/merton_term_structure.png)
 
-We can see immediately that the MLE estimates of $$\mu$$, while unbiased, have a high variance. This is consistent with the observation that the mean of a distribution is a lot harder to estimate precisely than the variance. This problem is even more pronounced for the more complicated processes, such as the Vasicek model. We will discuss this in length in the [next next post](https://steveya.github.io/posts/short-rate-models-4/) on calibrating the Vasicek model. 
+We can see immediately that the MLE estimates of $$\mu$$, while unbiased, have a high variance. This is consistent with the observation that the mean of a distribution is a lot harder to estimate precisely than the variance. This problem is even more pronounced for the more complicated processes, such as the Vasicek model. We will discuss this in length in the [post 4]({% post_url 2024-09-16-short-rate-models-4 %}) on calibrating the Vasicek model. 
 
 ## Wrapping Up
-We now know the Merton model, a simple one-factor short-rate equilibrium model that is also an affine term-structure model. In the previous [post](https://steveya.github.io/posts/short-rate-models-1/), we derived the price of a ZCB from the short-rate model and wrote a simple Python implementation of the ZCB price and yields.
+We now know the Merton model, a simple one-factor short-rate equilibrium model that is also an affine term-structure model. In the [previous post]({% post_url 2024-05-10-short-rate-models-1 %}), we derived the price of a ZCB from the short-rate model and wrote a simple Python implementation of the ZCB price and yields.
 
 In this post, We also learn how to simulate short rates with this model and how to calibrate its parameters from market-observed short rates. 
 
-We learn that the ZCB prices and yields are computed under the risk-neutral measure and calibrated to market-observed short rates yield parameters under the physical measure. However, the relationship of the parameters under these two measures still needs to be clarified, which prevents us from calibrating the model to market-observed yield curves. We will cover these topics much later, after introducing another popular short-rate model, the Vasicek model, in the [next post](https://steveya.github.io/posts/short-rate-models-3/).
+We learn that the ZCB prices and yields are computed under the risk-neutral measure and calibrated to market-observed short rates yield parameters under the physical measure. However, the relationship of the parameters under these two measures still needs to be clarified, which prevents us from calibrating the model to market-observed yield curves. We will cover these topics much later, after introducing another popular short-rate model, the Vasicek model, in the [next post]({% post_url 2024-08-10-short-rate-models-3 %}).

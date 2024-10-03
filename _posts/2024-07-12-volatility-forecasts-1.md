@@ -9,7 +9,7 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
 #### Updates
-(Code snippets included in this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/notebook/random_forest_ewma.ipynb).) I have updated the data used in this post to the end of 2023 to compare the results with the new model in [the next post](https://steveya.github.io/posts/volatility-forecast-2/).
+(Code snippets included in this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/notebook/random_forest_ewma.ipynb).) I have updated the data used in this post to the end of 2023 to compare the results with the new model in [the next post]({% post_url 2024-07-18-volatility-forecasts-2 %}).
 
 ## Table of Contents
 
@@ -75,4 +75,4 @@ When fitting the model to the SPY returns, STES has the potential to outperform 
 While I cannot exactly replicate the results in Liu et al. (2020) on the simulated time series, STES performs better on the SPY's data in terms of the out-of-sample RMSE, consistent with the author's calculations on different data sets. However, the gains seem small, not an order of magnitude better, and its net-of-cost performance as a trading strategy needs to be tested. I will be curious to test this forecast as a volatile trading strategy.
 
 ## Other Observations
-The author observes that STES is not a statistical model, so they cannot conduct significance tests on the parameters. In both Taylor (2004) and Liu et al. (2020), they draw interesting observations about the parameters of the fitted STES model. In particular, the fitted parameters imply that the realized volatility responds to past shocks differently depending on the sign and magnitude of the shock. Moreover, in terms of robustness to outliers, the STES also responds better by downweighting the weights on outliers. In the [next post](https://steveya.github.io/posts/volatility-forecast-2/), we'll discuss an extension of the STES model to use tree-ensembles to improve its performance.
+The author observes that STES is not a statistical model, so they cannot conduct significance tests on the parameters. In both Taylor (2004) and Liu et al. (2020), they draw interesting observations about the parameters of the fitted STES model. In particular, the fitted parameters imply that the realized volatility responds to past shocks differently depending on the sign and magnitude of the shock. Moreover, in terms of robustness to outliers, the STES also responds better by downweighting the weights on outliers. In the [next post]({% post_url 2024-07-18-volatility-forecasts-2 %}), we'll discuss an extension of the STES model to use tree-ensembles to improve its performance.

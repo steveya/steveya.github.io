@@ -17,7 +17,7 @@ The notebook for this post can be found [here](https://github.com/steveya/data-s
 4. [What's Next?](#whats-next)
 5. [Closing Thoughts](#closing-thoughts)
 
-Welcome to the final part of building a malaria detection model. If you've been following along, you've seen how I prepared the data and built various models to detect Malaria from cell images. How well did our models perform on a relative basis?
+Welcome back to our journey in building a malaria detection model. If you've been following along, you've seen how I prepared the data and built various models to detect Malaria from cell images. How well did our models perform on a relative basis?
 
 ## Model Performances
 

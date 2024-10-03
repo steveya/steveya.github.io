@@ -19,7 +19,7 @@ The code for this post is on [my Github](https://github.com/steveya/short-rate-m
 
 ## Recap
 
-In our [previous post](https://steveya.github.io/posts/short-rate-models-3/), we introduced the Vasicek model that used the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short rates. We then derived solutions for both the OU process and bond prices. We can now focus on the more practical aspects: simulating the Vasicek model and estimating its parameters from market-observed short rates.
+In our [previous post]({% post_url 2024-08-10-short-rate-models-3 %}), we introduced the Vasicek model that used the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short rates. We then derived solutions for both the OU process and bond prices. We can now focus on the more practical aspects: simulating the Vasicek model and estimating its parameters from market-observed short rates.
 
 Given the extensive study of the OU process in finance and physics literature, we will focus on introducing other essential concepts related to simulating and estimating the Vasicek model. When introducing how we simulate the OU process, we also discuss the convergence of the Euler-Maruyama discretization to the exact discretization. The different discretization is also the distinquishment between the likelihood and the quasi-likelihood function, leading us to the section on parameter estimation using the maximum likelihood methods. We will then demonstrate and discuss the limitation of the maximum likelihood estimator on finite samples. To overcome these issues, we introduce a particle filtering estimation method which has shown promising results in our empirical studies.
 
@@ -32,7 +32,7 @@ $$
 \end{equation}
 $$
 
-and if we discretize the solution of the Vasicek SDE, as derived from [Post 3](https://steveya.github.io/posts/short-rate-models-3/)
+and if we discretize the solution of the Vasicek SDE, as derived from [Post 3]({% post_url 2024-08-10-short-rate-models-3 %})
 
 $$
 \begin{equation}
@@ -525,7 +525,7 @@ To address these challenges, we introduced a particle filtering approach and pre
 
 There is a lot more we can do for both the Vasicek model and the particle filter. For example, we can take the paths of the particles and compute a time series of parameter estimates. If the parameters are stable (validated using simulated data, for example), we can apply the model to real-world data, analyze the behaviour of each parameter in different economic regimes, and draw conclusions about how macro variables impact variables like $$\kappa$$ or $$\theta$$.
 
-In our [next post](https://steveya.github.io/posts/short-rate-models-5/), we will broaden our perspective by introducing the affine term structure model, a general framework that encompasses both the Merton and Vasicek models as special cases. The affine term structure model provides a unified approach to understanding and comparing different short-rate models, setting the stage for more advanced applications in term-structure modelling.
+In our [next post]({% post_url 2024-10-30-short-rate-models-5 %}), we will broaden our perspective by introducing the affine term structure model, a general framework that encompasses both the Merton and Vasicek models as special cases. The affine term structure model provides a unified approach to understanding and comparing different short-rate models, setting the stage for more advanced applications in term-structure modelling.
 
 ## Optional: Strong Convergence of the Euler-Maruyama Method Applied to the OU process
 In this section, we show that the Euler-Maruyama method has a strong convergence of order 0.5 to the exact solution of the OU process.

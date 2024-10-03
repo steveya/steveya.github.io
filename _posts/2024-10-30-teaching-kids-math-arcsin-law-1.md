@@ -82,5 +82,5 @@ The arcsin law is a fascinating example of how mathematical concepts can challen
 The arcsin law reminds us that in the world of probability, our intuitions can often lead us astray, and careful analysis - or lots of basketball shots! - can reveal unexpected truths. It shows us that randomness doesn't always behave the way we expect, and that's what makes it so fascinating to study and experience.
 
 ## Next Step
-In the [next post](https://steveya.github.io/posts/teaching-kids-math-arcsin-law-2/), we'll discuss how to use simulation to teach Monte Carlo simulations to children.
+In the [next post]({% post_url 2025-01-31-teaching-kids-math-arcsin-law-2 %}), we'll discuss how to use simulation to teach Monte Carlo simulations to children.
 
