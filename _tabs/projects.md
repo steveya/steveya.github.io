@@ -11,9 +11,9 @@ Projects marked with Work in Progress (WIP) are still in progress and may not be
 ## Volatility Forecasting
 It was a rabbit hole that I accidentally got myself into.
  - Blog Post: 
-   - [Volatility Forecasts (Part 1 - ES vs STES Model)]({% post_url 2024-07-12-volatility-forecast-1 %})
-   - [Volatility Forecasts (Part 2 - XGBoost-STES)]({% post_url 2024-07-18-volatility-forecast-2 %})
-   - [Volatility Forecasts (Part 3 - Connection with Neural Network Models)]({% post_url 2024-10-02-volatility-forecast-3 %})
+   - [Volatility Forecasts (Part 1 - ES vs STES Model)]({% post_url 2024-07-12-volatility-forecasts-1 %})
+   - [Volatility Forecasts (Part 2 - XGBoost-STES)]({% post_url 2024-07-18-volatility-forecasts-2 %})
+   - [Volatility Forecasts (Part 3 - Connection with Neural Network Models)]({% post_url 2024-10-02-volatility-forecasts-3 %})
  - Notebook: [volatility-forecast](https://github.com/steveya/volatility-forecast/blob/main/notebook/stes_volatility_forecast.ipynb)
  - WIP GitHub Repository: [volatility-forecast](https://github.com/steveya/volatility-forecast)
 
