@@ -45,7 +45,7 @@ $$y\left(t, T\right) = \frac{1}{T-t}\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]$$
 
 $$P\left(t, T\right) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]$$
 
-These fundamental relationships will be used to calculate the price and yield of ZCB using our specific short-rate process. Readers familiar with asset pricing will notice that the price of a ZCB is calculated with respect to the risk-neutral measure $$Q$$. We will not be concerned with risk-neutral and physical measures just yet. For the first four posts, we assume the risk-neutral measure in bond pricing and the physical measure in the context of short-rate simulation and parameter estimation. A fuller treatment will be postponed to [Post 5]({% post_url 2024-10-30-short-rate-models-5 %}), where we establish the relationship between the risk-neutral and physical measures.
+These fundamental relationships will be used to calculate the price and yield of ZCB using our specific short-rate process. Readers familiar with asset pricing will notice that the price of a ZCB is calculated with respect to the risk-neutral measure $$Q$$. We will not be concerned with risk-neutral and physical measures just yet. For the first four posts, we assume the risk-neutral measure in bond pricing and the physical measure in the context of short-rate simulation and parameter estimation. A fuller treatment will be postponed to [Post 5](#), where we establish the relationship between the risk-neutral and physical measures.
 
 
 ## Merton's Model (1973)

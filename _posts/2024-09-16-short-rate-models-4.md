@@ -525,7 +525,7 @@ To address these challenges, we introduced a particle filtering approach and pre
 
 There is a lot more we can do for both the Vasicek model and the particle filter. For example, we can take the paths of the particles and compute a time series of parameter estimates. If the parameters are stable (validated using simulated data, for example), we can apply the model to real-world data, analyze the behaviour of each parameter in different economic regimes, and draw conclusions about how macro variables impact variables like $$\kappa$$ or $$\theta$$.
 
-In our [next post]({% post_url 2024-10-30-short-rate-models-5 %}), we will broaden our perspective by introducing the affine term structure model, a general framework that encompasses both the Merton and Vasicek models as special cases. The affine term structure model provides a unified approach to understanding and comparing different short-rate models, setting the stage for more advanced applications in term-structure modelling.
+In our [next post](#), we will broaden our perspective by introducing the affine term structure model, a general framework that encompasses both the Merton and Vasicek models as special cases. The affine term structure model provides a unified approach to understanding and comparing different short-rate models, setting the stage for more advanced applications in term-structure modelling.
 
 ## Optional: Strong Convergence of the Euler-Maruyama Method Applied to the OU process
 In this section, we show that the Euler-Maruyama method has a strong convergence of order 0.5 to the exact solution of the OU process.
