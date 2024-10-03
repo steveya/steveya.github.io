@@ -11,8 +11,8 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 ## Table of Contents
 
 1. [Recap](#recap)
-2. [From ES to RNN](#from-es-to-rnn)
-3. [From STES to GRU](#from-stes-to-gru)
+2. [From ES to Simple RNN](#from-es-to-simple-rnn)
+3. [From STES to Gated Recurrent Unit (GRU)](#from-stes-to-gated-recurrent-unit-gru)
 4. [Results](#results)
 5. [Wrapping Up](#wrapping-up)
 
@@ -45,7 +45,7 @@ $$\sigma_t^2 = (1 - \alpha_t) \sigma_{t-1}^2 + \alpha_t r_{t-1}^2$$
 
 The STES model generalizes the classic ES model, and XGBoost-STES is one generalization of the STES model that uses a more complex transition function. Another interesting question we can ask is how ES and STES models relate to other modern sequence neural network models. In this post, we will demonstrate that the ES model is a special case of the Recurrent Neural Network (RNN), and the STES model is a special case of the Recurrent Gated Neural Network (GRU). We will then compare the more general and powerful RNN and GRU models to the ES and STES models in terms of their predictive accuracy.
 
-## From ES to RNN
+## From ES to Simple RNN
 ### Recurrent Neural Networks (RNN)
 The RNN is a type of neural network commonly used for forecasting sequential data. It is "recurrent" because it performs the same computation for every time step, with the output at each time step fed back as input to the next time step. This allows the network to maintain a form of memory about past inputs, making it suitable for sequential data.
 
