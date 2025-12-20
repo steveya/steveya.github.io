@@ -8,6 +8,13 @@ The following is a list of my past and present projects. Each project consists o
 
 Projects marked with Work in Progress (WIP) are still in progress and may not be fully functional.
 
+## Signature Method
+My study notes on the signature method
+ - Blog Post:
+   - [Signature Methods (Part 1 - Motivation)]({% post_url 2025-12-14-signature-method-1 %})
+   - Signature Methods (Part 2 - Definition and Examples)
+   - Signature Methods (Part 3 - Volatility Forecasts)
+
 ## Volatility Forecasting
 It was a rabbit hole that I accidentally got myself into.
  - Blog Post: 
