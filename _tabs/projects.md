@@ -12,7 +12,7 @@ Projects marked with Work in Progress (WIP) are still in progress and may not be
 My study notes on the signature method
  - Blog Post:
    - [Signature Methods (Part 1 - Motivation)]({% post_url 2025-12-14-signature-method-1 %})
-   - Signature Methods (Part 2 - Definition and Examples)
+   - [Signature Methods (Part 2 - Signature and Augmentation)]({% post_url 2025-12-21-signature-method-2 %})
    - Signature Methods (Part 3 - Volatility Forecasts)
 
 ## Volatility Forecasting
