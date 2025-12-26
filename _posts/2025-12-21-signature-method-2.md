@@ -85,10 +85,9 @@ Since this grows quickly, in practice we typically have to control the number of
 
 From a modeling perspective, the signature provides a structured hierarchy of features: level 1 captures net changes, level 2 captures ordered pairwise interactions, and higher levels capture longer sequencing effects. Truncating at depth $$m$$ then amounts to assuming that most of the relevant path-dependence can be expressed using interaction templates of length at most $$m$$—an assumption that is often reasonable in practice when paired with regularization.
 
-## Two Motivating Examples
 If we view the signature as a compression of path information, can we recreate simple time-series features with it? Below are two examples that motivate the need for *augmentation*.
 
-### End-Point
+## Example 1: End-Point
 
 A very simple continuous functional is the endpoint:
 
@@ -126,7 +125,7 @@ $$
 
 so the endpoint functional is exactly a linear functional of level-1 signature coordinates (plus, if we keep the constant level-0 term, an optional intercept). In other words, for endpoints the coefficient vector $$\ell$$ simply “selects” the appropriate level-1 coordinate of the basepoint-augmented signature. Here we see that if we do not augment the path with a basepoint, we cannot exactly recover the end-point functional.
 
-### Moving Average
+## Example 2: Moving Average
 
 A slightly richer example is the window average of a level process $$x_t$$:
 
@@ -214,6 +213,6 @@ $$S^{(1,2)}(Z){0,N}-S^{(2,1)}(Z){0,N}=\sum_{n=1}^N r_n^2,$$
 Once the path representation contains the information the target depends on via appropriate augmentation, linear functionals of truncated signatures can approximate a broad class of continuous path-dependent maps. Many rolling statistics and economically meaningful targets depend on first and second moments, time normalization, and ordered interactions; augmentations such as time and lead–lag make these ingredients appear in low-order signature coordinates.
 
 ## What's Next
-In the next post, we will introduce **Chen’s Identity** and work through a few more examples of the “universality + augmentation” design pattern. A useful point to keep in mind is that many familiar rolling statistics—-such as the sample mean and sample variance—-ignore time ordering, yet they can still be **represented exactly** (after the right augmentation) as **linear functionals of signatures**. This is not because signatures are “just another way to compute the same statistics,” but because those statistics sit inside a much richer feature algebra.
+In the next post, we will work through a few more examples of the “universality + augmentation” design pattern. A useful point to keep in mind is that many familiar rolling statistics—-such as the sample mean and sample variance—-ignore time ordering, yet they can still be **represented exactly** (after the right augmentation) as **linear functionals of signatures**. This is not because signatures are “just another way to compute the same statistics,” but because those statistics sit inside a much richer feature algebra.
 
 Once we can reproduce the usual symmetric summaries as low-order special cases, the real value becomes clearer: signatures also encode ordered and asymmetric interaction patterns-—the kinds of effects that standard rolling features struggle to express without extensive hand-crafting.

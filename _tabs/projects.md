@@ -13,7 +13,7 @@ My study notes on the signature method
  - Blog Post:
    - [Signature Methods (Part 1 - Motivation)]({% post_url 2025-12-14-signature-method-1 %})
    - [Signature Methods (Part 2 - Signature and Augmentation)]({% post_url 2025-12-21-signature-method-2 %})
-   - Signature Methods (Part 3 - Volatility Forecasts)
+   - [Signature Methods (Part 3 - Lead–Lag Augmentation and Practical Limitations to the Signature Method)]({% post_url 2025-12-25-signature-method-3 %})
 
 ## Volatility Forecasting
 It was a rabbit hole that I accidentally got myself into.
