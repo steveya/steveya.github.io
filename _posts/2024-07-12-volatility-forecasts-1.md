@@ -15,8 +15,9 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 
 1. [Introduction](#introduction)
 2. [Smooth Transition Exponential Smoothing](#smooth-transition-exponential-smoothing)
-3. [Results](#results)
-4. [Other Observations](#other-observations)
+3. [Roadmap for this series](#roadmap-for-this-series)
+4. [Results](#results)
+5. [Wrapping Up](#wrapping-up)
 
 ## Introduction
 
