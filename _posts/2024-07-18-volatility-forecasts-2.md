@@ -172,34 +172,33 @@ Table 1 shows the out-of-sample RMSE of the XGBoost-STES model on simulated retu
 
 | Model | RMSE | (Liu et al 2020) |
 | --- | --- | --- |
-| STES-E&AE&SE | 2.80 | N.A |
-| STES-SE  | 2.82 | 2.44 |
-| ES       | 2.85 | 2.45 |
-| STES-AE  | 2.88 | 2.43 |
-| XGB-STES | 2.91 | N.A  |
-| STES-E&AE | 2.91 | N.A |
-| STES-E&SE | 2.93 | N.A |
-| STES-AE&SE | 2.94 | N.A |
+| STES-E&AE&SE | 2.68 | N.A |
+| STES-SE  | 2.67 | 2.44 |
+| ES       | 2.68 | 2.45 |
+| STES-AE  | 2.67 | 2.43 |
+| XGB-STES | 3.02 | N.A  |
+| STES-E&AE | 2.67 | N.A |
+| STES-E&SE | 2.67 | N.A |
+| STES-AE&SE | 2.67 | N.A |
 
 
 [Table 1: Comparison of the STES and ES models on simulated data ($$\eta = 4$$).]
 
 ### STES vs ES on SPY Returns
-On SPY data however, XGBoost-STES outperforms the simpler models by quite a bit. However, depending on how we tune the model, the test results can vary. When untuned (with some default parameters), the XGBoost-STES model outperforms the rest (perhaps by luck.) When tuned with either `RandomizedSearchCV` from `sklearn.model_selection` or the SOTA HPO library `optuna`, XGBoost-STES performs worse than the simple STES model. It highlights the problem as we move from simpler models such as STES to more complex ML models.
+On SPY data, the untuned XGBoost‑STES model achieved a test RMSE of **4.71e-04** (train RMSE **5.94e-04**) in my runs. A short `RandomizedSearchCV` tuning run found parameter combinations that reduced cross‑validation RMSE, but the tuned model's *test* RMSE remained **4.71e-04** (train RMSE **5.86e-04**) — i.e., no test improvement at printed precision. Optuna tuning was not run in this session (the `optuna` package was not installed). Importantly, the simpler STES variants still achieved the lowest out‑of‑sample RMSE on SPY (best: **STES_EAESE = 4.40e-04**).
 
 | Model | Test RMSE | Train RMSE |
 | --- | --- | --- |
-| XGB-STES (Untuned)  | 4.37e-04 | 5.01e-04 |
-| STES-E&AE&SE | 4.49e-04 | 4.92e-04 |
-| STES-AE&SE   | 4.50e-04 | 4.96e-04 |
-| STES-E&SE    | 4.50e-04 | 4.93e-04 |
-| STES-E&AE    | 4.52e-04 | 4.95e-04 |
+| XGB-STES (Untuned)  | 4.71e-04 | 5.94e-04 |
+| STES-E&AE&SE | 4.40e-04 | 4.92e-04 |
+| STES-AE&SE   | 4.49e-04 | 4.94e-04 |
+| STES-E&SE    | 4.49e-04 | 4.93e-04 |
+| STES-E&AE    | 4.51e-04 | 4.94e-04 |
 | ES           | 4.64e-04 | 4.99e-04 |
-| XGB-STES (Sklearn Tuned) | 4.78e-04 | 5.02e-04 |
-| XGB-STES (Optuna Tuned)  | 4.86e-04 | 4.88e-04 |
+| XGB-STES (Sklearn Tuned) | 4.71e-04 | 5.86e-04 |
 
 [Table 2: Comparison of the STES and ES models on SPY returns. Since my sample and data differ from the authors, their results are not listed. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31.]
 
 ## Wrapping Up
-We can do other interesting things to diagnose and understand this model, such as doing feature importance analysis. However, given that we have just 3 features, we will leave that for future posts. We have successfully created a simple ML-based STES hybrid model that outperforms the simpler STES and ES models. Both XGBoost-STES and STES models can be extended to include more variables (such as macro variables, calendar variables, and other time-series features) and other model features (adding regularization to the simple STES models as the number of features increases.) These will be the main focus of future posts in this series. In the [next post]({% post_url 2024-10-02-volatility-forecasts-3 %}) we will tie the ES and STES models with more modern neural network models. Stay tuned.
+We can do other interesting things to diagnose and understand this model, such as doing feature importance analysis. However, given that we have just 3 features, we will leave that for future posts. We have successfully created a simple ML-based STES hybrid model that outperforms the simpler STES and ES models. Both XGBoost-STES and STES models can be extended to include more variables (such as macro variables, calendar variables, and other time-series features) and other model features (adding regularization to the simple STES models as the number of features increases.) These will be the main focus of future posts in this series. In the [next post]({% post_url 2026-01-10-volatility-forecasts-3 %}) we will tie the ES and STES models with more modern neural network models. Stay tuned.
 

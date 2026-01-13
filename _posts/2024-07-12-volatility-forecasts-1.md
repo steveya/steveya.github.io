@@ -9,7 +9,7 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
 #### Updates
-(Code snippets included in this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/notebook/random_forest_ewma.ipynb).) I have updated the data used in this post to the end of 2023 to compare the results with the new model in [the next post]({% post_url 2024-07-18-volatility-forecasts-2 %}).
+(The code for this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/examples/volatility_forecast_1.py).)
 
 ## Table of Contents
 
@@ -19,60 +19,422 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 4. [Other Observations](#other-observations)
 
 ## Introduction
-The exponential smoothing (ES) model is a popular yet simple volatility forecasting method in finance and economics. It is formulated as
+
+Exponential smoothing (ES) is a simple yet widely used approach to volatility forecasting in finance and economics. It is formulated as
 
 $$
 \begin{equation}\label{eq:expsmooth}
-    \hat{\sigma}_t^2 = \alpha r_{t-1}^2 + (1-\alpha)\hat{\sigma}_{t-1}^2
+    \widehat{\sigma}_t^2 = \alpha r_{t-1}^2 + (1-\alpha)\widehat{\sigma}_{t-1}^2
 \end{equation}
 $$
 
-where $$\hat{\sigma}_t$$ is the estimated volatility at time $$t$$ and $$r_t$$ is the asset log returns at time $$t$$. It is an exponential-weighted moving average of the squared log returns $$r_t^2$$. While technically it is the second non-central moment of the log-return distribution, in finance, it is often treated as a variance estimate, assuming either $$\mathbb{E}\left[r_t\right] = 0$$ or is difficult to estimate precisely.
+where $$\widehat{\sigma}_t$$ denotes the estimated volatility at time $$t$$ and $$r_t$$ is the asset log return at time $$t$$. The recursion defines $$\widehat{\sigma}_t^2$$ as a weighted average of the most recent squared log return and the previous volatility estimate. In this post, we will often refer to $$\alpha$$ as **gate** or **learning rate** that controls how much new information is allowed to flow into our next period variance forecasts.
 
-Exponential-weighted moving average (EWMA) is a smoothing and time-series forecasting technique used in many fields, and within finance, its application goes beyond volatility forecasting. Treated as smoother, the parameter $$\alpha$$ controls the degree of smoothing. Treated as a moving average, it controls the weight of the most recent observation. If the most recent observation is deemed more important, it is given higher weight.
-
-## Smooth Transition Exponential Smoothing
-I came across a paper on Smooth Transition Exponential Smoothing (STES) [(Taylor, 2004)](https://doi.org/10.1016/j.ijforecast.2003.09.010) a few years ago. It started with the empirical observation that past return shocks exhibit an asymmetric relationship with future realized volatility. Therefore, one should assign more different weights to the recent observation depending on the characteristics of the recent shock. The STES uses past asset returns to help determine the value of $$\alpha$$. Specifically, STES is formulated as 
+Unrolling the recursion yields
 
 $$
-\begin{equation}\label{eq:stexpsmooth}
+\begin{equation}\label{eq:expsmooth_unrolled}
     \begin{aligned}
-        \alpha_t &= \frac{1}{1+\exp\left(X_t \beta\right)} \\
-        \hat{\sigma}_t^2 &= \alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\hat{\sigma}_{t-1}^2
+        \widehat{\sigma}_t^2 &= \alpha r_{t-1}^2 + (1-\alpha)\widehat{\sigma}_{t-1}^2 \\
+        &= \alpha r_{t-1}^2 + \alpha(1-\alpha)r_{t-2}^2 + (1-\alpha)^2\widehat{\sigma}_{t-2}^2 \\
+        &= \alpha r_{t-1}^2 + \alpha(1-\alpha)r_{t-2}^2 + \alpha(1-\alpha)^2r_{t-3}^2 + \dots \\
     \end{aligned}
 \end{equation}
 $$
 
-In this formulation, $$\alpha_t$$ is no longer a constant as in the ES model but is determined by the set of **transition variables** $$X_t$$, which can include a constant term and $$\lvert r_t \rvert$$ or $$r_t^2$$ that measures the magnitude of the most recent return, helping in accounting for volatility persistence and sudden price movements. It can also contain $$r_t$$ which introduces leverage effects into the model. The author demonstrates that STES performed competitively against ES and other GARCH models in terms of 1-step forecast error for major equity indices. These variables collectively enhance the STES model's ability to forecast volatility by considering different aspects of historical return data, including magnitude, nonlinearity, and direction, leading to improved predictive power. ​
+which makes clear that ES is an exponential-weighted moving average (EWMA) of past squared log returns $$r_t^2$$. EWMA itself is a popular linear filter used across many fields; in finance, it appears in a range of applications beyond volatility forecasting.
 
-Not being on a vol trade desk, my research interest was not forecasting realized volatility. I wanted to tackle a different but related problem: quantitatively selecting the $$\alpha$$ parameter of an exponential smoothing model. The technique used in this paper not only addresses this problem in the context of vol forecasting but also resonates with some other work I have seen before at work. In the end, I chose another method more suited to my specific problems, but this paper left an impression on me. Years later, in the present day, I saw its follow-up paper [(Liu, Taylor, Choo 2020)](https://doi.org/10.1016/j.econmod.2020.02.021) that extended the model to test if past trading volume helps forecast realized volatility and analyze the robustness of the STES model to outliers. I decided to replicate their results and extend their model with other variables.
+In addition, if a process is generated by ARIMA$$\,(0,1,1)\,$$, then EWMA is the one-step-ahead optimal linear forecast. An ARIMA$$\,(0,1,1)\,$$ is a random walk with a moving-average innovation, and the implied recursion for the conditional mean takes exactly the EWMA form.
+
+To see this, let $$y_t$$ follow ARIMA$$\,(0,1,1)\,$$:
+
+$$
+\Delta y_t = y_t - y_{t-1} = \varepsilon_t + \theta \varepsilon_{t-1},
+\qquad \varepsilon_t \sim \text{i.i.d. } (0,\sigma_\varepsilon^2)
+$$
+
+and let $$\mathcal{F}_t$$ denote the information set up to time $$t$$. Because $$\mathbb{E}[\varepsilon_{t+1}\mid \mathcal{F}_t]=0$$, the one-step-ahead conditional expectation is
+
+$$
+\mathbb{E}[y_{t+1}\mid \mathcal{F}_t]
+= y_t + \mathbb{E}[\Delta y_{t+1}\mid \mathcal{F}_t]
+= y_t + \theta \varepsilon_t
+$$
+
+Define the one-step forecast $$\widehat{y}_{t+1 \mid t} = \mathbb{E}[y_{t+1}\mid \mathcal{F}_t]$$. The corresponding forecast error is
+
+$$
+e_t = y_t - \widehat{y}_{t \mid t-1}
+$$
+
+Under the model, the innovations coincide with forecast errors, i.e. $$\varepsilon_t = e_t$$. Substituting this into the forecasting formula gives
+
+$$
+\widehat{y}_{t+1 \mid t} = y_t + \theta e_t
+= y_t + \theta\left(y_t - \widehat{y}_{t \mid t-1}\right)
+= (1+\theta)y_t - \theta \widehat{y}_{t \mid t-1}
+$$
+
+Rearranging,
+
+$$
+\widehat{y}_{t+1 \mid t} = \alpha y_t + (1-\alpha)\widehat{y}_{t \mid t-1},
+\qquad \alpha = 1+\theta
+$$
+
+This is exactly the exponential smoothing recursion: the next forecast is a convex combination of the latest observation and the previous forecast. For the usual invertibility condition of MA$$\,(1)\,$$ (which requires $$\lvert \theta \rvert<1$$), we have $$\alpha \in (0,2)$$; in many practical applications (including classical exponential smoothing), one restricts to $$\alpha\in(0,1)$$, which corresponds to $$\theta\in(-1,0)$$. The key point is structural: ARIMA$$\,(0,1,1)\,$$ implies an EWMA forecasting rule, and under correct specification, that rule is one-step-ahead optimal because it is the conditional expectation under the data-generating model.
+
+## Smooth Transition Exponential Smoothing
+
+Taylor (2004) introduces the Smooth Transition Exponential Smoothing (STES). It is motivated by an empirical regularity: past return shocks can have an asymmetric relationship with future realized volatility. A natural implication is that the effective update rate in an EWMA filter should vary with the characteristics of recent shocks rather than remain constant.
+
+STES modifies ES by allowing the smoothing parameter to change over time as a function of a set of **transition variables**. Specifically, it is formulated as
+
+$$
+\begin{equation}\label{eq:stexpsmooth}
+    \begin{aligned}
+        \alpha_t &= \frac{1}{1+\exp\left(-X_t \beta\right)} \\
+        \widehat{\sigma}_t^2 &= \alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\widehat{\sigma}_{t-1}^2
+    \end{aligned}
+\end{equation}
+$$
+
+Note on sign conventions (important later): the authors write $$\alpha_t = \frac{1}{1+\exp\left(X_t \beta\right)}$$. This is mathematically equivalent to writing $$\alpha_t = \frac{1}{1+\exp\left(-X_t \tilde\beta\right)}$$ after the re-parameterization $$\tilde\beta := -\beta$$. In code we use the standard expit form (monotone increasing in its argument), and therefore any "sign" differences you may see across references can be absorbed into the fitted coefficient vector.
+
+In contrast to ES, $$\alpha_t$$ is no longer constant. It is determined by the transition variables $$X_t$$, which may include a constant term and functions of recent returns such as $$\lvert r_t \rvert$$ or $$r_t^2$$ (to capture shock magnitude), as well as $$r_t$$ itself (to allow for sign effects, often discussed under “leverage” or asymmetry). By conditioning the update rate on these variables, STES retains the interpretability and computational simplicity of EWMA while permitting the $$\alpha_t$$ to adapt across market conditions.
+
+Taylor (2004) reports that STES performs competitively against ES and benchmark GARCH-type models in terms of one-step-ahead forecasting accuracy for major equity indices. A later study, Liu, Taylor, and Choo (2020), extends the framework to investigate whether trading volume adds incremental predictive value for realized volatility and to assess the robustness of STES to outliers.
+
+A useful way to place these models in context is to contrast the mechanism that makes ES optimal for ARIMA$$\,(0,1,1)\,$$ with the mechanism that motivates GARCH-type volatility models.
+
+- **ARIMA$$\,(0,1,1)\,$$ (level dynamics; linear forecast).**  
+  The ARIMA result above is about forecasting the *level* of a (possibly integrated) series with linear dependence in the innovations. If the variance process follows an ARIMA(0, 1, 1), then ES is optimal there because the conditional expectation of $$\sigma^2_{t+1}$$ depends on a geometrically decaying average of past squared shocks, which collapses into a one-parameter recursion.
+
+- **GARCH (variance dynamics; conditional heteroskedasticity).**  
+  In GARCH, the object of interest is the conditional variance, which evolves as a function of past squared shocks and past variances, e.g. $$\sigma_t^2 = \omega + \alpha r_{t-1}^2 + \beta \sigma_{t-1}^2$$. Even when the recursion resembles ES, the presence of an intercept and the requirement of positivity/stationarity constraints make it a different modeling class. More importantly, the *true* conditional variance is typically state-dependent: its persistence and responsiveness can vary across regimes, leverage states, and market microstructure conditions.
+
+This distinction helps clarify why a time-varying update rate can be theoretically beneficial. If the volatility process behaves as if it has different effective persistence in different regions of the state space—e.g., calm periods with slow-moving variance and crisis periods with sharp variance re-pricing—then any constant-$$\alpha$$ filter is forced to compromise. It will either react too slowly in stressed regimes or too quickly in calm regimes. STES addresses this mismatch in the most conservative way possible: it retains the stable EWMA recursion but lets the learning rate $$\alpha_t$$ be a smooth function of observable state variables. In that sense, STES can be interpreted as a low-dimensional, regime-adaptive approximation to richer conditional variance dynamics.
+
+From a modeling perspective, STES remains deliberately restrictive. Rather than forecasting volatility level directly with a rich parametric dynamics, it focuses on estimating the time-varying smoothing parameter $$\alpha_t$$ that governs how quickly the volatility estimate incorporates new information.
+
+## Roadmap for this series
+
+In this Volatility Forecasts series, we will explore extensions of the STES idea. In [Part 2]({% post_url 2024-07-18-volatility-forecasts-2 %}) we replace the linear transition function in STES with a tree-ensemble model. In [Part 3]({% post_url 2026-01-10-volatility-forecasts-3 %}) we connect these models to their modern neural-network counterparts. Future posts will also consider broader sets of transition variables.
 
 ## Results
-### STES vs ES on Simulated Returns
-First, let us replicate results from the (Liu et al. 2020) paper. They horserace a set of volatility forecast models that include the ES and STES models by fitting their parameters on a training sample and comparing their test-sample metrics that include RMSE, among others. They do this first on a simulated GARCH time series contaminated by extreme outliers. They found that the STES can already slightly outperform the ES model and better handle outliers on the simulated data. My result is listed in Table 1, along with their results. While I cannot reproduce their numbers, I actually do not think there is a reason why STES should outperform the ES model on the simulated data, as the ground truth is a constant parameter GARCH model with some added outliers. I follow the author's model naming convention: STES-AE means only the absolute return (AE) is used as the transition variable. Similarly, STES-E&AE&SE contains both returns (E), absolute returns (AE) and squared returns (SE) as transition variables. 
 
-| Model | RMSE | (Liu et al 2020) |
-| --- | --- | --- |
-| STES-AE | 2.85 | 2.43 |
-| STES-SE | 2.88 | 2.44 |
-| ES      | 2.82 | 2.45 |
+### STES vs ES on simulated returns
+
+We begin by replicating a subset of results from Liu et al. (2020) using data and simulation procedures available to us. The authors compare (among other models) ES and several STES variants by estimating parameters on a training window and evaluating out-of-sample metrics such as RMSE, MAE, and MedAE (median absolute error). They first conduct a controlled experiment on simulated GARCH returns contaminated by extreme outliers, and report that STES can outperform ES in terms of MAE and MedAE, and handle outliers more effectively. As we will see below, STES perform only similarly to ES in terms of RMSE.
+
+Table 1 reports our RMSE results alongside those from Liu et al. (2020). Although we do not reproduce their numbers exactly, the overall pattern is similar: the models are close, and the STES variants differ only marginally from ES. We follow the naming convention used by the authors: STES-AE uses absolute return (AE) as the transition variable; STES-E&AE&SE uses returns (E), absolute returns (AE), and squared returns (SE) jointly.
+
+| Model        | RMSE  | (Liu et al 2020) |
+| ---          | ---   | --- |
+| ES           | 2.68e-04  | 2.45e-04 |
+| STES-AE      | 2.67e-04  | 2.43e-04 |
+| STES-SE      | 2.67e-04  | 2.44e-04 |
+| STES-E&AE    | 2.67e-04  |     |
+| STES-E&SE    | 2.68e-04  |     |
+| STES-AE&SE   | 2.67e-04  |     |
+| STES-E&AE&SE | 2.68e-04  |     |
 
 [Table 1: Comparison of the STES and ES models on simulated data ($$\eta = 4$$).]
 
-### STES vs ES on SPY Returns
-When fitting the model to the SPY returns, STES has the potential to outperform the simple ES model. Table 2 shows the out-of-sample RMSE of the STES model on SPY's realized variance and confirms my prior belief.
+Table 1 shows that STES barely improves upon ES on simulated GARCH paths in terms of RMSE—even though GARCH is a conditional variance model and STES is adapting the variance filter through a time-varying learning rate. That intuition is misleading: **under a constant-parameter symmetric GARCH data-generating process, there is essentially no signal for a time-varying update rate to exploit**, and therefore STES cannot systematically reduce expected one-step-ahead RMSE relative to ES.
 
-| Model | Test RMSE | Train RMSE |
-| --- | --- | --- |
-| STES-E&AE&SE | 4.48e-04 | 4.98e-04 |
-| STES-AE&SE   | 4.49e-04 | 4.96e-04 |
-| STES-E&SE    | 4.52e-04 | 4.95e-04 |
-| STES-E&AE    | 4.54e-04 | 4.93e-04 |
-| ES           | 4.64e-04 | 4.99e-04 |
+We first show that the MSE-optimal forecast is the conditional expectation. Let $$Y_t$$ be the object we are trying to predict at time $$t-1$$ (in our experiments, $$Y_t = r_t^2$$). Among all $$\mathcal{F}_{t-1}$$-measurable predictors $$f_{t-1}$$, the predictor that minimizes one-step mean squared error satisfies
 
-[Table 2: Comparison of the STES and ES models on SPY returns. Since my sample and data differ from the authors, their results are not listed. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31]
+$$
+f_{t-1}^* = \arg\min_{f_{t-1}\in \mathcal{F}_{t-1}} \mathbb{E}\left[(Y_t - f_{t-1})^2\right]
+\quad \Longrightarrow \quad
+f_{t-1}^* = \mathbb{E}\left[Y_t \mid \mathcal{F}_{t-1}\right]
+$$
 
-While I cannot exactly replicate the results in Liu et al. (2020) on the simulated time series, STES performs better on the SPY's data in terms of the out-of-sample RMSE, consistent with the author's calculations on different data sets. However, the gains seem small, not an order of magnitude better, and its net-of-cost performance as a trading strategy needs to be tested. I will be curious to test this forecast as a volatile trading strategy.
+For any $$f_{t-1}$$,
 
-## Other Observations
-The author observes that STES is not a statistical model, so they cannot conduct significance tests on the parameters. In both Taylor (2004) and Liu et al. (2020), they draw interesting observations about the parameters of the fitted STES model. In particular, the fitted parameters imply that the realized volatility responds to past shocks differently depending on the sign and magnitude of the shock. Moreover, in terms of robustness to outliers, the STES also responds better by downweighting the weights on outliers. In the [next post]({% post_url 2024-07-18-volatility-forecasts-2 %}), we'll discuss an extension of the STES model to use tree-ensembles to improve its performance.
+$$
+\mathbb{E}\left[(Y_t - f_{t-1})^2\right]
+=
+\mathbb{E}\left[(Y_t - f_{t-1}^* + f_{t-1}^* - f_{t-1})^2\right]
+=
+\mathbb{E}\left[(Y_t - f_{t-1}^*)^2\right]
++
+\mathbb{E}\left[(f_{t-1}^* - f_{t-1})^2\right]
+$$
+
+where the cross term vanishes because $$Y_t - f_{t-1}^*$$ is orthogonal to all $$\mathcal{F}_{t-1}$$-measurable random variables. The second term is nonnegative, hence the minimum is achieved uniquely at $$f_{t-1}^*$$.
+
+Consider the standard GARCH$$\,(1,1)\,$$ return model (which is used in the simulation study)
+
+$$
+r_t = \sigma_t z_t,
+\qquad
+\mathbb{E}[z_t]=0,\quad \mathbb{E}[z_t^2]=1,\quad z_t \perp \mathcal{F}_{t-1}
+$$
+
+with conditional variance recursion
+
+$$
+\sigma_t^2 = \omega + \alpha r_{t-1}^2 + \beta \sigma_{t-1}^2,
+\qquad \omega>0,\ \alpha\ge 0,\ \beta\ge 0
+$$
+
+Then the conditional expectation of next-day squared return is
+
+$$
+\mathbb{E}\left[r_t^2\mid \mathcal{F}_{t-1}\right]
+=
+\mathbb{E}\left[\sigma_t^2 z_t^2 \mid \mathcal{F}_{t-1}\right]
+=
+\sigma_t^2 \mathbb{E}\left[z_t^2\right]
+=
+\sigma_t^2
+$$
+
+The ES recursion is
+
+$$
+\widehat{\sigma}_t^2 = \alpha_{\mathrm{ES}} r_{t-1}^2 + (1-\alpha_{\mathrm{ES}})\widehat{\sigma}_{t-1}^2
+$$
+
+A GARCH recursion can be rewritten to highlight its EWMA structure:
+
+$$
+\sigma_t^2
+= \omega + \alpha r_{t-1}^2 + \beta \sigma_{t-1}^2
+= \omega + (\alpha+\beta)\left(
+\underbrace{\frac{\alpha}{\alpha+\beta}}_{=: \alpha_{\mathrm{eff}}} r_{t-1}^2
++
+\underbrace{\frac{\beta}{\alpha+\beta}}_{=1-\alpha_{\mathrm{eff}}}\sigma_{t-1}^2
+\right)
+$$
+
+So GARCH is “intercept + persistence × EWMA”. When $$\alpha+\beta$$ is close to 1 and $$\omega$$ is small relative to the prevailing variance level, the conditional variance behaves very similarly to a constant-$$\alpha$$ EWMA with
+
+$$
+\alpha_{\mathrm{eff}} = \frac{\alpha}{\alpha+\beta}
+$$
+
+In our simulation setup, $$\alpha=0.11$$ and $$\beta=0.87$$, hence $$\alpha+\beta=0.98$$ and $$\alpha_{\mathrm{eff}}\approx 0.112$$. This already explains why ES is a strong baseline: **it is very close to the true one-step conditional variance mapping**, leaving limited headroom for further improvements in RMSE.
+
+STES uses a time-varying update rate:
+
+$$
+\widehat{\sigma}_t^2
+=
+\alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\widehat{\sigma}_{t-1}^2,
+\qquad
+\alpha_t = \frac{1}{1+\exp\left(-X_t\beta\right)}
+$$
+
+In standard symmetric GARCH$$\,(1,1)\,$$, the coefficient on $$r_{t-1}^2$$ in the conditional variance recursion is a **constant**. There is no mechanism in the DGP that says “use a different update rate after a large shock” or “use a different update rate after a negative return.” In fact, under symmetry and i.i.d. innovations, the sign of $$r_{t-1}$$ contains no information for $$\sigma_t^2$$ beyond $$r_{t-1}^2$$. The optimal solution within the STES family is to set $$X_t\beta$$ to be (approximately) constant, so that $$\alpha_t$$ becomes (approximately) constant. In other words:
+
+> If the true DGP implies an approximately constant optimal update rate, the best STES reduces to ES.
+
+There is also an irreducible noise floor in this evaluation protocol. Even an oracle predictor that knows the true conditional variance cannot predict the realized innovation $$z_t^2$$. Writing
+
+$$
+r_t^2 = \sigma_t^2 z_t^2
+$$
+
+we have
+
+$$
+r_t^2 - \sigma_t^2 = \sigma_t^2(z_t^2 - 1)
+$$
+
+so the minimum achievable one-step MSE is
+
+$$
+\mathbb{E}\left[\left(r_t^2 - \mathbb{E}[r_t^2\mid \mathcal{F}_{t-1}]\right)^2\right]
+=
+\mathbb{E}\left[\mathrm{Var}(r_t^2\mid \mathcal{F}_{t-1})\right]
+=
+\mathbb{E}[\sigma_t^4]\cdot \mathrm{Var}(z_t^2)
+$$
+
+With heavy-tailed innovations (as in the Student-$$t$$ setting), $$\mathrm{Var}(z_t^2)$$ can be large, and this irreducible component dominates the RMSE. As a result, even meaningful improvements in forecasting $$\sigma_t^2$$ may translate into small changes in RMSE measured against $$r_t^2$$.
+
+On our simulated GARCH paths, it is not surprising that STES fails to materially beat ES in RMSE. Under that DGP, the optimal one-step forecast is the GARCH conditional variance itself; ES already approximates it well when persistence is high; and the additional flexibility of a time-varying gate has no stable signal to exploit and can only fit noise. 
+
+### STES vs ES on SPY returns
+
+On real equity-index data, STES has more opportunity to add value because the transition variables can capture state dependence that a constant $$\alpha$$ cannot. Table 2 reports out-of-sample RMSE for ES and several STES variants when forecasting SPY realized variance. Across specifications, STES improvements over ES in terms of RMSE are more significant, with the best-performing variant in this run being STES-E&AE&SE.
+
+| Model        | Test RMSE | Train RMSE |
+| ---          | ---       | --- |
+| ES           | 4.64e-04  | 4.99e-04 |
+| STES-AE      | 4.51e-04  | 4.95e-04 |
+| STES-SE      | 4.49e-04  | 4.94e-04 |
+| STES-E&AE    | 4.51e-04  | 4.94e-04 |
+| STES-E&SE    | 4.49e-04  | 4.94e-04 |
+| STES-AE&SE   | 4.49e-04  | 4.94e-04 |
+| STES-E&AE&SE | 4.40e-04  | 4.92e-04 |
+
+[Table 2: Comparison of the STES and ES models on SPY returns. Since our sample and data differ from the authors, their results are not listed. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31]
+
+STES-E&AE&SE have better train and test RMSE, setting it apart from the other STES variants, which are themselves significant improvement from ES.
+
+Table 3 reports the fitted coefficients $$\beta$$ for each variant (best random initialization by OOS RMSE; in this run the optimizer converged very consistently across initializations). Blank entries indicate that the corresponding transition variable is not included in that variant.
+
+> **Important clarification (ES column):** ES does *not* have transition coefficients. To make the table comparable, the ES “const” entry should be interpreted as the *logit* of the fitted constant smoothing parameter, i.e. the constant score level that would reproduce the ES $$\alpha$$ under the same logistic map. ES still uses a single constant $$\alpha$$ and does not respond to features.
+
+| Feature | ES | STES-AE | STES-SE | STES-E&AE | STES-E&SE | STES-AE&SE | STES-E&AE&SE |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| const | -1.653 | -1.034 | -1.166 | -1.077 | -1.210 | -1.213 | -1.651 |
+| lag.logret |  |  |  | -1.791 | -2.203 |  | -17.509 |
+| lag.abslogret |  | -6.854 |  | -6.737 |  | 2.229 | 29.928 |
+| lag.sqlogret |  |  | -57.789 |  | -61.663 | -76.431 | -545.299 |
+
+[Table 3: Fitted logistic gate coefficients $$\beta$$ for ES and STES variants on SPY.]
+
+Each coefficient $$\beta_j$$ controls how strongly feature $$x_{j,t}$$ pushes the score, and therefore $$\alpha_t$$. Increasing $$x_{j,t}$$ shifts the score by $$\Delta s_t = \beta_j\Delta x_{j,t}$$, which increases $$\alpha_t$$ if $$\beta_j\Delta x_{j,t} > 0$$ and decreases $$\alpha_t$$ if it is negative. Finally, because $$\alpha_t$$ is logistic, its responsiveness depends on the level of the score: $$\partial\alpha_t/\partial s_t = \alpha_t(1-\alpha_t)$$, which is largest near $$\alpha_t\approx 0.5$$ and small when $$\alpha_t$$ is near 0 or 1.
+
+A common source of confusion is to read “the sign of $$\beta_j$$” as “the sign of the relationship between that feature and $$\alpha_t$$ in practice.” The sign *does* determine the local direction holding other features fixed, but **the realized relationship** depends on:
+
+1. **Feature scale and units.** A very large negative coefficient on $$r_{t-1}^2$$ can still have a modest effect if the numerical values of $$r_{t-1}^2$$ are tiny (which they typically are for daily log returns).
+2. **Joint effects across features.** In STES-E&AE&SE, the gate score is a *sum* of three terms (plus intercept), so the net effect of “large move yesterday” is the combined contribution of $$r_{t-1}$$, $$\lvert r_{t-1} \rvert$$, and $$r_{t-1}^2$$.
+3. **Nonlinearity of expit.** Even if the score moves by the same amount, $$\alpha_t$$ moves less when $$\alpha_t$$ is already near 0 or 1.
+
+In other words: **Table 3 tells you the direction each feature pushes the *logit score***, while the plots below tell you how $$\alpha_{t-1}$$ and forecast performance actually behave in the data distribution.
+
+---
+
+### When does STES beat ES? (OOS mechanism diagnostics)
+
+To move beyond “STES has lower RMSE,” we evaluate performance *day-by-day* in the OOS sample. Define the per-date squared loss differential:
+
+$$
+D_t = (y_t - \hat y^{ES}_t)^2 - (y_t - \hat y^{STES}_t)^2
+$$
+
+so $$D_t>0$$ means STES is better on date $$t$$ under squared error. We then define:
+
+- **``WIN`` events** = dates in the **top 10%** of $$D_t$$ in the OOS sample.
+- **``LOSE`` events** = dates in the **bottom 10%** of $$D_t$$ in the OOS sample.
+
+Note this is a *quantile definition*: “``WIN``” does not mathematically guarantee $$D_t>0$$ (though in practice the top tail is typically positive), and similarly “``LOSE``” does not guarantee $$D_t<0$$. It is simply “best vs worst relative days for STES.”
+
+#### Forecasts and loss differential over time
+
+![Figure 1.](/assets/img/post_assets/volatility-forecasts-1/spy_forecasts_and_D.png)
+
+Figure 1 shows the target $$y_t$$ and the two one-step forecasts in the OOS period, together with $$D_t$$. Most of the time the curves overlap. ES and STES often make nearly identical forecasts.
+RMSE differences are driven by a few episodes. Large spikes in $$D_t$$ concentrate in rare periods where volatility moves sharply (notably around the 2020 shock). This is common with squared-error objectives: the overall RMSE can be dominated by a small set of high-variance days.
+
+---
+
+### Event study around ``WIN`` vs ``LOSE`` dates
+
+We now ask: *what is different in the days around dates where STES is relatively much better vs relatively much worse?*
+
+We perform an “event study” centered at each OOS date $$t$$ that is a ``WIN`` (or ``LOSE``) event. Let event time be $$k \in [-10,10]$$ where $$k=0$$ corresponds to the ``WIN``/``LOSE`` date $$t$$ (the date whose $$D_t$$ places it in the tail). For a series $$z_t$$ we plot the cross-event mean:
+
+$$
+\mathbb{E}\left[z_{t+k}\mid t \in \texttt{WIN}\right]
+\quad\text{and}\quad
+\mathbb{E}\left[z_{t+k}\mid t \in \texttt{``LOSE``}\right].
+$$
+
+#### (A) Realized absolute return around events
+
+![Figure 2.](/assets/img/post_assets/volatility-forecasts-1/spy_event_absr.png)
+
+The y-axis is **mean $$\lvert r_{t+k} \rvert$$** across ``WIN`` events (blue) and ``LOSE`` events (orange). We observe that ``WIN`` events tend to be associated with **larger moves** (especially immediately after the event date), consistent with the idea that “big shocks” are exactly where a state-dependent update rate can matter. ``LOSE`` events look like cases where volatility does not persist in the same way after the event date. Being more reactive is helpful when volatility persists, but harmful when volatility mean-reverts quickly.
+
+#### (B) Gate level used for the forecast at date t
+
+![Figure 3.](/assets/img/post_assets/volatility-forecasts-1/spy_event_alpha.png)
+
+The y-axis is **mean $$\alpha_{t+k-1}$$**, i.e. the gate value *used in the forecast for date $$t+k$$* (since STES updates $$\hat\sigma^2_{t}$$ using $$\alpha_{t-1}$$). The green line is the constant ES $$\alpha$$.
+
+We see that STES has a **higher effective update rate** than ES on average in this run (blue/orange both above the green baseline). Around the most “``WIN``” dates, the gate is often elevated and shows a distinct hump shortly after the event date, consistent with “shock → faster updating.” However, ``LOSE`` events also show elevated gate levels. **High $$\alpha$$ is not automatically good.** The same reactivity that helps in persistent volatility regimes can hurt when the shock is followed by fast normalization.
+
+So the performance difference is not simply “STES increases $$\alpha$$.” rather:
+
+> STES adds value when it increases $$\alpha$$ in *the right episodes*—i.e., when a shock is followed by persistent high variance.
+
+#### (C) Innovation proxy around events
+
+![Figure 4.](/assets/img/post_assets/volatility-forecasts-1/spy_event_u.png)
+
+The y-axis is **mean innovation proxy**:
+
+$$
+u_{t-1} = r_{t-1}^2 - \hat v^{ES}_{t-1}
+$$
+
+where $$\hat v^{ES}_{t-1}$$ is the ES variance forecast at $$t-1$$ (so $$u_{t-1}$$ measures whether the realized squared return was above or below what ES expected).``WIN`` events tend to align with patterns where the ES innovation is followed by persistence (so increasing reactivity helps).``LOSE`` events often look like cases where the innovation is more transient (so increasing reactivity can lead to overshooting and larger error). We observe again that the gate is attempting to react to a surprise, but surprises come in at least two flavors—persistent vs transitory.
+
+
+### Which transition variables drive the gate differently on ``WIN`` vs ``LOSE`` dates?
+
+To interpret the fitted gate, we decompose the logit score into per-feature contributions:
+
+$$
+c_{j,t} = x_{j,t}\beta_j
+$$
+
+so the score is $$s_t=\sum_j c_{j,t}$$ and $$\alpha_t=\mathrm{expit}(s_t)$$. Since $$\alpha_t=\mathrm{expit}(s_t)$$ is monotone increasing in $$s_t$$, a positive contribution pushes $$\alpha_t$$ up (faster update), while a negative contribution pushes $$\alpha_t$$ down (slower update).
+
+Figure 5 reports the difference in mean contributions between ``WIN`` and ``LOSE`` events:
+
+$$
+\mathbb{E}[c_{j,t-1}\mid \texttt{WIN}] - \mathbb{E}[c_{j,t-1}\mid \texttt{LOSE}]
+$$
+
+![Figure 5.](/assets/img/post_assets/volatility-forecasts-1/spy_gate_contrib_win_minus_lose.png)
+
+A positive bar means the feature's mean score contribution is higher on ``WIN`` than on ``LOSE``, i.e.
+it pushes the logit score and $$\alpha$$ upward more on ``WIN`` dates than on ``LOSE`` dates. A negative bar means the feature pushes the score downward more on ``WIN`` than on ``LOSE``.
+These are relative, conditional means: a negative bar does not imply $$\alpha$$ is lower on ``WIN`` dates overall, because other features (and the intercept) may more than offset it.
+
+Also note an important interpretation detail: a bigger $$\beta$$ does not necessarily mean a bigger effect, because the contribution is $$x\beta$$ and the feature scales differ (e.g., $$\lvert r_{t-1} \rvert$$ is typically around 1% while $$r_{t-1}^2$$ is around 0.0001).
+
+In the ``WIN``/``LOSE`` decomposition, a “``WIN`` event” is defined as the top 10% of the loss differential $$D_t = \ell^{ES}t-\ell^{STES}t$$ (STES substantially better than ES), and a “``LOSE`` event” is the bottom 10% (STES substantially worse). The bar chart reports
+
+$$
+\mathbb{E}[c{j,t}\mid WIN] - \mathbb{E}[c{j,t}\mid LOSE]
+$$
+
+i.e., how the average score contributions differ between the two tails.
+
+Empirically, the lag-return term contributes more positively on ``WIN`` events than on ``LOSE`` events (about $$+0.013$$ in score units), while the magnitude terms (absolute and squared returns) contribute more negatively on ``WIN`` events (about $$-0.030$$ and $$-0.024$$, respectively). Summing across features yields a net score difference of roughly
+
+$$
+\Delta s \equiv \mathbb{E}[s\mid WIN]-\mathbb{E}[s\mid LOSE]\approx -0.041
+$$
+
+which implies a slightly lower gate on ``WIN`` events because $$\mathrm{expit}(\cdot)$$ is monotone:
+
+$$
+\mathbb{E}[\alpha\mid WIN] < \mathbb{E}[\alpha\mid LOSE]
+$$
+
+Indeed, the mean gate levels are approximately $$\alpha_{WIN}\approx 0.196$$ and $$\alpha_{LOSE}\approx 0.202$$ (a difference of about $$-0.0065$$). A useful linearization explains why the gap is small:
+$$
+\Delta \alpha \approx \alpha(1-\alpha)\Delta s
+$$
+and around $$\alpha\approx 0.2$$ we have $$\alpha(1-\alpha)\approx 0.16$$, so $$\Delta s\approx -0.041$$ translates into $$\Delta\alpha\approx -0.0065$$.
+
+The key takeaway is that STES wins not only by reacting more after shocks, but also by not overreacting in precisely the episodes that separate its best from its worst outcomes. This is also why unconditional plots of $$\alpha_t$$ versus $$\lvert r_t \rvert$$ can suggest a rising relationship on average, while the conditional ``WIN``/``LOSE`` decomposition can simultaneously show that, among the most performance-relevant tail events, STES’s gate tends to be slightly lower when it outperforms and slightly higher when it underperforms.
+
+---
+
+### Stylized facts from these diagnostics (SPY variance)
+
+These diagnostics support a few concrete “stylized facts” about variance dynamics and the role of the STES gate:
+
+1. **Tail predictability:** improvements in squared-error loss are concentrated in the extreme tail of $$\lvert r_{t-1} \rvert$$. Most normal days show little difference between ES and STES.
+2. **Episodic dominance:** OOS RMSE is heavily influenced by rare, high-volatility episodes. A model can improve RMSE mainly by being less wrong during those few days, even if it behaves similarly to the baseline most of the time.
+3. **Shock-responsive updating:** the *average* $$\alpha_{t-1}$$ rises with the magnitude of $$\lvert r_{t-1} \rvert$$ (see the binned plot), meaning the fitted gate behaves like “bigger move yesterday → more reactive updating” on average. This statement is about the *net realized behavior* of the fitted transition function, not about any single $$\beta$$ sign in isolation.
+4. **Reactivity is not always beneficial:** both the ``WIN`` and ``LOSE`` sets contain highly reactive gate states. The key is not merely raising $$\alpha$$, but raising it when volatility is about to persist and avoiding overreaction when volatility mean-reverts.
+
+On SPY the STES-EAESE mechanism behaves like a state-dependent EWMA: it becomes more reactive after large moves, and that reactivity is precisely where its incremental forecasting value is concentrated.
+
+## Wrapping Up
+
+Taylor (2004) notes that STES is not a statistical model in the classical parametric sense, which limits the use of conventional significance tests for parameters. Both Taylor (2004) and Liu et al. (2020) nevertheless provide informative interpretation of fitted transition functions. In particular, the estimated transition function implies that volatility updating speed can depend on both the sign and the magnitude of recent shocks, and the mechanism can downweight certain observations depending on how the features combine in the logit score—supporting the empirical claim of improved robustness to outliers.
+
+In the [next post]({% post_url 2024-07-18-volatility-forecasts-2 %}), we discuss an extension of STES that replaces the linear transition function with tree-ensemble models.
