@@ -114,7 +114,7 @@ From a modeling perspective, ``STES`` remains deliberately restrictive. Rather t
 
 ## Roadmap for this series
 
-In this Volatility Forecasts series, we will explore extensions of the ``STES`` idea. In [Part 2]({% post_url 2024-07-18-volatility-forecasts-2 %}) we replace the linear transition function in ``STES`` with a tree-ensemble model. In [Part 3]({% post_url 2026-01-10-volatility-forecasts-3 %}) we connect these models to their modern neural-network counterparts. Future posts will also consider broader sets of transition variables.
+In this Volatility Forecasts series, we will explore extensions of the ``STES`` idea. In [Part 2]({% post_url 2024-07-18-volatility-forecasts-2 %}) we replace the linear transition function in ``STES`` with a tree-ensemble model. In [Part 3]({% post_url 2024-10-02-volatility-forecasts-3 %}) we connect these models to their modern neural-network counterparts. Future posts will also consider broader sets of transition variables.
 
 ## Results
 
