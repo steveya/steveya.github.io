@@ -96,17 +96,17 @@ This is exactly the exponential smoothing recursion where the next forecast is a
 $$
 \begin{equation}\label{eq:stexpsmooth}
     \begin{aligned}
-        \alpha_t &= \frac{1}{1+\exp\left(-X_t \beta\right)} \\
-        \widehat{\sigma}_t^2 &= \alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\widehat{\sigma}_{t-1}^2
+        \widehat{\sigma}_t^2 &= \alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\widehat{\sigma}_{t-1}^2 \\
+        \alpha_{t-1} &= \mathrm{sigmoid}\left(-X_{t-1}^\top \beta\right) \\
     \end{aligned}
 \end{equation}
 $$
 
-> Note on sign convention: the authors write $$\alpha_t = \frac{1}{1+\exp\left(X_t \beta\right)}$$. This is mathematically equivalent to writing $$\alpha_t = \frac{1}{1+\exp\left(-X_t \tilde\beta\right)}$$ after the re-parameterization $$\tilde\beta := -\beta$$. In code and in this series we use the standard ``expit`` form that is monotone increasing in its argument.
+> Note on sign convention: the authors write $$\alpha_t = \frac{1}{1+\exp\left(X_t \beta\right)}$$. This is mathematically equivalent to writing $$\alpha_t = \frac{1}{1+\exp\left(-X_t \tilde\beta\right)}$$ after the re-parameterization $$\tilde\beta = -\beta$$. In code and in this series we use the sigmoid form (which is implemented using the scipy's ``expit`` function) that is monotone increasing in its argument.
 
 In contrast to ``ES``, $$\alpha_t$$ is no longer constant. It is determined by the transition variables $$X_t$$, which may include a constant term and functions of recent returns such as $$\lvert r_t \rvert$$ or $$r_t^2$$ (to capture shock magnitude), as well as $$r_t$$ itself (to allow for sign effects, often discussed under “leverage” or asymmetry). By conditioning the update rate on these variables, ``STES`` retains the interpretability and computational simplicity of ``EWMA`` while permitting the $$\alpha_t$$ to adapt across market conditions.
 
-``Taylor (2004)`` reports that ``STES`` performs competitively against ``ES`` and benchmark ``GARCH``-type models in terms of one-step-ahead forecasting accuracy for major equity indices. A later study, ``Liu, Taylor, and Choo (2020)``, extends the framework to investigate whether trading volume adds incremental predictive value for realized volatility and to assess the robustness of ``STES`` to outliers.
+[``Taylor (2004)``](https://doi.org/10.1016/j.ijforecast.2003.09.010) reports that ``STES`` performs competitively against ``ES`` and benchmark ``GARCH``-type models in terms of one-step-ahead forecasting accuracy for major equity indices. A later study, [``Liu, Taylor, and Choo (2020)``](ttps://doi.org/10.1016/j.econmod.2020.02.021), extends the framework to investigate whether trading volume adds incremental predictive value for realized volatility and to assess the robustness of ``STES`` to outliers.
 
 A time-varying update rate can be beneficial in theory and in practice. If the volatility process behaves as if it has different effective persistence in different regions of the state space—e.g., calm periods with slow-moving variance and crisis periods with sharp variance re-pricing—then any constant-$$\alpha$$ filter is forced to compromise. It will either react too slowly in stressed regimes or too quickly in calm regimes. ``STES`` addresses this mismatch in the most conservative way possible: it retains the stable ``EWMA`` recursion but lets the learning rate $$\alpha_t$$ be a smooth function of observable state variables. In that sense, ``STES`` can be interpreted as a low-dimensional, regime-adaptive approximation to richer conditional variance dynamics.
 
@@ -249,13 +249,13 @@ On real equity-index data, ``STES`` has more opportunity to add value because th
 
 | Model        | Test ``RMSE`` | Train ``RMSE`` |
 | ---          | ---       | --- |
-| ``ES``           | 4.64e-04  | 4.99e-04 |
-| ``STES-AE``      | 4.51e-04  | 4.95e-04 |
-| ``STES-SE``      | 4.49e-04  | 4.94e-04 |
-| ``STES-E&AE``    | 4.51e-04  | 4.94e-04 |
-| ``STES-E&SE``    | 4.49e-04  | 4.94e-04 |
-| ``STES-AE&SE``   | 4.49e-04  | 4.94e-04 |
-| ``STES-E&AE&SE`` | 4.40e-04  | 4.92e-04 |
+| ``ES``           | 4.64e-04  | 5.06e-04 |
+| ``STES-AE``      | 4.54e-04  | 5.03e-04 |
+| ``STES-SE``      | 4.52e-04  | 5.02e-04 |
+| ``STES-E&AE``    | 4.52e-04  | 5.01e-04 |
+| ``STES-E&SE``    | 4.50e-04  | 4.99e-04 |
+| ``STES-AE&SE``   | 4.49e-04  | 5.02e-04 |
+| ``STES-E&AE&SE`` | 4.49e-04  | 4.98e-04 |
 
 [Table 2: Comparison of the ``STES`` and ``ES`` models on ``SPY`` returns. Since our sample and data differ from the authors, their results are not listed. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31]
 

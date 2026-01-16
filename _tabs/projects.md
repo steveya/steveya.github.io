@@ -14,6 +14,7 @@ My study notes on the signature method
    - [Signature Methods (Part 1 - Motivation)]({% post_url 2025-12-14-signature-method-1 %})
    - [Signature Methods (Part 2 - Signature and Augmentation)]({% post_url 2025-12-21-signature-method-2 %})
    - [Signature Methods (Part 3 - Lead–Lag Augmentation and Practical Limitations to the Signature Method)]({% post_url 2025-12-25-signature-method-3 %})
+   - [Signature Methods in Volatility Forecasts]({% post_url 2026-01-16-signature-method-in-volatility-forecasts %})
 
 ## Volatility Forecasting
 It was a rabbit hole that I accidentally got myself into.
@@ -21,6 +22,7 @@ It was a rabbit hole that I accidentally got myself into.
    - [Volatility Forecasts (Part 1 - ES vs STES Model)]({% post_url 2024-07-12-volatility-forecasts-1 %})
    - [Volatility Forecasts (Part 2 - XGBoost-STES)]({% post_url 2024-07-18-volatility-forecasts-2 %})
    - [Volatility Forecasts (Part 3 - Connection with Neural Network Models)]({% post_url 2024-10-02-volatility-forecasts-3 %})
+   - [Signature Methods in Volatility Forecasts]({% post_url 2026-01-16-signature-method-in-volatility-forecasts %})
  - Notebook: [volatility-forecast](https://github.com/steveya/volatility-forecast/blob/main/notebook/stes_volatility_forecast.ipynb)
  - WIP GitHub Repository: [volatility-forecast](https://github.com/steveya/volatility-forecast)
 
