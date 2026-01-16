@@ -8,7 +8,7 @@ tags: [quantitative-finance, volatility-forecast, machine-learning, research]
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
-(Code snippets for this post can be found in the accompanying notebook in the linked [Github repository](https://github.com/steveya/volatility-forecast/notebook/random_forest_ewma.ipynb).)
+(Code snippets for this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/blob/main/examples/volatility_forecast_2.py).)
 
 ## Recap
 In the [previous post]({% post_url 2024-07-12-volatility-forecasts-1 %}), we replicated the Smooth Transition Exponential Smoothing (``STES``) model from [(Taylor 2004)](https://doi.org/10.1016/j.ijforecast.2003.09.010) and [(Liu, Taylor, Choo 2020)](https://doi.org/10.1016/j.econmod.2020.02.021). In a small replication study on ``SPY`` returns, ``STES`` delivered modest improvements in out-of-sample ``RMSE`` relative to simple Exponential Smoothing (``ES``). Here, we ask a natural follow-up: if we keep the same feature set $$X_t$$ (lag returns, lag squared returns, and lag absolute returns), can a more flexible gate improve the forecast further?
