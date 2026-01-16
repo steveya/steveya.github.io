@@ -17,14 +17,14 @@ My study notes on the signature method
    - [Signature Methods in Volatility Forecasts]({% post_url 2026-01-16-signature-method-in-volatility-forecasts %})
 
 ## Volatility Forecasting
-It was a rabbit hole that I accidentally got myself into.
+My work on volatility forecasting. How far can we go by extending simple exponential smoothing filter?
  - Blog Post: 
    - [Volatility Forecasts (Part 1 - ES vs STES Model)]({% post_url 2024-07-12-volatility-forecasts-1 %})
    - [Volatility Forecasts (Part 2 - XGBoost-STES)]({% post_url 2024-07-18-volatility-forecasts-2 %})
    - [Volatility Forecasts (Part 3 - Connection with Neural Network Models)]({% post_url 2024-10-02-volatility-forecasts-3 %})
    - [Signature Methods in Volatility Forecasts]({% post_url 2026-01-16-signature-method-in-volatility-forecasts %})
- - Notebook: [volatility-forecast](https://github.com/steveya/volatility-forecast/blob/main/notebook/stes_volatility_forecast.ipynb)
- - WIP GitHub Repository: [volatility-forecast](https://github.com/steveya/volatility-forecast)
+ - Research Code: [volatility-forecast](https://github.com/steveya/volatility-forecast/blob/main/examples)
+ - Research Library: [volatility-forecast](https://github.com/steveya/volatility-forecast)
 
 ## Malaria Detection
 My work on the Capstone Project for the certificate program Applied Data Science with MIT Professional Education. 
