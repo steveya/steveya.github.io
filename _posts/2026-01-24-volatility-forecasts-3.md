@@ -211,7 +211,7 @@ This is analogous to the scaling issues found in Lasso or Ridge regression, wher
 > To see how the quantity of curvature relates to the number of sample, we only need to look at the mean squared error objective function. 
 >
 > $$
-> \ell = \frac{1}{2} \left(\hat{y} - y\right)^2 \implies \frac{\partial^2 \ell}{\partial \hat{y}^2} = 1
+> \ell = \frac{1}{2} \left(\hat{y} - y\right)^2 \rightarrow \frac{\partial^2 \ell}{\partial \hat{y}^2} = 1
 > $$
 >
 > $$H_m = \sum_{i\in I_m} 1$$
