@@ -33,19 +33,55 @@ $$
 \mathtt{loss} = \frac{1}{T}\sum_{t=1}^{T}\left(r_t^2 - \widehat{\sigma}_t^2\right)^2
 $$
 
-For each time step $$t$$, the forecasted variance $$\sigma_t^2$$ is a weighted combination of the previous period’s squared return $$r_{t-1}^2$$ and the previous forecast $$\widehat{\sigma}_{t-1}^2$$. The weight $$\alpha_{t-1}$$ is produced by an XGBoost model applied to the transition variable $$X_{t-1}$$ and passed through a sigmoid so it lies in $(0,1)$. In other words, we do not predict next-day variance directly; instead, we predict a time-varying update weight and then generate the variance forecast recursively over contiguous blocks of the feature matrix.
+For each time step $$t$$, the forecasted variance $$\sigma_t^2$$ is a weighted combination of the previous period’s squared return $$r_{t-1}^2$$ and the previous forecast $$\widehat{\sigma}_{t-1}^2$$. The weight $$\alpha_{t-1}$$ is produced by an XGBoost model applied to the transition variable $$X_{t-1}$$ and passed through a sigmoid so it lies in $$(0,1)$$. In other words, we do not predict next-day variance directly; instead, we predict a time-varying update weight and then generate the variance forecast recursively over contiguous blocks of the feature matrix.
 
 ## Brief Introduction to ``XGBoost``
 
-``XGBoost`` is a general-purpose engine for functional gradient descent. At its core, it optimizes an objective function by iteratively adding functions $f_t(x)$ (regression trees) to an ensemble. For example, the model at step $$t$$ is $$F_t(x) = \sum_{k=1}^t f_k(x)$$.
+``XGBoost`` is a general-purpose engine for functional gradient descent. At its core, it optimizes an objective function by iteratively adding functions $$f_t(x)$$ (regression trees) to an ensemble. For example, the model at step $$j$$ is $$F_j(x) = \sum_{k=1}^j f_k(x)$$.
 
 ``XGBoost`` does not optimize the loss directly. Instead, at each step $$t$$, it approximates the loss using a second-order Taylor expansion around the current prediction $$z_i^{(t-1)}$$. If we wish to minimize a loss $$\mathcal{L} = \sum_i \ell(y_i, z_i)$$, ``XGBoost`` solves for the term $$f_t(x_i)$$ that minimizes:
 
 $$
-\mathcal{L}^{(t)} \approx \sum_{i=1}^N \left[ \ell(y_i, z_i^{(t-1)}) + g_i f_t(x_i) + \frac{1}{2}h_i f_t^2(x_i) \right] + \Omega(f_t)
+\mathcal{L}^{(j)} \approx \sum_{i=1}^N \left[ \ell(y_i, z_i^{(t-1)}) + g_i f_j(x_i) + \frac{1}{2}h_i f_j^2(x_i) \right] + \Omega(f_j)
 $$
 
-where $$g_i = \partial \ell / \partial z_i$$ is the gradient and $$h_i = \partial^2 \ell / \partial z_i^2$$ is the Hessian. The term $$\Omega(f_t)$$ penalizes the complexity of the tree.
+where $$g_i = \partial \ell / \partial z_i$$ is the gradient and $$h_i = \partial^2 \ell / \partial z_i^2$$ is the Hessian. The term $$\Omega(f_t)$$ penalizes the complexity of the tree. We minimize this loss function with respect to $$f_j$$, and the term $$\ell(y_i, z_i^{(t-1)})$$ depends only on the previous trees and is a constant that can be dropped from this step.
+
+In XGBoost, the function $$f_j$$ is a regression tree. A regression tree maps a data point $$x_i$$ to a leaf node $$m$$ and assign it a score $$w_m$$. i.e. 
+
+$$
+f_j(x_i) = w_{m(x_i)}
+$$
+
+where $$m(x_i)$$ is if-else rule that maps $$x_i$$ to the leaf node $$m$$, $$w$$ is the vector of scores for all leaves. The $$\mathcal{L}^{(j)}$$ above sums over all $$x_i$$, and we can rewrite it as a summation over all $$M$$ leaf groups. Let $$I_m = \left[i \mid m(x_i) = m\right]$$, $$\mathcal{L}^{(j)}$$ and the regularization term 
+
+$$\Omega(f_j) = \gamma M + \frac{1}{2}\lambda\sum_{j=m}^M w_m^2$$ 
+
+can be written as
+
+$$
+\mathcal{L}^{(j)} \approx \sum_{m=1}^M \left[ \left(\sum_{i \in I_m} g_m\right) w_m + \frac{1}{2} \left(\sum_{i \in I_m} h_i\right) w_m^2 \right] + \gamma M + \frac{1}{2}\lambda\sum_{j=m}^M w_m^2
+$$
+
+We minimize this loss function with respect to $$f_j$$, or rather, the weight vector $$w$$.  and does not depend on $$w$$, so it can be removed in the optimization. Rewrite $$G_m = \sum_{m \in I_m} g_m$$ and $$H_m = \sum_{m \in I_m} h_m$$. We can rearrange the terms to get
+
+$$
+\mathcal{L}^{(j)} \approx \sum_{m=1}^M \left[ G_m w_m + \frac{1}{2} \left(H_m + \lambda \right) w_m^2 \right] + \gamma M
+$$
+
+This is a sum of quadratic equation in $$w_m$$ and its minimum is achieved at 
+
+$$
+w_m^* = -\frac{G_m}{H_m + \lambda}
+$$
+
+Note that $$\gamma M$$ is also a constant at this step and drops out of the optimization. The $$\gamma M$$ term only plays a role when ``XGBoost`` decides the split. Once we plug in $$w_m^*$$ back into $$L$$ and simplify, we get
+
+$$
+\mathrm{Score} = -\frac{1}{2} \sum_{m=1}^M \frac{G_m^2}{H_m + \lambda} + \gamma M
+$$
+
+``XGBoost`` then calculates the "Gain" of a split, it drops the negative sign (to convert Loss to Gain) and compares ``Score(Left) + Score(Right) - Score(Parent)``. ``XGBoost`` creates a split if the Gain is above a certain threshold, and $$\gamma$$ acts to reduce the gain from each split 
 
 This formulation reveals that to adapt ``XGBoost`` to any problem, we only need to provide two arrays: the gradient vector $$g$$ and the Hessian "vector" $$h$$. The library handles the tree construction, which involves finding splits that maximize the reduction in this regularized quadratic loss. Specifically, for a leaf node $$j$$ containing a set of instance indices $$I_j$$, the optimal weight $$w_j$$ and the resulting structure score are derived from the sums $$G_j = \sum_{i \in I_j} g_i$$ and $$H_j = \sum_{i \in I_j} h_i$$:
 
@@ -58,15 +94,15 @@ Here, $$\lambda$$ acts as an L2 regularizer on the leaf weights, and $$\gamma$$ 
 
 > Why is the Hessian a vector in ``XGBoost``
 >
->For a dataset of size $N$, the Hessian is strictly an $$N \times N$$ matrix. However, ``XGBoost`` (and most boosting libraries) requests a vector of size $$N$$. This is because ``XGBoost`` cannot handle an $N \times N$ matrix due to memory constraints. For 1 million rows, the matrix has $$10^{12}$$ entries and is in general not feasible to store. Computationally, inverting or decomposing this matrix to find optimal tree splits is also impossible ($$O(N^3)$$).
+> For a dataset of size $$N$$, the Hessian is strictly an $$N \times N$$ matrix. However, ``XGBoost`` (and most boosting libraries) requests a vector of size $$N$$. This is because ``XGBoost`` cannot handle an $$N \times N$$ matrix due to memory constraints. For 1 million rows, the matrix has $$10^{12}$$ entries and is in general not feasible to store. Computationally, inverting or decomposing this matrix to find optimal tree splits is also impossible ($$O(N^3)$$).
 >
->To make the problem solvable, ``XGBoost`` makes a **diagonal approximation**. It assumes that for the purpose of finding the next split, the rows are independent. It ignores the cross-dependencies and only asks for the diagonal elements:
+> To make the problem solvable, ``XGBoost`` makes a **diagonal approximation**. It assumes that for the purpose of finding the next split, the rows are independent. It ignores the cross-dependencies and only asks for the diagonal elements:
 >
->$$
->h_t = \frac{\partial^2 L}{\partial z_t^2}
->$$
+> $$
+> h_t = \frac{\partial^2 L}{\partial z_t^2}
+> $$
 >
->and the "Hessian" becomes a $$N$$-dimensional vector. This independence assumption is why the method is an approximation. However, because we update the model iteratively (boosting), errors from this approximation are corrected in subsequent rounds, allowing ``XGBoost`` to converge even with this simplified curvature information.
+> and the "Hessian" becomes a $$N$$-dimensional vector. This independence assumption is why the method is an approximation. However, because we update the model iteratively (boosting), errors from this approximation are corrected in subsequent rounds, allowing ``XGBoost`` to converge even with this simplified curvature information.
 
 ### Previous Implementation
 
@@ -121,7 +157,7 @@ In our recursive model like ``STES``, the off-diagonal terms (e.g., $$\frac{\par
 > Gauss-Newton approximation is a standard technique in non-linear least squares optimization. We approximate the curvature of the loss function by assuming the underlying model is locally linear, effectively ignoring the second-order complexity of the model itself.
 >
 > Our objective function $$L(z)$$ is a composition of two functions:
-> 1.  The **Prediction Model** $$f(z)$$: Maps the input margin $z$ to a prediction $$\hat{y}$$ (in our case, the variance $$v$$).
+> 1.  The **Prediction Model** $$f(z)$$: Maps the input margin $$z$$ to a prediction $$\hat{y}$$ (in our case, the variance $$v$$).
 > 2.  The **Loss Function** $$\ell(\hat{y}, y)$$: Measures the error. For Least Squares, this is $$\ell = \frac{1}{2}(\hat{y} - y)^2$$.
 >
 > $$
@@ -134,7 +170,7 @@ In our recursive model like ``STES``, the off-diagonal terms (e.g., $$\frac{\par
 > L'(z) = (f(z) - y) \cdot f'(z)
 > $$
 >
-> and to find the Hessian, we differentiate $$L'(z)$$ again. Since $$L'(z)$$ is the product of two terms, we use the Product Rule $$(uv)' = u'v + uv'$$:
+> and to find the Hessian, we differentiate $$L'(z)$$ again. Product Rule yields:
 > 
 > $$
 > L''(z) = \underbrace{(f'(z))^2}_{\text{Term 1}} + \underbrace{(f(z) - y) \cdot f''(z)}_{\text{Term 2}}
@@ -166,9 +202,31 @@ $$
 \text{Score} = -\frac{1}{2} \frac{G^2}{H + \lambda}
 $$
 
-wheer $$G \approx 10^{-8}$$ and $$H \approx 10^{-16}$$, and the default regularization parameter $$\lambda = 1$$, the denominator is dominated by $$\lambda$$. The resulting score is roughly $$10^{-16}$$, which is numerically indistinguishable from zero. Furthermore, we initially ran with the default `min_child_weight` parameter, which requires the sum of Hessians in a leaf to exceed 1. Our Hessians at $10^{-16}$ is just on a different scale.
+wheer $$G \approx 10^{-8}$$ and $$H \approx 10^{-16}$$, and the default regularization parameter $$\lambda = 1$$, the denominator is dominated by $$\lambda$$. The resulting score is roughly $$10^{-16}$$, which is numerically indistinguishable from zero. Furthermore, we initially ran with the default `min_child_weight` parameter, which requires the sum of Hessians in a leaf to exceed 1. Our Hessians at $$10^{-16}$$ is just on a different scale.
 
-This is analogous to the scaling issues found in Lasso or Ridge regression, where unstandardized features can lead to disproportionate penalization. Here, the "feature" is the gradient signal itself. To fix this, we multiply returns by 100 before squaring them. This scales the variance targets by $10,000$. The gradient, which is quadratic in the scale of returns, increases by a factor of $10^8$, bringing it to order $O(1)$. With this adjustment, the standard ``XGBoost`` hyperparameters function as intended.
+This is analogous to the scaling issues found in Lasso or Ridge regression, where unstandardized features can lead to disproportionate penalization. Here, the "feature" is the gradient signal itself. To fix this, we multiply returns by 100 before squaring them. This scales the variance targets by $$10,000$$. The gradient, which is quadratic in the scale of returns, increases by a factor of $$10^8$$, bringing it to order $$O(1)$$. With this adjustment, the standard ``XGBoost`` hyperparameters function as intended.
+
+> The `min_child_weight` relates to the Hessian and measures the quantity of the curvature or the number of samples in a leaf. A split is only allowed if $$H_\mathrm{left} \ge \text{min_child_weight}$$ and $$H_\mathrm{right} \ge \text{min_child_weight}$$. In second order optimization, the curvature measures the steepness of the surface. When curvature is high, a small change in prediction changes the error massively. The model has a strong motivation to split here. On the other hand, when the curvature is small, the loss function is a flat plain. The optimizaer can change the prediction wildly and the error barely changes. The model would have no strong incentive to split here.
+>
+> To see how the quantity of curvature relates to the number of sample, we only need to look at the mean squared error objective function. 
+>
+> $$
+> \ell = \frac{1}{2} \left(\hat{y} - y\right)^2 \implies \frac{\partial^2 \ell}{\partial \hat{y}^2} = 1
+> $$
+>
+> $$H_m = \sum_{i\in I_m} 1$$
+>
+> is just the number of sample.
+>
+> The Hessian in logistic regression varies depending on how confident the model is. The Hessian for a single data point $$i$$ is:
+>
+> $$
+> h_i = p_i (1 - p_i)
+> $$
+>
+> where $$p_i$$ is the predicted probability. If the model predicts $$p = 0.5$$, then $$h_i = 0.5 \times 0.5 = 0.25$$ is at the maximum curvature. The loss function is steep and a split here make sense. If the model predicts $$p = 0.99$$, then $$h_i = 0.99 \times 0.01 \approx 0.01$$. The model is already sure about this prediction. The loss function is flat and the model should decide not to split further. 
+>
+> `min_child_weight` measures whether there is there enough *unsolved* data?
 
 ### Hyperparameter Tuning with Time-Series Cross-Validation
 
@@ -201,9 +259,9 @@ This ensures that our cross-validation scores accurately reflect the model's abi
 
 ## Results and Discussion
 
-We evaluated both the Alternating (Algorithm 1) and End-to-End (Algorithm 2) implementations on SPY returns from 2000 to 2023. We also added the cross-validation to Algorithm 1 for comparison.
+We evaluated both the Alternating (Algorithm 1) and End-to-End (Algorithm 2) implementations on SPY returns from 2000 to 2023. We also added the cross-validation to Algorithm 1 for comparison so the number might be different from the last post.
 
-| Model | IS RMSE (Mean) | OS RMSE (Mean) |
+| Model | IS RMSE | OS RMSE |
 | :--- | :--- | :--- |
 | **ES** | 5.06e-4 | 4.64e-4 |
 | **STES-EAESE** | **4.98e-4** | 4.49e-4 |
@@ -214,4 +272,4 @@ Even though the Algorithm 1 has the lowest OS RMSE, its in-sample performance is
 
 ![Figure 2. $$\alpha$$ of our Models](/assets/img/post_assets/volatility-forecasts-3/alpha_comp.png)
 
-That's it for this post. We will diagnose the XGBSTES model further in future posts. We really want to continue with the analysis of using Signature fetures to forecast volatility. See you then.
+That's it for this post. We will diagnose the XGBSTES model further in future posts. See you then.
