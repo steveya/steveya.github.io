@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Volatility Forecasts (Part 2 - XGBSTES)"
+title: "Volatility Forecasts (Part 2 - XGBSTES Algorithm 1)"
 date: 2024-07-18
 categories: [Quantitative Finance]
 tags: [quantitative-finance, volatility-forecast, machine-learning, research]
@@ -560,4 +560,3 @@ The key takeaways from the comprehensive evaluation:
 
 The error distribution difference—smaller median/mean absolute errors but larger root mean squared error—suggests the tree-gated approach may be better suited for applications where typical forecast accuracy matters more than avoiding occasional large misses. This could be valuable for risk management systems that focus on day-to-day volatility tracking rather than extreme tail events.
 
-In the next post, we will connect ``ES``/``STES``-style gating ideas with more modern neural-network architectures.

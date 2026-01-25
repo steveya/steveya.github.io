@@ -114,9 +114,13 @@ From a modeling perspective, ``STES`` remains deliberately restrictive. Rather t
 
 ## Roadmap for this series
 
-In this Volatility Forecasts series, we will explore extensions of the ``STES`` idea. In [Part 2]({% post_url 2024-07-18-volatility-forecasts-2 %}) we replace the linear transition function in ``STES`` with a tree-ensemble model. In [Part 3]({% post_url 2024-10-02-volatility-forecasts-3 %}) we connect these models to their modern neural-network counterparts. Future posts will also consider broader sets of transition variables.
+In this Volatility Forecasts series, we will explore extensions of the ``STES`` idea. In [Part 2]({% post_url 2024-07-18-volatility-forecasts-2 %}) and [Part 3]({% post_url 2026-01-24-volatility-forecasts-3 %}), we replace the linear transition function in ``STES`` with a tree-ensemble model. 
 
 ## Results
+
+### Preprocessing
+
+All results use standardized inputs: features (excluding the constant term) are normalized using ``StandardScaler`` fit on the training split, then applied identically to both training and test splits. 
 
 ### ``STES`` vs ``ES`` on simulated returns
 
@@ -124,17 +128,17 @@ We begin by replicating a subset of results from ``Liu et al. (2020)`` using dat
 
 Table 1 reports our ``RMSE`` results alongside those from ``Liu et al. (2020)``. Although we do not reproduce their numbers exactly, the overall pattern is similar: the models are close, and the ``STES`` variants differ only marginally from ``ES``. We follow the naming convention used by the authors: ``STES-AE`` uses absolute return (``AE``) as the transition variable; ``STES-E&AE&SE`` uses returns (``E``), absolute returns (``AE``), and squared returns (``SE``) jointly.
 
-| Model        | ``RMSE``  | ``(Liu et al 2020)`` |
+| Model        | ``RMSE`` (standardized) | ``(Liu et al 2020)`` |
 | ---          | ---   | --- |
-| ``ES``           | 2.68e-04  | 2.45e-04 |
-| ``STES-AE``      | 2.67e-04  | 2.43e-04 |
-| ``STES-SE``      | 2.67e-04  | 2.44e-04 |
-| ``STES-E&AE``    | 2.67e-04  |     |
-| ``STES-E&SE``    | 2.68e-04  |     |
-| ``STES-AE&SE``   | 2.67e-04  |     |
-| ``STES-E&AE&SE`` | 2.68e-04  |     |
+| ``ES``           | 2.66e-04  | 2.45e-04 |
+| ``STES-AE``      | 2.65e-04  | 2.43e-04 |
+| ``STES-SE``      | 2.66e-04  | 2.44e-04 |
+| ``STES-E&AE``    | 2.65e-04  |     |
+| ``STES-E&SE``    | 2.66e-04  |     |
+| ``STES-AE&SE``   | 2.66e-04  |     |
+| ``STES-E&AE&SE`` | 2.67e-04  |     |
 
-[Table 1: Comparison of the ``STES`` and ``ES`` models on simulated data ($$\eta = 4$$).]
+[Table 1: Comparison of the ``STES`` and ``ES`` models on simulated data ($$\eta = 4$$). *Standardized inputs using StandardScaler on training features; reflects 100 Monte Carlo runs.*]
 
 Table 1 shows that ``STES`` barely improves upon ``ES`` on simulated ``GARCH`` paths in terms of ``RMSE``. One might presume that ``STES`` can outperform ``ES`` on ``GARCH`` given that it is a conditional variance model and ``STES`` is adapting the variance filter through a time-varying learning rate. That intuition is misleading: **under a vanilla GARCH data-generating process, there is essentially no signal for a time-varying update rate to exploit**, and therefore ``STES`` cannot systematically reduce expected one-step-ahead ``RMSE`` relative to ``ES``.
 
@@ -255,9 +259,9 @@ On real equity-index data, ``STES`` has more opportunity to add value because th
 | ``STES-E&AE``    | 4.52e-04  | 5.01e-04 |
 | ``STES-E&SE``    | 4.50e-04  | 4.99e-04 |
 | ``STES-AE&SE``   | 4.49e-04  | 5.02e-04 |
-| ``STES-E&AE&SE`` | 4.49e-04  | 4.98e-04 |
+| ``STES-E&AE&SE`` | 4.49e-04  | 5.00e-04 |
 
-[Table 2: Comparison of the ``STES`` and ``ES`` models on ``SPY`` returns. Since our sample and data differ from the authors, their results are not listed. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31]
+[Table 2: Comparison of the ``STES`` and ``ES`` models on ``SPY`` returns with standardized inputs. *Standardized features (all except constant term) using StandardScaler fit on training split, applied to both training and test. Results are averaged over 100 random initializations. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31*]
 
 ``STES-E&AE&SE`` have better train and test ``RMSE``, setting it apart from the other ``STES`` variants, which are themselves significant improvement from ``ES``.
 
@@ -267,21 +271,16 @@ Table 3 reports the fitted coefficients $$\beta$$ for each variant (best random 
 
 | Feature | ``ES`` | ``STES-AE`` | ``STES-SE`` | ``STES-E&AE`` | ``STES-E&SE`` | ``STES-AE&SE`` | ``STES-E&AE&SE`` |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| const | -1.653 | -1.034 | -1.166 | -1.077 | -1.210 | -1.213 | -1.651 |
-| lag.logret |  |  |  | -1.791 | -2.203 |  | -17.509 |
-| lag.abslogret |  | -6.854 |  | -6.737 |  | 2.229 | 29.928 |
-| lag.sqlogret |  |  | -57.789 |  | -61.663 | -76.431 | -545.299 |
+| const | -2.181 | -1.803 | -1.804 | -1.817 | -2.020 | -1.903 | -2.048 |
+| lag.logret |  |  |  | -0.098 | -0.358 |  | -0.233 |
+| lag.abslogret |  | -0.055 |  | -0.082 |  | 0.142 | 0.188 |
+| lag.sqlogret |  |  | -0.031 |  | -0.190 | -0.109 | -0.242 |
 
-[Table 3: Fitted logistic gate coefficients $$\beta$$ for ``ES`` and ``STES`` variants on ``SPY``.]
+[Table 3: Fitted logistic gate coefficients $$\beta$$ for ``ES`` and ``STES`` variants on ``SPY`` (standardized inputs).]
 
-Each coefficient $$\beta_j$$ controls the direction and strength $$x_{j,t}$$ pushes the score and $$\alpha_t$$. Increasing $$x_{j,t}$$ shifts the score by $$\Delta s_t = \beta_j\Delta x_{j,t}$$, which increases $$\alpha_t$$ if $$\beta_j\Delta x_{j,t} > 0$$ and decreases $$\alpha_t$$ if it is negative. Finally, because $$\alpha_t$$ is logistic, its responsiveness depends on the level of the score: $$\partial\alpha_t/\partial s_t = \alpha_t(1-\alpha_t)$$, which is largest near $$\alpha_t\approx 0.5$$ and small when $$\alpha_t$$ is near 0 or 1.
+Each coefficient $$\beta_j$$ controls the direction and strength $$x_{j,t}$$ pushes the score and $$\alpha_t$$. Increasing $$x_{j,t}$$ shifts the score by $$\Delta s_t = \beta_j\Delta x_{j,t}$$, which increases $$\alpha_t$$ if $$\beta_j\Delta x_{j,t} > 0$$ and decreases $$\alpha_t$$ if it is negative. Therefore, a negative $$\beta$$ coefficient above implies a negative relationship between the variable and $$\alpha$$, all else equal. Since $$\alpha_t$$ is logistic, its responsiveness depends on the level of the score: $$\partial\alpha_t/\partial s_t = \alpha_t(1-\alpha_t)$$, which is largest near $$\alpha_t\approx 0.5$$ and small when $$\alpha_t$$ is near 0 or 1.
 
-A common source of confusion is to read “the sign of $$\beta_j$$” as “the sign of the relationship between that feature and $$\alpha_t$$ in practice.” The sign *does* determine the local direction holding other features fixed, but **the realized relationship** depends on:
-
-1. **Feature scale and units.** A very large negative coefficient on $$r_{t-1}^2$$ can still have a modest effect if the numerical values of $$r_{t-1}^2$$ are tiny (which they typically are for daily log returns).
-2. **Joint effects across features.** In ``STES-E&AE&SE``, the gate score is a *sum* of three terms (plus intercept), so the net effect of “large move yesterday” is the combined contribution of $$r_{t-1}$$, $$\lvert r_{t-1} \rvert$$, and $$r_{t-1}^2$$.
-3. **Nonlinearity of expit.** Even if the score moves by the same amount, $$\alpha_t$$ moves less when $$\alpha_t$$ is already near 0 or 1.
-
+Since the three variables are not independent, centeris paribus interpretation is a little difficult. However, we can see consistently that a negative SPY return shock increase the weights on recent observation, but its magnitude, as captured by `sqlogret` and `abslogret`, can dampen its effect, so large negative return does not increase $$\alpha$$ as much as a medium-sized one.
 
 ### When does STES beat ES? (OOS mechanism diagnostics)
 
@@ -366,8 +365,6 @@ A positive bar means the feature's mean score contribution is higher on ``WIN`` 
 it pushes the logit score and $$\alpha$$ upward more on ``WIN`` dates than on ``LOSE`` dates. A negative bar means the feature pushes the score downward more on ``WIN`` than on ``LOSE``.
 These are relative, conditional means: a negative bar does not imply $$\alpha$$ is lower on ``WIN`` dates overall, because other features (and the intercept) may more than offset it.
 
-Note that a bigger $$\beta$$ does not necessarily mean a bigger effect, because the contribution is $$x\beta$$ and the feature scales differ (e.g., $$\lvert r_{t-1} \rvert$$ is typically around 1% while $$r_{t-1}^2$$ is around 0.0001).
-
 In the ``WIN``/``LOSE`` decomposition, a “``WIN`` event” is defined as the top 10% of the loss differential $$D_t = \ell^{ES}t-\ell^{STES}t$$ (``STES`` substantially better than ``ES``), and a “``LOSE`` event” is the bottom 10% (``STES`` substantially worse). The bar chart reports
 
 $$
@@ -376,10 +373,10 @@ $$
 
 i.e., how the average score contributions differ between the two tails.
 
-Empirically, the lag-return term contributes more positively on ``WIN`` events than on ``LOSE`` events (about $$+0.013$$ in score units), while the magnitude terms (absolute and squared returns) contribute more negatively on ``WIN`` events (about $$-0.030$$ and $$-0.024$$, respectively). Summing across features yields a net score difference of roughly
+Empirically, the lag-return term contributes more positively on ``WIN`` events than on ``LOSE`` events (about -1.1e-3), while the magnitude terms (absolute and squared returns) have mixed contribution (at 0.0002.57e-4 and -3.07e-5, respectively). Summing across features yields a net score difference of roughly
 
 $$
-\Delta s \equiv \mathbb{E}[s\mid WIN]-\mathbb{E}[s\mid LOSE]\approx -0.041
+\Delta s \equiv \mathbb{E}[s\mid WIN]-\mathbb{E}[s\mid LOSE]\approx -0.001
 $$
 
 which implies a slightly lower gate on ``WIN`` events because $$\mathrm{expit}(\cdot)$$ is monotone:
@@ -387,12 +384,6 @@ which implies a slightly lower gate on ``WIN`` events because $$\mathrm{expit}(\
 $$
 \mathbb{E}[\alpha\mid WIN] < \mathbb{E}[\alpha\mid LOSE]
 $$
-
-Indeed, the mean gate levels are approximately $$\alpha_{WIN}\approx 0.196$$ and $$\alpha_{LOSE}\approx 0.202$$ (a difference of about $$-0.0065$$). A useful linearization explains why the gap is small:
-$$
-\Delta \alpha \approx \alpha(1-\alpha)\Delta s
-$$
-and around $$\alpha\approx 0.2$$ we have $$\alpha(1-\alpha)\approx 0.16$$, so $$\Delta s\approx -0.041$$ translates into $$\Delta\alpha\approx -0.0065$$.
 
 The key takeaway is that ``STES`` wins not only by reacting more after shocks, but also by not overreacting in precisely the episodes that separate its best from its worst outcomes. This is also why unconditional plots of $$\alpha_t$$ versus $$\lvert r_t \rvert$$ can suggest a rising relationship on average, while the conditional ``WIN``/``LOSE`` decomposition can simultaneously show that, among the most performance-relevant tail events, ``STES``’s gate tends to be slightly lower when it outperforms and slightly higher when it underperforms.
 

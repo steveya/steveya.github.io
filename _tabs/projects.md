@@ -14,15 +14,15 @@ My study notes on the signature method
    - [Signature Methods (Part 1 - Motivation)]({% post_url 2025-12-14-signature-method-1 %})
    - [Signature Methods (Part 2 - Signature and Augmentation)]({% post_url 2025-12-21-signature-method-2 %})
    - [Signature Methods (Part 3 - Lead–Lag Augmentation and Practical Limitations to the Signature Method)]({% post_url 2025-12-25-signature-method-3 %})
-   - [Signature Methods in Volatility Forecasts]({% post_url 2026-01-16-signature-method-in-volatility-forecasts %})
+   - Signature Methods in Volatility Forecasts
 
 ## Volatility Forecasting
 My work on volatility forecasting. How far can we go by extending simple exponential smoothing filter?
  - Blog Post: 
    - [Volatility Forecasts (Part 1 - ES vs STES Model)]({% post_url 2024-07-12-volatility-forecasts-1 %})
-   - [Volatility Forecasts (Part 2 - XGBoost-STES)]({% post_url 2024-07-18-volatility-forecasts-2 %})
-   - [Volatility Forecasts (Part 3 - Connection with Neural Network Models)]({% post_url 2024-10-02-volatility-forecasts-3 %})
-   - [Signature Methods in Volatility Forecasts]({% post_url 2026-01-16-signature-method-in-volatility-forecasts %})
+   - [Volatility Forecasts (Part 2 - XGBoost-STES Algorithm 1)]({% post_url 2024-07-18-volatility-forecasts-2 %})
+   - [Volatility Forecasts (Part 3 - XGBoost-STES Algorithm 2)]({% post_url 2026-01-24-volatility-forecasts-3 %})
+   - Signature Methods in Volatility Forecasts
  - Research Code: [volatility-forecast](https://github.com/steveya/volatility-forecast/blob/main/examples)
  - Research Library: [volatility-forecast](https://github.com/steveya/volatility-forecast)
 
