@@ -1,0 +1,9 @@
+---
+title: "Tags"
+---
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+tags: true
+```

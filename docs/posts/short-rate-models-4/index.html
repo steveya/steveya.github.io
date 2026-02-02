@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2024-09-16">
+
+<title>Short Rate Models (Part 4: Simulating and Calibrating the Vasicek Model) – Steve Yang</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Steve Yang</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/archives.html"> 
+<span class="menu-text">Archives</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/categories.html"> 
+<span class="menu-text">Categories</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/tags.html"> 
+<span class="menu-text">Tags</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#table-of-contents" id="toc-table-of-contents" class="nav-link active" data-scroll-target="#table-of-contents">Table of Contents</a></li>
+  <li><a href="#recap" id="toc-recap" class="nav-link" data-scroll-target="#recap">Recap</a></li>
+  <li><a href="#simulating-vasicek-model" id="toc-simulating-vasicek-model" class="nav-link" data-scroll-target="#simulating-vasicek-model">Simulating Vasicek Model</a></li>
+  <li><a href="#model-estimation" id="toc-model-estimation" class="nav-link" data-scroll-target="#model-estimation">Model Estimation</a>
+  <ul class="collapse">
+  <li><a href="#maximum-likelihood-estimation" id="toc-maximum-likelihood-estimation" class="nav-link" data-scroll-target="#maximum-likelihood-estimation">Maximum Likelihood Estimation</a></li>
+  <li><a href="#why-is-it-so-hard-to-estimate-the-ou-process-parameters" id="toc-why-is-it-so-hard-to-estimate-the-ou-process-parameters" class="nav-link" data-scroll-target="#why-is-it-so-hard-to-estimate-the-ou-process-parameters">Why is it so hard to estimate the OU process parameters?</a></li>
+  <li><a href="#particle-filtering" id="toc-particle-filtering" class="nav-link" data-scroll-target="#particle-filtering">Particle Filtering</a></li>
+  <li><a href="#comparison" id="toc-comparison" class="nav-link" data-scroll-target="#comparison">Comparison</a></li>
+  </ul></li>
+  <li><a href="#wrapping-up-and-looking-ahead" id="toc-wrapping-up-and-looking-ahead" class="nav-link" data-scroll-target="#wrapping-up-and-looking-ahead">Wrapping Up and Looking Ahead</a></li>
+  <li><a href="#optional-strong-convergence-of-the-euler-maruyama-method-applied-to-the-ou-process" id="toc-optional-strong-convergence-of-the-euler-maruyama-method-applied-to-the-ou-process" class="nav-link" data-scroll-target="#optional-strong-convergence-of-the-euler-maruyama-method-applied-to-the-ou-process">Optional: Strong Convergence of the Euler-Maruyama Method Applied to the OU process</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Short Rate Models (Part 4: Simulating and Calibrating the Vasicek Model)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Quantitative Finance</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 16, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="table-of-contents" class="level2">
+<h2 class="anchored" data-anchor-id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#recap">Recap</a></li>
+<li><a href="#simulating-vasicek-model">Simulating Vasicek Model</a></li>
+<li><a href="#model-estimation">Model Estimation</a></li>
+</ol>
+<p>The code for this post is on <a href="https://github.com/steveya/short-rate-models/blob/main/notebook/vasicek_model.ipynb">my Github</a>.</p>
+</section>
+<section id="recap" class="level2">
+<h2 class="anchored" data-anchor-id="recap">Recap</h2>
+<p>In our <a href="../short-rate-models-3/">previous post</a>, we introduced the Vasicek model that used the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short rates. We then derived solutions for both the OU process and bond prices. We can now focus on the more practical aspects: simulating the Vasicek model and estimating its parameters from market-observed short rates.</p>
+<p>Given the extensive study of the OU process in finance and physics literature, we will focus on introducing other essential concepts related to simulating and estimating the Vasicek model. When introducing how we simulate the OU process, we also discuss the convergence of the Euler-Maruyama discretization to the exact discretization. The different discretization is also the distinquishment between the likelihood and the quasi-likelihood function, leading us to the section on parameter estimation using the maximum likelihood methods. We will then demonstrate and discuss the limitation of the maximum likelihood estimator on finite samples. To overcome these issues, we introduce a particle filtering estimation method which has shown promising results in our empirical studies.</p>
+</section>
+<section id="simulating-vasicek-model" class="level2">
+<h2 class="anchored" data-anchor-id="simulating-vasicek-model">Simulating Vasicek Model</h2>
+<p>We can simulate the Vasicek short-rate process directly applying the Euler-Maruyama discretization to its stochastic differential equation (SDE). This method can introduce time-aggregation error when the discretization step <span class="math display">\[\Delta t\]</span> is large. A better approach when <span class="math display">\[\Delta t\]</span> is large is to apply Euler-Maruyama discretization to the solution of the SDE. More specifically, if we discretize the Vasicek SDE, we get</p>
+<p><span class="math display">\[
+\begin{equation}
+\Delta r_t = \kappa(\theta - r_t) \Delta t + \sigma \sqrt{\Delta t} N(0, 1)
+\end{equation}
+\]</span></p>
+<p>and if we discretize the solution of the Vasicek SDE, as derived from <a href="../short-rate-models-3/">Post 3</a></p>
+<p><span class="math display">\[
+\begin{equation}
+r_s = r_t e^{-\kappa \left(s-t\right)} + \theta \left(1 - e^{-\kappa\left(s-t\right)}\right) + \sigma \int_t^s e^{-\kappa \left(u-t\right)} dW_u
+\end{equation}
+\]</span></p>
+<p>and substitute <span class="math display">\[s = t + \Delta t\]</span>, we get the following discrete SDE:</p>
+<p><span class="math display">\[
+\begin{equation}
+\Delta r_t = r_{t + \Delta t} - r_t = \left(1 - e^{-\kappa \Delta t}\right) \left(\theta - r_t\right)  + \sqrt{\frac{ \sigma^2 \left(1 - e^{-2 \kappa \Delta t} \right) }{ 2 \kappa } } N(0, 1)
+\end{equation}
+\]</span></p>
+<p>As <span class="math display">\[\kappa\]</span> or <span class="math display">\[\Delta t\]</span> gets larger, the difference between <span class="math display">\[\kappa \Delta t\]</span> and <span class="math display">\[\left(1 - e^{-\kappa \Delta t}\right)\]</span> also grows larger; similarly, the difference between <span class="math display">\[\sigma \sqrt{\Delta t}\]</span> and <span class="math display">\[\sqrt{\frac{ \sigma^2 \left(1 - e^{-2 \kappa \Delta t} \right) }{ 2 \kappa } }\]</span> also grows larger. In practice, these differences are insignificant, and we will demonstrate this by comparing the simulated path of the OU process under the Euler-Maruyama method and the exact method. In the <a href="#optional-strong-convergence-of-the-euler-maruyama-method-applied-to-the-ou-process">optional section</a> below, we will show that the differences are bounded by <span class="math display">\[\mathcal{O}(\Delta t^2)\]</span>.</p>
+<p>The following figure illustrates this by plotting the same short rate path generated from these two methods, <code>simulate_vasicek_short_rates_euler</code> and <code>simulate_vasicek_short_rates_exact</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simulate_vasicek_short_rates_euler(r0, kappa, theta, sigma, t, dt, seed<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Simulates the Vasicek short rates model using the </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Euler-Maruyama discretization. </span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    r0 (float): Initial (current) short rate.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">    kappa (float): Speed of mean reversion.</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">    theta (float): Long-term mean level of the short rate.</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">    sigma (float): Annualized volatility of the short rate process.</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">    t (float): Number of years to simulate.</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">    dt (float): Time step size.</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">    times (np.ndarray): Time steps.</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">    rates (np.ndarray): Simulated short rates.</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    np.random.seed(seed)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    nd <span class="op">=</span> <span class="bu">int</span>(t <span class="op">/</span> dt)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    times <span class="op">=</span> np.linspace(<span class="dv">0</span>, t, nd)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    rates <span class="op">=</span> np.zeros(nd)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    rates[<span class="dv">0</span>] <span class="op">=</span> r0</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    diffusion <span class="op">=</span> sigma <span class="op">*</span> np.random.normal(<span class="dv">0</span>, np.sqrt(dt), nd)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, nd):</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        dr <span class="op">=</span> kappa <span class="op">*</span> (theta <span class="op">-</span> rates[t<span class="op">-</span><span class="dv">1</span>]) <span class="op">*</span> dt <span class="op">+</span> diffusion[t]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        rates[t] <span class="op">=</span> rates[t<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> dr</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> times, rates</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> simulate_vasicek_short_rates_exact(r0, kappa, theta, sigma, t, dt, seed<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co">    Simulates the Vasicek short rates model using the </span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co">    analytical solution</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="co">    r0 (float): Initial (current) short rate.</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="co">    kappa (float): Speed of mean reversion.</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="co">    theta (float): Long-term mean level of the short rate.</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="co">    sigma (float): Annualized volatility of the short rate process.</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="co">    t (float): Number of years to simulate.</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="co">    dt (float): Time step size.</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="co">    times (np.ndarray): Time steps.</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="co">    rates (np.ndarray): Simulated short rates.</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    np.random.seed(seed)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    nd <span class="op">=</span> <span class="bu">int</span>(t <span class="op">/</span> dt)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    times <span class="op">=</span> np.linspace(<span class="dv">0</span>, t, nd)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    rates <span class="op">=</span> np.zeros(nd)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    rates[<span class="dv">0</span>] <span class="op">=</span> r0</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    exp_kappa_dt <span class="op">=</span> np.exp(<span class="op">-</span>kappa <span class="op">*</span> dt)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    variance <span class="op">=</span> sigma<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> np.exp(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> kappa <span class="op">*</span> dt)) <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> kappa)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, nd):</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>        exp_rate <span class="op">=</span> (theta <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> exp_kappa_dt) <span class="op">+</span> rates[t<span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> exp_kappa_dt)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>        rates[t] <span class="op">=</span> np.random.normal(exp_rate, np.sqrt(variance))</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> times, rates</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Using <span class="math display">\[r_0 = 0.05\]</span>, <span class="math display">\[\kappa = 0.15\]</span>, <span class="math display">\[\theta = 0.03\]</span>, <span class="math display">\[\sigma = 0.01\]</span>, <span class="math display">\[t = 5\]</span>, <span class="math display">\[\Delta t = 1 / 252\]</span>, we plot the simulated short rate paths from the two methods below in Figure 1 top panel and their differences in the bottom panel.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../assets/img/post_assets/short-rate-models-4/discretization_comp.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 1. Simulated Paths Using the Euler and the Exact Methods</figcaption>
+</figure>
+</div>
+</section>
+<section id="model-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="model-estimation">Model Estimation</h2>
+<p>Now that we can simulate short rates from the Vasicek model with specific OU process parameters. We can ask ourselves if we can estimate or recover these parameters from the simulated short rates. The OU process’s parameters can be estimated using traditional methods such as the <code>maximum likelihood estimation (MLE)</code>. There are other techniques based on regression and GMM, but we will not go through them here. Interested readers are referred <a href="https://hudsonthames.org/caveats-in-calibrating-the-ou-process/">here</a> and other online resource. We also use this opportunity to introduce the <code>quasi maximum likelihood estimation (QMLE)</code>, which relates the likelihood function to discretization schemes in our context. After these introductions, we demonstrate through simulations that the MLE parameter estimates from finite samples are problematic and discuss the source of the problem. We then introduce a particle filtering method to estimate the model parameters that empirically improve the parameter estimation.</p>
+<section id="maximum-likelihood-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="maximum-likelihood-estimation">Maximum Likelihood Estimation</h3>
+<p>Just as we did for the Merton model, we can derive the log-likelihood function for the Vasicek model by noting that conditional on the short rate at time <span class="math display">\[t\]</span>, the short rate at time <span class="math display">\[t+\Delta t\]</span> is Gaussian distributed.</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+\ell(\kappa, \theta, \sigma) &amp;= \log \left( p \left( r_1, r_2, \ldots, r_n \mid \kappa, \theta, \sigma \right) \right) \\
+&amp;= \log \left( \prod_{i=1}^n p \left( r_i \mid r_{i-1}, \kappa, \theta, \sigma \right) \right) \\
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>We can calculate <span class="math display">\[p \left(r_i \vert r_{i-1}\right)\]</span> analytically, in which the conditional distribution of <span class="math display">\[r_{i+1}\]</span> given <span class="math display">\[r_i\]</span> is Gaussian with mean <span class="math display">\[e^{-\kappa \Delta t} r_{i-1} + \left(1 - e^{-\kappa \Delta t}\right)\theta + r_{i-1}\]</span> and variance <span class="math display">\[\frac{\sigma^2 \left(1 - e^{-2\kappa \Delta t}\right)}{2\kappa}\]</span>. Alternatively, it is also tempting to just use the Euler-Maruyama method to discretize the OU process, then calculate the likelihood as Gaussian distributed with mean <span class="math display">\[\kappa\left(\theta - r_{i-1}\right) \Delta t + r_{i-1}\]</span> and variance <span class="math display">\[\sigma^2\]</span>. Since the second likelihood function approximates the first, it is called the quasi-log-likelihood function, and methods based on maximizing the quasi-log-likelihood function are called quasi-maximum likelihood estimation (QMLE). As with our simulation study in the previous section, where we bound the difference between the two discretization methods, it is easy to show that the difference between the mean and variance used in MLE and QMLE for the Vasicek model also converge as <span class="math display">\[\Delta t \to 0\]</span>. The difference is negligible at <span class="math display">\[\Delta t = 1/252\]</span> (a typical value for financial applications), and MLE and QMLE yield similar results.</p>
+<p>The conditional distribution might not have a closed form for a more complex stochastic process. In such a case, we can approximate the likelihood function numerically. In these cases, we need to recognize that QMLE is not consistent at any <span class="math display">\[\Delta t\]</span>, and its variance does not converge to the Cramér-Rao lower bound.</p>
+<p>Below is the Python implementation of the MLE and QMLE for the Vasicek model.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> vasicek_quasi_log_likelihood(params, rates, dt):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    kappa, theta, sigma <span class="op">=</span> params</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    exp_r <span class="op">=</span> rates[:<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> kappa <span class="op">*</span> (theta <span class="op">-</span> rates[:<span class="op">-</span><span class="dv">1</span>]) <span class="op">*</span> dt</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    var_r <span class="op">=</span> sigma<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> dt</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    logL <span class="op">=</span> np.<span class="bu">sum</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            np.log(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> var_r) <span class="op">+</span> </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            (rates[<span class="dv">1</span>:] <span class="op">-</span> exp_r)<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> var_r</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span>logL</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calibrate_vasicek_qmle(rates, dt):</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    initial_params <span class="op">=</span> [np.random.uniform(<span class="dv">0</span>, <span class="dv">1</span>), np.mean(rates), np.std(np.diff(rates)) <span class="op">*</span> np.sqrt(<span class="dv">1</span><span class="op">/</span>dt)]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    bounds <span class="op">=</span> [(<span class="fl">1e-8</span>, <span class="va">None</span>), (<span class="va">None</span>, <span class="va">None</span>), (<span class="fl">1e-8</span>, <span class="va">None</span>)]</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> minimize(</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        vasicek_quasi_log_likelihood, initial_params, </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        args<span class="op">=</span>(rates, dt), bounds<span class="op">=</span>bounds, method<span class="op">=</span><span class="st">'Powell'</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    kappa, theta, sigma <span class="op">=</span> result.x</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> kappa, theta, sigma</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> vasicek_log_likelihood(params, rates, dt):</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    kappa, theta, sigma <span class="op">=</span> params</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    exp_r <span class="op">=</span> theta <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> np.exp(<span class="op">-</span>kappa <span class="op">*</span> dt)) <span class="op">+</span> rates[:<span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> np.exp(<span class="op">-</span>kappa <span class="op">*</span> dt)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    var_r <span class="op">=</span> sigma<span class="op">**</span><span class="dv">2</span> <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> np.exp(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> kappa <span class="op">*</span> dt)) <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> kappa)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    logL <span class="op">=</span> np.<span class="bu">sum</span>(</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            np.log(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> var_r) <span class="op">+</span> </span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>            (rates[<span class="dv">1</span>:] <span class="op">-</span> exp_r)<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> var_r</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span>logL</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calibrate_vasicek_mle(rates, dt):</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    initial_params <span class="op">=</span> [np.random.uniform(<span class="dv">0</span>, <span class="dv">1</span>), np.mean(rates), np.std(np.diff(rates)) <span class="op">*</span> np.sqrt(<span class="dv">1</span><span class="op">/</span>dt)]</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    bounds <span class="op">=</span> [(<span class="fl">1e-8</span>, <span class="va">None</span>), (<span class="va">None</span>, <span class="va">None</span>), (<span class="fl">1e-8</span>, <span class="va">None</span>)]</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> minimize(</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>        vasicek_log_likelihood, initial_params, </span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        args<span class="op">=</span>(rates, dt), bounds<span class="op">=</span>bounds, method<span class="op">=</span><span class="st">'Powell'</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    kappa, theta, sigma <span class="op">=</span> result.x</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> kappa, theta, sigma</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We generate 5000 paths of the short rate process using the same <span class="math display">\[\kappa = 0.15\]</span>, <span class="math display">\[\theta = 0.03\]</span>, <span class="math display">\[\sigma = 0.01\]</span> and <span class="math display">\[ r_0 = 0.05\]</span> for <span class="math display">\[t=5\]</span> years, and apply the maximum likelihood to estimate the parameters from each path. Figures 3, 4, and 5 show the distribution of the MLE estimates for <span class="math display">\[\kappa\]</span>, <span class="math display">\[\theta\]</span>, and <span class="math display">\[\sigma\]</span> against their true values. The <span class="math display">\[\kappa\]</span> and <span class="math display">\[\theta\]</span> median estimates from the 5-year simulated samples are quite different from the true values, and the estimates’ variance is quite large. For the <span class="math display">\[\kappa\]</span> estimates, we also include the estimates from the QMLE. The results show that MLE and QMLE are very similar for the Vasicek model.</p>
+<p><img src="../../assets/img/post_assets/short-rate-models-4/kappa_mle_bootstrap.png" class="img-fluid" alt="Figure 3. MLE Estimates for the Vasicek Model Parameters (\kappa)"> <img src="../../assets/img/post_assets/short-rate-models-4/theta_mle_bootstrap.png" class="img-fluid" alt="Figure 4. MLE Estimates for the Vasicek Model Parameters (\theta)"> <img src="../../assets/img/post_assets/short-rate-models-4/sigma_mle_bootstrap.png" class="img-fluid" alt="Figure 5. MLE Estimates for the Vasicek Model Parameters (\sigma)"></p>
+</section>
+<section id="why-is-it-so-hard-to-estimate-the-ou-process-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="why-is-it-so-hard-to-estimate-the-ou-process-parameters">Why is it so hard to estimate the OU process parameters?</h3>
+<p>Estimating the OU process parameters <span class="math display">\[\kappa\]</span> and <span class="math display">\[\theta\]</span> from finite sample data is challenging for several reasons</p>
+<ul>
+<li><p>Identification: For the <span class="math display">\[\kappa\]</span> estimates, when true <span class="math display">\[\kappa\]</span> is small, the OU process behaves almost like a random walk, meaning the process is barely mean-reverting within a finite sample. In this situation, the term <span class="math display">\[e^{-\theta \Delta t}\]</span> approaches 1, making it difficult to distinguish the contribution of <span class="math display">\[\kappa\]</span> and <span class="math display">\[\theta\]</span>. Moreover, looking at the log-likelihood function, we notice that <span class="math display">\[\kappa\]</span> and <span class="math display">\[\theta\]</span> show up together in the term <span class="math display">\[\theta \left(1 - e^{-\kappa \Delta t}\right)\]</span>, and for small sample sizes, there is high correlation between these parameters: a slight change in <span class="math display">\[\theta\]</span> can often be compensated by a change in <span class="math display">\[\kappa\]</span>. As a result, the likelihood surface can be flat or ill-conditioned for both <span class="math display">\[\kappa\]</span> and <span class="math display">\[\theta\]</span>, making it hard for MLE to find the true values.</p></li>
+<li><p>Bias: In finite and short samples, the stochastic process may not have enough time to revert to its mean, making it difficult to observe the true behaviour of the mean-reversion process. If the sample path has not had enough realizations of reversion toward <span class="math display">\[theta\]</span>, the estimates of <span class="math display">\[\theta\]</span> will be biased toward the initial value of the process. This bias is particularly problematic for processes that start far from <span class="math display">\[\theta\]</span>. Since the estimate of <span class="math display">\[\kappa\]</span> depends critically on <span class="math display">\[\theta\]</span>. If one is estimated poorly (e.g., due to a small sample size or near-unit root behaviour), the other will also be inaccurate. This compounding effect makes <span class="math display">\[\theta\]</span> hard to estimate independently when <span class="math display">\[\kappa\]</span> is small or uncertain. The MLE <span class="math display">\[\kappa\]</span> estimate is biased. The bias occurs because the likelihood function is non-linear in <span class="math display">\[\kappa\]</span>, and small-sample variability causes the MLE to overestimate <span class="math display">\[\kappa\]</span>. This bias becomes significant when the sample size is small or when <span class="math display">\[\kappa \Delta t\]</span> is small (i.e., for slow mean-reversion).</p></li>
+<li><p>Variance: the variance term in the likelihood function is inversely proportional to <span class="math display">\[\kappa\]</span>. As <span class="math display">\[\kappa \to 0\]</span>, the variance of the process becomes very large, leading to a larger confidence interval and higher uncertainty in the parameter estimates.</p></li>
+</ul>
+<p>Next, we propose a particle filtering method to estimate the parameters of the Vasicek model. This method helps address some of the abovementioned problems and empirically improves the parameter estimation. Let’s go!</p>
+</section>
+<section id="particle-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="particle-filtering">Particle Filtering</h3>
+<p>I once worked on calibrating the Constant Elasticity of Variance (CEV) model to daily volatility surfaces. At first, I estimate the two parameters of the model by minimizing the mean squared error (MSE) between the observed and model volatility surfaces. However, this approach makes the estimated parameters unstable. Upon further examination and many advices later, I found that not only was the objective function non-linear, but it was also flat, and the model parameters were poorly identified. There was a non-linear region in the parameter space that all gave low MSE and had multiple local minima. After some brainstorming, I used the particle filter to estimate the parameters. The particle filtering also allows me to track multiple minimas over time and take their averages as the parameter estimates. The resulting parameter estimates were much smoother over time.</p>
+<p>We have similar challenges with calibrating the Vasicek model: the nonlinearity (in finite samples), the flat likelihood function, and the poor identification of the parameters (<span class="math display">\[\kappa\]</span> and <span class="math display">\[\theta\]</span>). Therefore, we suspect that particle filtering can help improve the parameter estimation. Particle filtering, a sequential Monte Carlo method, addresses these challenges by approximating the posterior distribution of the parameters given the observations. Below, we briefly review each step of implementing the particle filtering method. These steps are</p>
+<ol type="1">
+<li>Initialization</li>
+<li>Prediction</li>
+<li>Update</li>
+<li>Resampling</li>
+<li>MCMC</li>
+</ol>
+<p>Particle filtering is computationally more expensive, so code and execution optimization is necessary. We use Numba to JIT compile our functions, and that means some functions from <code>scipy</code> need to be rewritten.</p>
+<section id="initialization" class="level4">
+<h4 class="anchored" data-anchor-id="initialization">1. Initialization</h4>
+<p>The first step in our particle filtering algorithm is to initialize a set of <span class="math display">\[N\]</span> particles. For our Vasicek model, each particle represents a possible parameter set <span class="math display">\[(\kappa, \theta, \sigma)\]</span>. These particles are sampled from our prior distributions of each parameter of the Vasicek model:</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+\kappa_i &amp;\sim \text{Gamma}(a_\kappa, b_\kappa) \\
+\theta_i &amp;\sim \mathcal{N}(\mu_\theta, \sigma_\theta^2) \\
+\sigma_i &amp;\sim \text{Gamma}(a_\sigma, b_\sigma) \\
+\end{aligned}
+\end{equation}
+\]</span></p>
+<ol type="1">
+<li><p><span class="math display">\[\kappa\]</span> (mean reversion speed): We use a Gamma distribution because <span class="math display">\[\kappa\]</span> must be positive. Moreover, from the histogram of MLE estimates for <span class="math display">\[\kappa\]</span> above, the Gamma distribution looks to be a decent approximation.</p></li>
+<li><p><span class="math display">\[\theta\]</span> (long-term mean): We use a Normal distribution as <span class="math display">\[\theta\]</span> can theoretically take any real value. In practice, it is often close to the average observed short rate.</p></li>
+<li><p><span class="math display">\[\sigma\]</span> (volatility): Like <span class="math display">\[\kappa\]</span>, <span class="math display">\[\sigma\]</span> must be positive, so we again use a Gamma distribution.</p></li>
+</ol>
+<p>The specific parameters of these distributions (<span class="math display">\[a_\kappa\]</span>, <span class="math display">\[b_\kappa\]</span>, <span class="math display">\[\mu_\theta\]</span>, <span class="math display">\[\sigma_\theta\]</span>, <span class="math display">\[a_\sigma\]</span>, <span class="math display">\[b_\sigma\]</span>) should be chosen based on prior knowledge or preliminary analysis of the data. In our implementation, we used some reasonable default values, which can be adjusted as needed. For example, we can use the sample mean and standard deviation to set the parameters of the Normal distribution for <span class="math display">\[\theta\]</span>.</p>
+<p>Along with the particles, we initialize their weights to be uniformly distributed, giving each particle equal probability. As we process more data, these weights will be updated to reflect how well each particle explains the observed short rates.</p>
+<p>In our code:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> initialize_particles(num_particles):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    particles <span class="op">=</span> np.column_stack((</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        np.random.gamma(<span class="dv">2</span>, <span class="dv">2</span>, num_particles),  <span class="co"># kappa</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        np.random.normal(<span class="dv">0</span>, <span class="dv">2</span>, num_particles),  <span class="co"># theta</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        np.random.gamma(<span class="dv">2</span>, <span class="fl">0.5</span>, num_particles)  <span class="co"># sigma</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">=</span> np.ones(num_particles) <span class="op">/</span> num_particles</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> particles, weights</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We can compare and contrast the initialization of the particle filtering and the maximum likelihood estimation (MLE). In MLE, we typically start with a single set of parameter estimates and iteratively refine them. Here, we begin with a diverse set of parameter combinations, allowing us to explore the parameter space more thoroughly. This approach is particularly beneficial when dealing with complex, potentially multimodal likelihood surfaces, where MLE might get stuck in local optima.</p>
+<p>As we proceed through the particle filtering algorithm, this initial diverse set of particles will be refined based on their ability to explain the observed data, eventually converging toward the most probable parameter distributions.</p>
+</section>
+<section id="prediction" class="level4">
+<h4 class="anchored" data-anchor-id="prediction">2. Prediction</h4>
+<p>We use the current parameter estimates for each time step to predict the short rate in the next period. In the OU process, the transition density from one state to the next follows a Gaussian distribution:</p>
+<p><span class="math display">\[ r_t | r_{t-1}, \kappa, \theta, \sigma \sim \mathcal{N}(\mu_t, \Sigma_t) \]</span></p>
+<p>Where the mean and variance are given by:</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+\mu_t &amp;= r_{t-1}e^{-\kappa\Delta t} + \theta(1 - e^{-\kappa\Delta t}) \\
+\Sigma_t &amp;= \frac{\sigma^2}{2\kappa}(1 - e^{-2\kappa\Delta t}) \\
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>These equations should look familiar from our earlier derivation of the Vasicek model’s analytical solution. They are also the same as the likelihood function used in MLE.</p>
+<p>We implement this transition in our <code>ou_transition</code> function:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ou_transition(x, kappa, theta, sigma, dt):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    mean <span class="op">=</span> x <span class="op">*</span> np.exp(<span class="op">-</span>kappa <span class="op">*</span> dt) <span class="op">+</span> theta <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> np.exp(<span class="op">-</span>kappa <span class="op">*</span> dt))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    var <span class="op">=</span> (sigma<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> kappa)) <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> np.exp(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> kappa <span class="op">*</span> dt))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.random.normal(mean, np.sqrt(var))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It is important to note that while this function returns a single sample, we will apply this transition to each particle in the context of particle filtering. This step propagates our entire set of parameter estimates forward in time, maintaining the diversity of our particle population.</p>
+<p>In the next step (the update step), we will use these predicted states to update the weights of our particles based on how well they match the observed data. This back-and-forth between prediction and update is at the heart of the particle filtering algorithm, allowing us to refine our parameter estimates sequentially as we process more data.</p>
+</section>
+<section id="update" class="level4">
+<h4 class="anchored" data-anchor-id="update">3. Update</h4>
+<p>In the update step, we adjust our belief about the parameters based on new observations. It involves updating the weights of our particles to reflect how well each particle’s parameters explain the observed data. For each new observation, we update the weight of each particle based on the likelihood of the new observation given the parameters:</p>
+<p><span class="math display">\[ w_t^i \propto w_{t-1}^i \cdot p(r_t \vert r_{t-1}, \kappa_i, \theta_i, \sigma_i) \]</span></p>
+<p>Here, <span class="math display">\[w_t^i\]</span> is the updated weight for particle <span class="math display">\[i\]</span> at time <span class="math display">\[t\]</span>, <span class="math display">\[w_{t-1}^i\]</span> is its previous weight, and <span class="math display">\[p(r_t \vert r_{t-1}, \kappa_i, \theta_i, \sigma_i)\]</span> is the likelihood of observing the current short rate <span class="math display">\[r_t\]</span> given the previous rate <span class="math display">\[r_{t-1}\]</span> and the parameters of particle <span class="math display">\[i\]</span>.</p>
+<p>The likelihood is the probability density function of the normal distribution:</p>
+<p><span class="math display">\[ p(r_t | r_{t-1}, \kappa, \theta, \sigma) = \frac{1}{\sqrt{2\pi\Sigma_t}} \exp\left(-\frac{(r_t - \mu_t)^2}{2\Sigma_t}\right) \]</span></p>
+<p>where <span class="math display">\[\mu_t\]</span> and <span class="math display">\[\Sigma_t\]</span> are the mean and variance of the transition density, as defined in the prediction step.</p>
+<p>We implement this update process in two functions: <code>compute_likelihood</code> and <code>update</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_likelihood(r_prev, r_curr, kappa, theta, sigma, dt):</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    mean <span class="op">=</span> r_prev <span class="op">*</span> np.exp(<span class="op">-</span>kappa <span class="op">*</span> dt) <span class="op">+</span> theta <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> np.exp(<span class="op">-</span>kappa <span class="op">*</span> dt))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    var <span class="op">=</span> (sigma<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> kappa)) <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> np.exp(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> kappa <span class="op">*</span> dt))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.exp(<span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> ((r_curr <span class="op">-</span> mean)<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> var)) <span class="op">/</span> np.sqrt(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> var)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> update(particles, weights, r_prev, r_curr, dt):</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    likelihoods <span class="op">=</span> compute_likelihood(r_prev, r_curr, particles[:, <span class="dv">0</span>], particles[:, <span class="dv">1</span>], particles[:, <span class="dv">2</span>], dt) <span class="co"># compute the likelihood of the new observation given the parameters of each particle</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">*=</span> likelihoods <span class="co"># update the weights by multiplying the likelihoods</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    weights <span class="op">/=</span> np.<span class="bu">sum</span>(weights) <span class="co"># renormalize the weights</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    ... <span class="co"># continue to the next step</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This update step marks a significant departure from traditional Maximum Likelihood Estimation (MLE):</p>
+<ol type="1">
+<li><p>Distribution vs.&nbsp;Point Estimate: In MLE, we iteratively refine a single set of parameters to maximize the likelihood. In particle filtering, we maintain a distribution of parameter sets (particles) and their associated probabilities (weights).</p></li>
+<li><p>Full Posterior Representation: The particle weights represent the parameters’ full posterior distribution given the observed data. This provides a richer view of the parameter space compared to the point estimate from MLE.</p></li>
+<li><p>Sequential Update: Particle filtering allows for sequential updating as new data arrives, making it well-suited for online estimation problems. MLE typically requires recomputation using all available data.</p></li>
+<li><p>Handling Multimodality: By maintaining multiple hypotheses (particles), particle filtering can better handle multimodal likelihood surfaces where MLE might get stuck in local optima.</p></li>
+</ol>
+<p>This approach allows us to capture the uncertainty in our parameter estimates and potentially explore multiple regions of high likelihood in the parameter space simultaneously. As we process more data, particles with parameters that consistently explain the observations well will gain more weight, while those that perform poorly will become less influential.</p>
+</section>
+<section id="resampling" class="level4">
+<h4 class="anchored" data-anchor-id="resampling">4. Resampling</h4>
+<p>After several iterations, many particles may end up with negligible weights, effectively reducing the number of particles contributing to the estimation. This phenomenon, known as particle degeneracy, can lead to poor approximations of the posterior distribution. Resampling is a way to address this problem.</p>
+<p>To determine when to resample, we measure the effective sample size (ESS) of our particles. The ESS is an estimate of how many particles are effectively contributing to the approximation:</p>
+<p><span class="math display">\[ N_{\text{eff}} = \frac{1}{\sum_{i=1}^N (w_t^i)^2} \]</span></p>
+<p>where <span class="math display">\[N\]</span> is the total number of particles and <span class="math display">\[w_t^i\]</span> is the normalized weight of particle <span class="math display">\[i\]</span> at time <span class="math display">\[t\]</span>. The ESS ranges from 1 (when one particle has all the weight) to <span class="math display">\[N\]</span> (when all particles have equal weights).</p>
+<p>We trigger resampling when the ESS falls below a certain threshold, typically half the number of particles:</p>
+<p><span class="math display">\[ N_{\text{eff}} &lt; \frac{N}{2} \]</span></p>
+<p>This condition balances the need to maintain particle diversity with the computational cost of frequent resampling.</p>
+<p>When resampling is triggered, we use a method called systematic resampling. This efficient method ensures that particles with higher weights are more likely to be selected. It is implemented as follows:</p>
+<ol type="1">
+<li>Compute the cumulative sum of weights.</li>
+<li>Generate a random starting point <span class="math display">\[u_0 \sim U(0, \frac{1}{N})\]</span>.</li>
+<li>For <span class="math display">\[i = 0, ..., N-1\]</span>:
+<ul>
+<li>Set <span class="math display">\[u_i = u_0 + \frac{i}{N}\]</span></li>
+<li>Find the smallest <span class="math display">\[j\]</span> such that the cumulative sum up to <span class="math display">\[j\]</span> is greater than <span class="math display">\[u_i\]</span>.</li>
+<li>Select the <span class="math display">\[j\]</span>-th particle.</li>
+</ul></li>
+</ol>
+<p>This method ensures that particles are selected proportionally to their weights while introducing some randomness to maintain diversity.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> update(particles, weights, r_prev, r_curr, dt):</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    ... <span class="co"># continue from previous step</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="dv">1</span> <span class="op">/</span> np.<span class="bu">sum</span>(weights<span class="op">**</span><span class="dv">2</span>) <span class="op">&lt;</span> <span class="bu">len</span>(particles) <span class="op">/</span> <span class="dv">2</span>:</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        particles <span class="op">=</span> systematic_resample(particles, weights)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        weights <span class="op">=</span> np.ones(<span class="bu">len</span>(weights)) <span class="op">/</span> <span class="bu">len</span>(weights)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        particles <span class="op">=</span> mcmc(particles, weights, r_prev, r_curr, dt)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> particles, weights</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> systematic_resample(particles, weights):</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">len</span>(weights)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    indices <span class="op">=</span> np.zeros(N, dtype<span class="op">=</span>np.int64)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> np.cumsum(weights) <span class="co"># compute the cumulative sum of the weights  </span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    u0 <span class="op">=</span> np.random.random() <span class="op">/</span> N <span class="co"># generate a random starting point</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    j <span class="op">=</span> <span class="dv">0</span> <span class="co"># initialize the index</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Iterate through the particles, selecting indices based on </span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># where `u` falls in the cumulative sum. </span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(N):</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        u <span class="op">=</span> u0 <span class="op">+</span> i <span class="op">/</span> N</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> u <span class="op">&gt;</span> C[j]:</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>            j <span class="op">+=</span> <span class="dv">1</span> <span class="co"># increment the index until u is less than the cumulative sum</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        indices[i] <span class="op">=</span> j </span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Return the particles at the selected indices</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> particles[indices]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If the algorithm stops here, many particles would have the same values after a few resamples because resampling does not introduce any new particles; it simply selects particles with high weights more often, and we end up with many particles of the same value. To circumvent this, we apply the Markov-Chain Monte Carlo (MCMC)(discussed in the next section) to introduce additional diversity among the resampled particles.</p>
+</section>
+<section id="markov-chain-monte-carlo" class="level4">
+<h4 class="anchored" data-anchor-id="markov-chain-monte-carlo">5. Markov-Chain Monte Carlo</h4>
+<p><a href="https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo">Markov Chain Monte Carlo</a> (MCMC) is a class of algorithms primarily used for sampling from complex or high-dimensional probability distributions based on Markov chains. It can improve particle diversity and exploration of the parameter space. Specifically, we apply a Metropolis-Hastings algorithm to resample from the empirical (target) distribution.</p>
+<p>The Metropolis-Hastings algorithm works by constructing a Markov chain with the desired distribution as its equilibrium distribution. It does this through a series of accept/reject steps:</p>
+<ol type="1">
+<li>Start with an initial state (in our case, the current particle).</li>
+<li>Propose a new state according to some proposal distribution.</li>
+<li>Calculate the probability of accepting the new state.</li>
+<li>Accept or reject the new state based on this probability.</li>
+</ol>
+<p>We implement the Metropolis-Hastings steps as follows:</p>
+<ol type="1">
+<li><p>Propose a new particle position:</p>
+<p><span class="math display">\[ (\kappa', \theta', \sigma') \sim \mathcal{N}((\kappa, \theta, \sigma), \Sigma_{\text{adaptive}}) \]</span></p>
+<p>We use a multivariate normal distribution centred at the current particle position with an adaptive covariance matrix. The distribution of the proposed particle would be similar to the target distribution.</p></li>
+<li><p>Compute the acceptance ratio:</p>
+<p><span class="math display">\[ \alpha = \min\left(1, \frac{p(r_t | r_{t-1}, \kappa', \theta', \sigma')}{p(r_t | r_{t-1}, \kappa, \theta, \sigma)}\right) \]</span></p>
+<p>The acceptance ratio compares the likelihood of the proposed state to the current state. If the proposed state is more likely (ratio &gt; 1), we always accept it. If it is less likely, we may still accept it with some probability. This way, the algorithm can explore less likely but potentially important regions of the parameter space.</p></li>
+<li><p>Accept the proposal with probability <span class="math display">\[\alpha\]</span>: We generate a random number between 0 and 1. If it is less than <span class="math display">\[\alpha\]</span>, we accept the proposed state; otherwise, we keep the current particle.</p></li>
+</ol>
+<p>The adaptive covariance <span class="math display">\[\Sigma_{\text{adaptive}}\]</span> is computed using the <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html">kernel-density estimate using Gaussian kernels</a>. We reimplemented here to be compatible with Numba. This adaptive scheme allows the proposal distribution to adjust to the shape of the target distribution as we gather more information about it through our particles. We implemented this idea in our <code>adaptive_kernel</code> and <code>mcmc</code> functions:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> adaptive_kernel(particles, weights):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># reimplementation of </span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    cov <span class="op">=</span> weighted_cov(particles, weights)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> cov.shape[<span class="dv">0</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    h <span class="op">=</span> (<span class="dv">4</span> <span class="op">/</span> (<span class="bu">len</span>(particles) <span class="op">*</span> (<span class="dv">2</span> <span class="op">+</span> d))) <span class="op">**</span> (<span class="dv">1</span><span class="op">/</span>(d<span class="op">+</span><span class="dv">4</span>))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> h <span class="op">*</span> cov</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mcmc(particles, weights, r_prev, r_curr, dt):</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    cov <span class="op">=</span> adaptive_kernel(particles, weights)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    new_particles <span class="op">=</span> np.empty_like(particles)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(particles)):</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        proposal <span class="op">=</span> multivariate_normal(particles[i], cov)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> proposal[<span class="dv">0</span>] <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> proposal[<span class="dv">2</span>] <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>            log_prob_old <span class="op">=</span> np.log(compute_likelihood(r_prev, r_curr, particles[i, <span class="dv">0</span>], particles[i, <span class="dv">1</span>], particles[i, <span class="dv">2</span>], dt))</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>            log_prob_new <span class="op">=</span> np.log(compute_likelihood(r_prev, r_curr, proposal[<span class="dv">0</span>], proposal[<span class="dv">1</span>], proposal[<span class="dv">2</span>], dt))</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> np.log(np.random.random()) <span class="op">&lt;</span> log_prob_new <span class="op">-</span> log_prob_old:</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>                new_particles[i] <span class="op">=</span> proposal</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>                new_particles[i] <span class="op">=</span> particles[i]</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>            new_particles[i] <span class="op">=</span> particles[i]</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> new_particles</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <code>mcmc</code> function proposes new positions for each particle, accepting or rejecting based on the Metropolis-Hastings criterion. We use log probabilities to avoid numerical underflow and ensure κ and σ remain positive. The condition <code>proposal[0] &gt; 0 and proposal[2] &gt; 0</code> ensures that we only consider valid proposals where κ and σ are positive, as required by the Vasicek model.</p>
+<p>The MCMC step replaces some particles with higher likelihoods, making the particle filtering more efficient at approximating the target distribution.</p>
+</section>
+<section id="tying-it-all-together" class="level4">
+<h4 class="anchored" data-anchor-id="tying-it-all-together">Tying It All Together</h4>
+<p>The <code>calibrate_vasicek_particle_filter</code> runs the complete particle filtering algorithm that calibrates the Vasicek model:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> estimate(particles, weights):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.<span class="bu">sum</span>(particles <span class="op">*</span> weights[:, np.newaxis], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="at">@njit</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calibrate_vasicek_particle_filter(data, dt, num_particles<span class="op">=</span><span class="dv">1000</span>):</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    particles, weights <span class="op">=</span> initialize_particles(num_particles) <span class="co"># initialize the particles and weights</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(data)): <span class="co"># Sequential processing of observed data.</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        particles, weights <span class="op">=</span> update(particles, weights, data[t<span class="op">-</span><span class="dv">1</span>], data[t], dt)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> estimate(particles, weights)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>In the <code>estimate</code> function, we compute the parameter estimates as the weighted average of all the values. We can also try other estimates, such as the weighted median or the mode, but we will leave that to interested readers.</p>
+</section>
+</section>
+<section id="comparison" class="level3">
+<h3 class="anchored" data-anchor-id="comparison">Comparison</h3>
+<p>After all that, let us compare the results of particle filtering to those of the MLE. We repeat our previous experiment: simulate 5000 paths of the 5-year short rate under the Vasicek model and compare the estimated <span class="math display">\[\kappa\]</span> from the two methods. The histograms below show the estimated <span class="math display">\[\kappa\]</span> from MLE and particle filtering. Figure 6 plots the mode of their respective distribution against the true value.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../assets/img/post_assets/short-rate-models-4/kappa_estimates_comp.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 6. Comparison of MLE and particle filter estimates of <span class="math display">\[\kappa\]</span></figcaption>
+</figure>
+</div>
+<p>We see that the particle filter estimate’s distribution is much less dispersed than that of the MLE. Its mode is also much closer to the true value than the MLE estimate’s.</p>
+</section>
+</section>
+<section id="wrapping-up-and-looking-ahead" class="level2">
+<h2 class="anchored" data-anchor-id="wrapping-up-and-looking-ahead">Wrapping Up and Looking Ahead</h2>
+<p>In this post we cover the more practical aspects of the Vasicek model, focusing on simulation and estimation techniques. We explored two methods for simulating the Vasicek short-rate process: the Euler-Maruyama discretization and the exact method. While these methods yield slightly different results, we demonstrated that their differences are negligible for commonly used discretization step sizes and showed that the Euler-Maruyama discretization converge strongly to the exact solution.</p>
+<p>The challenge of estimating the Vasicek model parameters became evident as we examined the maximum likelihood estimation (MLE) results. Our simulation study revealed significant biases and large variances in the MLE estimates, particularly for the mean-reversion parameter <span class="math display">\[\kappa\]</span>. These issues stem from the complex interplay between the model parameters and the finite sample sizes typically available in practice.</p>
+<p>To address these challenges, we introduced a particle filtering approach and present a detailed implementation. This method showed promising results as it produces more stable and accurate parameter estimates than the MLE. The particle filter’s ability to maintain multiple hypotheses and sequentially update parameter estimates makes it well-suited for online and adaptive situations we often desire in practice.</p>
+<p>There is a lot more we can do for both the Vasicek model and the particle filter. For example, we can take the paths of the particles and compute a time series of parameter estimates. If the parameters are stable (validated using simulated data, for example), we can apply the model to real-world data, analyze the behaviour of each parameter in different economic regimes, and draw conclusions about how macro variables impact variables like <span class="math display">\[\kappa\]</span> or <span class="math display">\[\theta\]</span>.</p>
+<p>In our <a href="#">next post</a>, we will broaden our perspective by introducing the affine term structure model, a general framework that encompasses both the Merton and Vasicek models as special cases. The affine term structure model provides a unified approach to understanding and comparing different short-rate models, setting the stage for more advanced applications in term-structure modelling.</p>
+</section>
+<section id="optional-strong-convergence-of-the-euler-maruyama-method-applied-to-the-ou-process" class="level2">
+<h2 class="anchored" data-anchor-id="optional-strong-convergence-of-the-euler-maruyama-method-applied-to-the-ou-process">Optional: Strong Convergence of the Euler-Maruyama Method Applied to the OU process</h2>
+<p>In this section, we show that the Euler-Maruyama method has a strong convergence of order 0.5 to the exact solution of the OU process.</p>
+<p>Let us first define what strong convergence of a discretization method means. A numerical method <span class="math display">\[M\]</span> has <strong>strong convergence of order <span class="math display">\[\alpha\]</span></strong> to the exact solution for a stochastic process <span class="math display">\[r_t\]</span> if the expected absolute error satisfies</p>
+<p><span class="math display">\[
+\begin{equation}
+\mathbb{E} \left[  \underset{0 \leq t \leq T}{\sup} \left| r_t - r_t^M \right| \right] = \mathcal{O}(\Delta t^{\alpha})
+\end{equation}
+\]</span></p>
+<p>where <span class="math display">\[r_T\]</span> is the exact solution of the SDE and <span class="math display">\[r_T^M\]</span> is the numerical approximation. As we have shown earlier, the Euler Maruyama (EM) discretization of the OU process gives the approximation</p>
+<p><span class="math display">\[
+\begin{equation}
+r_{t + \Delta t}^{EM} = r_t^{EM} + \kappa \left(\theta - r_t^{EM} \right) \Delta t + \sigma \sqrt{\Delta t} \epsilon_t
+\end{equation}
+\]</span></p>
+<p>whereas the exact solution gives the equation</p>
+<p><span class="math display">\[
+\begin{equation}
+r_{t+\Delta t} = r_t e^{-\kappa \left(\Delta t\right)} + \theta \left(1 - e^{-\kappa\left(\Delta t\right)}\right) + \sigma \int_t^{t + \Delta t} e^{-\kappa \left(u-t\right)} dW_u
+\end{equation}
+\]</span></p>
+<p>Denote <span class="math display">\[r(t_n) = r_{t_n}\]</span>. The error <span class="math display">\[e_{n+1} = r(t_n) - r_n^{EM}\]</span> can be decomposed into three parts:</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+e_{n+1} &amp;= r(t_n) - r_n^{EM} &amp; \\
+&amp;= \left(r(t_n) e^{-\kappa \Delta t} + \theta \left(1 - e^{-\kappa\left(\Delta t\right)}\right) + \sigma \int_t^{t + \Delta t} e^{-\kappa \left(u-t\right)} dW_u\right) &amp; \\
+&amp;- \left(r_n^{EM} + \kappa \left(\theta - r_n^{EM}\right) \Delta t + \sigma \sqrt{\Delta t} \epsilon_{n} \right) &amp; \\
+&amp;= \left(r(t_n) e^{-\kappa \Delta t} - r_n^{EM} \right) &amp; \text{Part (1)} \\
+&amp;+ \left(\theta \left(1 - e^{-\kappa\left(\Delta t\right)}\right) - \kappa \left(\theta - r_n^{EM}\right) \Delta t \right) &amp; \text{Part (2)} \\
+&amp;+ \left(\sigma \int_t^{t + \Delta t} e^{-\kappa \left(u-t\right)} dW_u - \sigma \sqrt{\Delta t} \epsilon_{n} \right) &amp; \text{Part (3)}
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>The first part is the error from the drift term involving the short rate <span class="math display">\[r(t_n)\]</span>:</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+\text{Part (1)} &amp;= r(t_n)e^{-\kappa \Delta t} - \left(r_n^{EM} + \kappa \left(\theta - r_n^{EM}\right) \Delta t \right) \\
+&amp;= r(t_n)\left(1 - \kappa\Delta t + \mathcal{O}(\Delta t^2)\right) - r_n^{EM}\left(1 + \kappa \Delta t + \mathcal{O}(\Delta t^2)\right) \quad \text{(by Taylor expansion)} \\
+&amp;= r(t_n) - r_n^{EM} - \kappa \Delta t r(t_n) + \kappa \Delta t r_n^{EM} + \mathcal{O}(\Delta t^2) \\
+&amp;= \left(1 - \kappa \Delta t\right) e_n + \mathcal{O}(\Delta t^2)
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>The second part is the error from the drift term involving the mean reversion <span class="math display">\[\theta\]</span>:</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+\text{Part (2)} &amp;= \theta \left(1 - e^{-\kappa \Delta t}\right) - \kappa\theta \Delta t \\
+&amp;= \theta \left(1 - 1 + \kappa \Delta t + \mathcal{O}(\Delta t^2)\right) - \kappa\theta \Delta t \quad \text{(by Taylor expansion)} \\
+&amp;= \mathcal{O}(\Delta t^2)
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>The third part is the error from the diffusion term and has a normal distribution with mean 0 and variance <span class="math display">\[\sigma^2 \left(\frac{1 - e^{-2\kappa \Delta t}}{2\kappa} - \Delta t \right)\]</span>. The variance can be simplified as</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+\mathrm{Var}(\text{Part (3)}) &amp;= \sigma^2 \left(\frac{1 - e^{-2\kappa \Delta t}}{2\kappa} - \Delta t\right) \\
+&amp;= \sigma^2 \left(\Delta t - \frac{2\kappa \Delta t^2}{3} + \mathcal{O}(\Delta t^3) - \Delta t\right) \quad \text{(by Taylor expansion)} \\
+&amp;= \mathcal{O}(\Delta t^2)
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>Putting these terms together, the error <span class="math display">\[e_{n+1}\]</span> can be written as</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+e_{n+1} &amp;= e_n \left(1 - \kappa \Delta t\right) + \Delta e_n \\
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>where <span class="math display">\[\Delta e_n\]</span> is the error from the mean-reversion term and the diffusion term and has order <span class="math display">\[\mathcal{O}(\Delta t^2)\]</span>.</p>
+<p>To show that the Euler-Maruyama method converges to the exact solution of the OU process, we need to show that the expected absolute error satisfies</p>
+<p><span class="math display">\[
+\begin{equation}
+\mathbb{E} \left[  \underset{0 \leq t \leq T}{\sup} \left| r(t) - r_t^{EM} \right| \right] = \mathcal{O}(\Delta t)
+\end{equation}
+\]</span></p>
+<p>Squaring the error and taking the expected value, we get</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+\mathbb{E} \left[ |e_{n+1}|^2 \right] &amp;\leq \left(1 - \kappa \Delta t\right)^2 \mathbb{E} \left[ |e_n|^2 \right] + C_1 \Delta t^2 \\
+&amp;\leq \left(1 - 2 \kappa \Delta t\right) \mathbb{E} \left[ |e_n|^2 \right] + C_1 \Delta t^2 \quad \text{for small } \Delta t \\
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>Here we introduce a version of <a href="https://math.stackexchange.com/questions/4090462/gronwall-lemma-for-system-of-linear-differential-inequalities">Gronwall’s inequality</a>, which is a useful tool to bound the solution of a differential or difference equations. It states that if <span class="math display">\[f\]</span> is a non-negative function and satisfies <span class="math display">\[\frac{d}{dt} f(t) \leq a_1 f(t) + a_0\]</span> for all <span class="math display">\[t\]</span>, then</p>
+<p><span class="math display">\[
+\begin{equation}
+f(t) \leq f(0) e^{a_1 t} + \frac{a_0}{a_1} \left(e^{a_1 t} - 1\right)
+\end{equation}
+\]</span></p>
+<p>and for the difference equation, if <span class="math display">\[f\]</span> satisfies <span class="math display">\[f(n+1) - f(n) \leq a_1 f(n) + a_0\]</span> for all <span class="math display">\[n \geq 0\]</span>, then</p>
+<p><span class="math display">\[
+\begin{equation}
+f(n) \leq f(0) e^{a_1 n} + \frac{a_0}{a_1} \left(e^{a_1 n} - 1\right)
+\end{equation}
+\]</span></p>
+<p>Let <span class="math display">\[f(n) = \mathbb{E} \left[ \lvert e_n \rvert^2 \right]\]</span> and substituting into the inequality, we have</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+\mathbb{E} \left[ |e_{n+1}|^2 \right] &amp;\leq \left(1 - 2 \kappa \Delta t\right) \mathbb{E} \left[ |e_n|^2 \right] + C_1 \Delta t^2 \\
+&amp;\Longrightarrow \mathbb{E} \left[ |e_{n+1}|^2 - |e_{n}|^2 \right] \leq \left(- 2 \kappa \Delta t\right) \mathbb{E} \left[ |e_n|^2 \right] + C_1 \Delta t^2 \\
+&amp;\Longrightarrow \mathbb{E} \left[ |e_{n}|^2 \right] \leq \mathbb{E} \left[ |e_{0}|^2 \right] e^{-2 \kappa \Delta t n} + \frac{C_1 \Delta t^2}{2 \kappa\Delta t} \left(e^{-2 \kappa \Delta t n} - 1\right) \\
+&amp;\Longrightarrow \mathbb{E} \left[ |e_{n}|^2 \right] \leq \mathbb{E} \left[ |e_{0}|^2 \right] e^{-2 \kappa \Delta t n} + C_2 \Delta t \\
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>Finally, to compute the strong convergence rate, we take the square root of the mean-square error <span class="math display">\[\mathbb{E} \left[ \lvert e_n \rvert^2 \right]\]</span>, and the expected absolute error has bound <span class="math display">\[\mathbb{E} \left[ \lvert e_n \rvert \right] \leq \sqrt{\mathbb{E} \left[ \lvert e_n \rvert^2 \right]} = \mathcal{O}(\Delta t)\]</span> by Jensen’s inequality.</p>
+<p>We have shown that the Euler-Maruyama method has strong convergence of order <span class="math display">\[1/2\]</span> to the exact solution of the OU process.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/steveya\.github\.io");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© Steve Yang</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

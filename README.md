@@ -1,3 +1,20 @@
-Hello! Welcome to my blog repo. To access the blog, please go to [steveya.github.io](https://steveya.github.io).
+# Steve Yang Blog (Quarto)
 
-This blog is powered by the [Chirpy](https://chirpy.dev) theme.
+This site is now built with [Quarto](https://quarto.org/) and deployed to GitHub Pages.
+
+## Local preview
+
+```bash
+quarto preview
+```
+
+## Migration
+
+Legacy Jekyll sources are preserved in `_jekyll_legacy/`. To regenerate the Quarto
+content from the legacy posts:
+
+```bash
+./scripts/migrate_posts.py --clean
+```
+
+See `migration-log.md` for files that require manual migration.

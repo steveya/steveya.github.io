@@ -1,0 +1,344 @@
+---
+layout: post
+title: Signature Methods (Part 3 - Lead–Lag Augmentation and Practical Limitations to the Signature Method)
+date: 2025-12-25
+categories: [Quantitative Finance]
+tags: [study-notes, signature-method, quantitative-finance, machine-learning, research]
+math: true
+---
+
+Continuing from the previous post, we work through three examples of approximating path functionals using linear functionals of truncated signatures in increasingly less practical way to illustrate the power and limitation of the signature method. The first example is the sample variance function. To make second-moment information accessible at low signature levels, we introduce the lead–lag augmentation and show that sample variance becomes an exact linear functional of depth-2 signature coordinates. The second example is sample standard deviation. It differs from variance by a scalar square-root map, so we need one additional step: approximate that square-root map by a polynomial and use the shuffle product to express polynomial powers as linear-on-signature functionals. The third example is a counterexample. We use the running maximum to illustrate that, while the universal approximation property is theoretically powerful, it does not eliminate the need for careful feature and augmentation design, and some functionals are not efficiently represented at low depth.
+
+## Variance and Standard Deviation of Increments
+
+Let $$x_0,x_1,\dots,x_N$$ be log-prices on a fixed window, and define the increments (log-returns)
+
+$$
+r_n = x_n - x_{n-1},\qquad n=1,\dots,N
+$$
+
+The sample mean and (unbiased) sample variance are
+
+$$
+\bar r = \frac{1}{N}\sum_{n=1}^N r_n,
+\qquad
+\widehat{\mathrm{Var}}(r) = \frac{1}{N-1}\sum_{n=1}^N (r_n-\bar r)^2
+$$
+
+The sample standard deviation (sample volatility) is
+
+$$
+\widehat{\mathrm{Std}}(r) = \sqrt{\widehat{\mathrm{Var}}(r)}
+$$
+
+Define the variance numerator
+
+$$
+q
+= \sum_{n=1}^N (r_n-\bar r)^2
+= \sum_{n=1}^N r_n^2 - \frac{\left(\sum_{n=1}^N r_n\right)^2}{N}
+$$
+
+Then
+
+$$
+\widehat{\mathrm{Var}}(r) = \frac{q}{N-1}
+\qquad
+\widehat{\mathrm{Std}}(r) = \sqrt{\frac{q}{N-1}}
+$$
+
+## Lead–Lag Augmentation
+
+A one-dimensional signature only sees the net increment $$x_N-x_0$$ and cannot recover $$\sum r_n^2$$. The lead–lag augmentation fixes this by embedding the 1D level sequence into a 2D path whose depth-2 signature contains increment-level second-moment information.
+
+Define the lead–lag path $$Z=\mathrm{LL}(x)\in\mathbb{R}^2$$ by the following discrete sequence of points. For each $$n=1,\dots,N$$, append the two segments
+
+$$
+(x_{n-1},x_{n-1})
+\to
+(x_n,x_{n-1})
+\to
+(x_n,x_n)
+$$
+
+to the path. This is a piecewise-linear path in $$\mathbb{R}^2$$ whose first coordinate leads (updates first) and second coordinate lags (updates second) at each step.
+
+The total increment in each channel still equals the net move of the original series
+
+$$
+S^{(1)}(Z)_{0,N} = x_N-x_0
+\qquad
+S^{(2)}(Z)_{0,N} = x_N-x_0
+$$
+
+but with this convention the antisymmetric level-2 combination $$S^{(1,2)}-S^{(2,1)}$$ yields a sum of increment squares.
+
+### Expressing $$^2$$ as Level-2 Signature
+
+Fix one step $$n$$ and write $$r=r_n=x_n-x_{n-1}$$. Since signature coordinates depend only on increments, we can translate the step by subtracting $$(x_{n-1},x_{n-1})$$ from each point. The translated step is
+
+$$
+(0,0)\to (r,0)\to (r,r)
+$$
+
+Parametrize this 2D path $$Z=(Z^1,Z^2)$$ over $$[0,2]$$ as
+
+$$
+Z(t)=
+\begin{cases}
+(rt,\,0), & t\in[0,1]\\
+(r,\,r(t-1)), & t\in[1,2]
+\end{cases}
+$$
+
+Then the differentials are
+
+$$
+dZ(t)=
+\begin{cases}
+(r\,dt,\,0), & t\in[0,1]\\
+(0,\,r\,dt), & t\in[1,2]
+\end{cases}
+$$
+
+By definition
+
+$$
+S^{(1,2)}(Z)=\int_{0<t_1<t_2<2} dZ^1_{t_1}\, dZ^2_{t_2}
+$$
+
+For the integrand to be nonzero we need $$t_1\in[0,1]$$ and $$t_2\in[1,2]$$. On this domain the ordering constraint $$t_1<t_2$$ is automatically satisfied, so the domain factorizes and
+
+$$
+S^{(1,2)}(Z)
+=
+\left(\int_{0}^{1} dZ^1\right)\left(\int_{1}^{2} dZ^2\right)
+=
+(r)(r)=r^2
+$$
+
+Similarly
+
+$$
+S^{(2,1)}(Z)=\int_{0<t_1<t_2<2} dZ^2_{t_1}\, dZ^1_{t_2}
+$$
+
+To get a nonzero contribution we would need $$t_1\in[1,2]$$ and $$t_2\in[0,1]$$, which is incompatible with $$t_1<t_2$$. Therefore
+
+$$
+S^{(2,1)}(Z)=0
+$$
+
+and hence on this step
+
+$$
+S^{(1,2)}(Z) - S^{(2,1)}(Z) = r^2
+$$
+
+Summing over $$n$$ gives the window identity
+
+$$
+S^{(1,2)}(Z)_{0,N} - S^{(2,1)}(Z)_{0,N} = \sum_{n=1}^N r_n^2
+$$
+
+*Remark on conventions.* With the particular “lead-first, lag-second” convention above, each step contributes to $$S^{(1,2)}$$ and $$S^{(2,1)}$$ vanishes. Other lead–lag conventions distribute the contribution differently, but the antisymmetric combination $$S^{(1,2)}-S^{(2,1)}$$ is the convention-robust way to state the quadratic-variation identity.
+
+### The Mean Term Via Repeated-Index Level-2 Signatures
+
+We also need $$\left(\sum r_n\right)^2$$. Since
+
+$$
+S^{(1)}(Z)_{0,N} = \sum_{n=1}^N r_n
+$$
+
+and for any bounded-variation path the repeated-index level-2 coordinate satisfies
+
+$$
+S^{(1,1)}(Z)_{0,N} = \frac{1}{2}\Big(S^{(1)}(Z)_{0,N}\Big)^2
+$$
+
+we obtain
+
+$$
+\left(\sum_{n=1}^N r_n\right)^2 = 2\,S^{(1,1)}(Z)_{0,N}
+$$
+
+## Example 1: Sample Variance
+
+Substitute the two identities into the expression for $$q$$
+
+$$
+q
+=
+\sum_{n=1}^N r_n^2 - \frac{\left(\sum_{n=1}^N r_n\right)^2}{N}
+=
+\Big(S^{(1,2)}(Z)_{0,N} - S^{(2,1)}(Z)_{0,N}\Big)
+-
+\frac{2}{N}S^{(1,1)}(Z)_{0,N}
+$$
+
+So $$q$$ is an exact linear functional of depth-2 signature coordinates of the lead–lag path $$Z$$. Therefore the unbiased sample variance is also an exact linear functional
+
+$$
+\widehat{\mathrm{Var}}(r)
+=
+\frac{1}{N-1}q
+=
+\left\langle a,\ S^{\le 2}(Z)\right\rangle
+$$
+
+for an explicit coefficient vector $$a$$ supported only on depth-2 coordinates.
+
+In other words, lead–lag augmentation makes sample variance low-order linear in signatures.
+
+## Example 2: Sample Standard Deviation
+
+Standard deviation applies a square-root to variance
+
+$$
+\widehat{\mathrm{Std}}(r) = \sqrt{\frac{q}{N-1}}
+$$
+
+Define the scalar function
+
+$$
+f(q) = \sqrt{\frac{q}{N-1}}
+$$
+
+The issue is that $$f$$ is nonlinear. To express it as a linear functional on signatures, we approximate $$f$$ by a polynomial on a compact interval $$[q_{\min},q_{\max}]$$ with $$q_{\min}>0$$. In particular, we choose a degree-$$M$$ polynomial
+
+$$
+p_M(q)=\sum_{m=0}^M c_m q^m
+$$
+
+such that
+
+$$
+\sup_{q\in[q_{\min},q_{\max}]} |f(q) - p_M(q)| \le \varepsilon_M
+\qquad
+\varepsilon_M\to 0\ \text{as}\ M\to\infty
+$$
+
+There are many approximation schemes. Taylor approximation is local: it is accurate near the expansion point and can deteriorate away from it. Chebyshev approximations are designed for uniform control on an interval: they aim to make the maximum error over $$[q_{\min},q_{\max}]$$ small. For $$\sqrt{q}$$, Taylor can also become numerically fragile if the interval approaches 0, while Chebyshev remains well-behaved as long as $$q_{\min}>0$$.
+
+We have already shown
+
+$$
+q(Z)=\langle a,\ S^{\le 2}(Z)\rangle
+$$
+
+so once we choose the polynomial approximation, the remaining step is to express the powers $$q(Z)^m$$ as linear functionals of signature coordinates. This is where the shuffle product enters.
+
+### Brief Excursion Into Shuffle Product
+
+Conceptually, the shuffle product says that the product of two linear signature statistics is again a linear signature statistic, with coefficients given by all order-preserving interleavings of indices. In its simplest form, for two level-1 coordinates
+
+$$
+S^{(i)}(Z)\,S^{(j)}(Z) = S^{(i,j)}(Z) + S^{(j,i)}(Z)
+$$
+
+More generally, if $$\langle u, S(Z)\rangle$$ and $$\langle v, S(Z)\rangle$$ are two linear functionals of the full signature, then there exists a coefficient object $$u ⧢ v$$ such that
+
+$$
+\langle u, S(Z)\rangle\,\langle v, S(Z)\rangle = \langle u ⧢ v, S(Z)\rangle
+$$
+
+Iterating this construction defines the shuffle power. For any coefficient object $$a$$, define its $$m$$-fold shuffle power recursively by
+
+$$
+a^{⧢ 0} = \varnothing \quad (\text{the empty word, corresponding to the constant }1)
+\qquad
+a^{⧢ (m+1)} = a^{⧢ m} ⧢ a
+$$
+
+Then the shuffle identity implies
+
+$$
+\big(\langle a, S(Z)\rangle\big)^m = \langle a^{⧢ m}, S(Z)\rangle
+$$
+
+A useful bookkeeping rule is that if $$a$$ only involves signature coordinates up to depth $$k$$, then $$a^{⧢ m}$$ only involves coordinates up to depth $$mk$$. In our case, $$q(Z)$$ is depth-2, so $$q(Z)^m$$ will live at depth $$2m$$.
+
+### Continuing The Volatility Derivation
+
+Returning to our polynomial approximation of $$f$$
+
+$$
+p_M(q(Z))
+=
+\sum_{m=0}^M c_m q(Z)^m
+=
+\left\langle \sum_{m=0}^M c_m a^{⧢ m},\ S(Z)\right\rangle
+$$
+
+Define
+
+$$
+\ell_M = \sum_{m=0}^M c_m a^{⧢ m}
+$$
+
+Since $$a$$ is supported at depth $$\le 2$$, the coefficient object $$\ell_M$$ is supported at depth $$\le 2M$$. Hence
+
+$$
+\widehat{\mathrm{Std}}(r)
+=
+f(q(Z))
+\approx
+p_M(q(Z))
+=
+\langle \ell_M,\ S^{\le 2M}(Z)\rangle
+$$
+
+and the uniform approximation error is controlled by the scalar polynomial approximation error
+
+$$
+\sup_{q\in[q_{\min},q_{\max}]}
+\left|
+\sqrt{\frac{q}{N-1}} - \langle \ell_M,\ S^{\le 2M}(Z)\rangle
+\right|
+\le
+\varepsilon_M
+$$
+
+This exercise makes the universal approximation mechanism concrete: lead–lag augmentation makes the variance numerator a depth-2 linear signature statistic, and polynomial approximation plus shuffle powers turn the square-root nonlinearity into a linear functional on higher-depth signatures. In practice, coefficients are typically learned by regularized regression on signature or log-signature features rather than constructed analytically.
+
+> Practical note on efficiency. The construction above is intentionally pedagogical. With lead–lag, the variance numerator $$q$$ is already an exact depth-2 linear signature statistic, so modeling variance (or realized variance) is naturally low-depth. The square-root step is what forces the polynomial degree $$M$$ and therefore depth $$2M$$ through shuffle powers, and the feature dimension can grow quickly as $$M$$ increases, especially if we want uniform accuracy on an interval that includes small $$q$$. In practice, one typically forecasts variance (or log-variance) directly, or computes $$q$$ from low-order signature terms and applies the square-root outside the signature model
+
+Below we give another contrasting example where universality exists in theory but is often inefficient in practice.
+
+## Example 3: Sample Maximum
+
+The previous examples (endpoint, window average, sample variance) are intentionally friendly: after an appropriate augmentation, they become exact linear functionals of low-order signature coordinates. This is useful pedagogically, but it can give a misleading impression that signatures automatically replace all hand-crafted time-series features.
+
+A counterexample that is very natural in quant work is the running maximum on a window
+
+$$
+F(X) = \max_{t\in[a,b]} x_t
+$$
+
+where $$x_t$$ is a level process (e.g., log-price, spread level, a macro index level). Since $$F$$ is continuous for continuous paths under the supremum norm, universality suggests that $$F$$ can be approximated by linear functionals of truncated signatures. However, unlike variance or window averages, there is no reason to expect a low-order exact representation, and in practice the approximation is often inefficient. The goal of this section is to make that limitation precise: signatures are expressive, but they are not a free replacement for max-type features unless we are willing to pay for higher depth or augment the path to expose max-like behavior directly.
+
+The earlier exact examples share a structural property. They can be written in terms of integral-type summaries. Endpoint depends on $$\int_a^b dx_t$$. Window average depends on $$\int_a^b x_t\,dt$$ after time augmentation. Sample variance depends on $$\sum r_n^2$$ and $$\big(\sum r_n\big)^2$$ after lead–lag. These objects are global in the sense that they aggregate information across the entire window, and low-order signature terms are naturally suited to represent them because low-order iterated integrals are themselves global aggregates.
+
+The running maximum is different. $$\max x_t$$ is an extremal functional: it is controlled by behavior near the highest point of the path rather than by an averaged interaction. It is also nonsmooth: small perturbations that affect the peak can change the value sharply even if they do not change low-order integral summaries very much. For this reason, max-type functionals are typically not low-order friendly.
+
+More formally, no fixed low truncation depth can reproduce max exactly on a rich class of paths. A finite truncation depth $$m$$ gives a finite-dimensional feature vector $$S^{\le m}(X)$$, and any linear functional $$\langle \ell, S^{\le m}(X)\rangle$$ depends only on a finite collection of iterated integrals. On any reasonably rich family of continuous paths, we can modify the path locally by inserting a narrow bump so that the running maximum increases noticeably, while the change in any fixed finite set of iterated integrals can be made arbitrarily small by localizing the modification in time. Low-order signatures are built from sums of products of increments integrated over the window, and a highly localized spike affects only a small portion of those integrals. In contrast, $$\max$$ is designed to react to exactly such localized behavior. Therefore we should not expect an identity of the form
+
+$$
+\max_{t\in[a,b]} x_t = \langle \ell, S^{\le m}(X)\rangle
+$$
+
+to hold for any small fixed $$m$$ on any class of paths with nontrivial shape variability.
+
+Even though max is not expected to be exactly representable at low order, it remains a continuous functional on continuous paths under the uniform topology. In particular, if we restrict attention to a compact set $$K$$ of continuous paths, then $$F(X)=\max_{t\in[a,b]} x_t$$ is continuous on $$K$$. Under the usual universality statement on such a compact set, we obtain the existence result: for any $$\varepsilon>0$$ there exists a depth $$m$$ and a coefficient vector $$\ell$$ such that
+
+$$
+\sup_{X\in K}\left|\max_{t\in[a,b]} x_t - \langle \ell, S^{\le m}(X)\rangle\right|<\varepsilon
+$$
+
+However, it is important to interpret this correctly: this is an existence theorem. It does not claim that a small depth is sufficient, nor does it provide an efficient constructive representation in general. To make this statement operational for max, one typically needs substantially higher truncation depth, or one needs to expose max-like behavior directly via augmentation.
+
+This example illustrates a practical limitation. Some widely used time-series features are structurally compatible with low-order signature coordinates after the right augmentation. Other features, such as max, drawdown, or barrier hits, are continuous but extremal and are typically not efficiently represented by low-order truncated signatures. Therefore, signatures should not be viewed as a universal replacement for hand-crafted features. A more accurate mental model is that signatures provide a principled feature hierarchy for ordered interactions, augmentations determine what information is easily accessible at low depth, and for extremal functionals it can be more effective to include the statistic explicitly as a channel rather than relying on high-depth approximation.
+
+## What's Next
+In Part 4 we will apply the signature method to volatility forecasting. I previously wrote a short series on volatility forecasts starting [here](../volatility-forecasts-1/), where I compared a range of models using relatively simple price and return-only features. We will revisit the same setup and evaluation framework, and then ask a focused question: what changes when we replace hand-crafted lag features with truncated signature features computed from a multichannel return path

@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-01-24">
+
+<title>Volatility Forecasts (Part 3 - XGBSTES Algorithm 2) – Steve Yang</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Steve Yang</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/archives.html"> 
+<span class="menu-text">Archives</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/categories.html"> 
+<span class="menu-text">Categories</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/tags.html"> 
+<span class="menu-text">Tags</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../pages/about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#recap" id="toc-recap" class="nav-link active" data-scroll-target="#recap">Recap</a></li>
+  <li><a href="#brief-introduction-to-xgboost" id="toc-brief-introduction-to-xgboost" class="nav-link" data-scroll-target="#brief-introduction-to-xgboost">Brief Introduction to <code>XGBoost</code></a>
+  <ul class="collapse">
+  <li><a href="#previous-implementation" id="toc-previous-implementation" class="nav-link" data-scroll-target="#previous-implementation">Previous Implementation</a></li>
+  <li><a href="#revised-method-end-to-end-optimization" id="toc-revised-method-end-to-end-optimization" class="nav-link" data-scroll-target="#revised-method-end-to-end-optimization">Revised Method: End-to-End Optimization</a></li>
+  <li><a href="#hyperparameter-tuning-with-time-series-cross-validation" id="toc-hyperparameter-tuning-with-time-series-cross-validation" class="nav-link" data-scroll-target="#hyperparameter-tuning-with-time-series-cross-validation">Hyperparameter Tuning with Time-Series Cross-Validation</a></li>
+  </ul></li>
+  <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion">Results and Discussion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Volatility Forecasts (Part 3 - XGBSTES Algorithm 2)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Quantitative Finance</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 24, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>(Code snippets for this post can be found in the <a href="https://github.com/steveya/volatility-forecast/blob/main/examples/volatility_forecast_2.py">Github repository</a>.) Update: added discussion and a new fitting algorithm</p>
+<section id="recap" class="level2">
+<h2 class="anchored" data-anchor-id="recap">Recap</h2>
+<p>In the <a href="../volatility-forecasts-2/">previous post</a>, we extended the Smooth Transition Exponential Smoothing (<code>STES</code>) model from <a href="https://doi.org/10.1016/j.ijforecast.2003.09.010">(Taylor 2004)</a> and <a href="https://doi.org/10.1016/j.econmod.2020.02.021">(Liu, Taylor, Choo 2020)</a> by replacing the linear model in <code>STES</code> with a <code>XGBoost</code> model.</p>
+<p>We saw that the XGBoost model has lower <code>MAE</code> and <code>MedAE</code> scores, but generally underperform STES in terms of <code>RMSE</code>. We did not however find out the true cause of this. In this post, we drill down into the cause of this, and propose a different fitting algorithm.</p>
+<p>Recall that the <code>XGBSTES</code> model is formulated as</p>
+<p><span class="math display">\[
+\begin{equation}
+\begin{aligned}
+\sigma_t^2 &amp;= \alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\widehat{\sigma}_{t-1}^2 \\
+\alpha_{t-1} &amp;= \mathrm{sigmoid}\left(\mathcal{F}(X_{t-1})\right) \\
+\end{aligned}
+\end{equation}
+\]</span></p>
+<p>We fit the model by minimizing mean squared error (<code>MSE</code>) between the forecasted variance <span class="math display">\[\sigma_t^2\]</span> and realized squared returns.</p>
+<p><span class="math display">\[
+\mathtt{loss} = \frac{1}{T}\sum_{t=1}^{T}\left(r_t^2 - \widehat{\sigma}_t^2\right)^2
+\]</span></p>
+<p>For each time step <span class="math display">\[t\]</span>, the forecasted variance <span class="math display">\[\sigma_t^2\]</span> is a weighted combination of the previous period’s squared return <span class="math display">\[r_{t-1}^2\]</span> and the previous forecast <span class="math display">\[\widehat{\sigma}_{t-1}^2\]</span>. The weight <span class="math display">\[\alpha_{t-1}\]</span> is produced by an XGBoost model applied to the transition variable <span class="math display">\[X_{t-1}\]</span> and passed through a sigmoid so it lies in <span class="math display">\[(0,1)\]</span>. In other words, we do not predict next-day variance directly; instead, we predict a time-varying update weight and then generate the variance forecast recursively over contiguous blocks of the feature matrix.</p>
+</section>
+<section id="brief-introduction-to-xgboost" class="level2">
+<h2 class="anchored" data-anchor-id="brief-introduction-to-xgboost">Brief Introduction to <code>XGBoost</code></h2>
+<p><code>XGBoost</code> is a general-purpose engine for functional gradient descent. At its core, it optimizes an objective function by iteratively adding functions <span class="math display">\[f_t(x)\]</span> (regression trees) to an ensemble. For example, the model at step <span class="math display">\[j\]</span> is <span class="math display">\[F_j(x) = \sum_{k=1}^j f_k(x)\]</span>.</p>
+<p><code>XGBoost</code> does not optimize the loss directly. Instead, at each step <span class="math display">\[t\]</span>, it approximates the loss using a second-order Taylor expansion around the current prediction <span class="math display">\[z_i^{(t-1)}\]</span>. If we wish to minimize a loss <span class="math display">\[\mathcal{L} = \sum_i \ell(y_i, z_i)\]</span>, <code>XGBoost</code> solves for the term <span class="math display">\[f_t(x_i)\]</span> that minimizes:</p>
+<p><span class="math display">\[
+\mathcal{L}^{(j)} \approx \sum_{i=1}^N \left[ \ell(y_i, z_i^{(t-1)}) + g_i f_j(x_i) + \frac{1}{2}h_i f_j^2(x_i) \right] + \Omega(f_j)
+\]</span></p>
+<p>where <span class="math display">\[g_i = \partial \ell / \partial z_i\]</span> is the gradient and <span class="math display">\[h_i = \partial^2 \ell / \partial z_i^2\]</span> is the Hessian. The term <span class="math display">\[\Omega(f_t)\]</span> penalizes the complexity of the tree. We minimize this loss function with respect to <span class="math display">\[f_j\]</span>, and the term <span class="math display">\[\ell(y_i, z_i^{(t-1)})\]</span> depends only on the previous trees and is a constant that can be dropped from this step.</p>
+<p>In XGBoost, the function <span class="math display">\[f_j\]</span> is a regression tree. A regression tree maps a data point <span class="math display">\[x_i\]</span> to a leaf node <span class="math display">\[m\]</span> and assign it a score <span class="math display">\[w_m\]</span>. i.e.&nbsp;</p>
+<p><span class="math display">\[
+f_j(x_i) = w_{m(x_i)}
+\]</span></p>
+<p>where <span class="math display">\[m(x_i)\]</span> is if-else rule that maps <span class="math display">\[x_i\]</span> to the leaf node <span class="math display">\[m\]</span>, <span class="math display">\[w\]</span> is the vector of scores for all leaves. The <span class="math display">\[\mathcal{L}^{(j)}\]</span> above sums over all <span class="math display">\[x_i\]</span>, and we can rewrite it as a summation over all <span class="math display">\[M\]</span> leaf groups. Let <span class="math display">\[I_m = \left[i \mid m(x_i) = m\right]\]</span>, <span class="math display">\[\mathcal{L}^{(j)}\]</span> and the regularization term</p>
+<p><span class="math display">\[\Omega(f_j) = \gamma M + \frac{1}{2}\lambda\sum_{j=m}^M w_m^2\]</span></p>
+<p>can be written as</p>
+<p><span class="math display">\[
+\mathcal{L}^{(j)} \approx \sum_{m=1}^M \left[ \left(\sum_{i \in I_m} g_m\right) w_m + \frac{1}{2} \left(\sum_{i \in I_m} h_i\right) w_m^2 \right] + \gamma M + \frac{1}{2}\lambda\sum_{j=m}^M w_m^2
+\]</span></p>
+<p>We minimize this loss function with respect to <span class="math display">\[f_j\]</span>, or rather, the weight vector <span class="math display">\[w\]</span>. and does not depend on <span class="math display">\[w\]</span>, so it can be removed in the optimization. Rewrite <span class="math display">\[G_m = \sum_{m \in I_m} g_m\]</span> and <span class="math display">\[H_m = \sum_{m \in I_m} h_m\]</span>. We can rearrange the terms to get</p>
+<p><span class="math display">\[
+\mathcal{L}^{(j)} \approx \sum_{m=1}^M \left[ G_m w_m + \frac{1}{2} \left(H_m + \lambda \right) w_m^2 \right] + \gamma M
+\]</span></p>
+<p>This is a sum of quadratic equation in <span class="math display">\[w_m\]</span> and its minimum is achieved at</p>
+<p><span class="math display">\[
+w_m^* = -\frac{G_m}{H_m + \lambda}
+\]</span></p>
+<p>Note that <span class="math display">\[\gamma M\]</span> is also a constant at this step and drops out of the optimization. The <span class="math display">\[\gamma M\]</span> term only plays a role when <code>XGBoost</code> decides the split. Once we plug in <span class="math display">\[w_m^*\]</span> back into <span class="math display">\[L\]</span> and simplify, we get</p>
+<p><span class="math display">\[
+\mathrm{Score} = -\frac{1}{2} \sum_{m=1}^M \frac{G_m^2}{H_m + \lambda} + \gamma M
+\]</span></p>
+<p><code>XGBoost</code> then calculates the “Gain” of a split, it drops the negative sign (to convert Loss to Gain) and compares <code>Score(Left) + Score(Right) - Score(Parent)</code>. <code>XGBoost</code> creates a split if the Gain is above a certain threshold, and <span class="math display">\[\gamma\]</span> acts to reduce the gain from each split</p>
+<p>This formulation reveals that to adapt <code>XGBoost</code> to any problem, we only need to provide two arrays: the gradient vector <span class="math display">\[g\]</span> and the Hessian “vector” <span class="math display">\[h\]</span>. The library handles the tree construction, which involves finding splits that maximize the reduction in this regularized quadratic loss. Specifically, for a leaf node <span class="math display">\[j\]</span> containing a set of instance indices <span class="math display">\[I_j\]</span>, the optimal weight <span class="math display">\[w_j\]</span> and the resulting structure score are derived from the sums <span class="math display">\[G_j = \sum_{i \in I_j} g_i\]</span> and <span class="math display">\[H_j = \sum_{i \in I_j} h_i\]</span>:</p>
+<p><span class="math display">\[
+w_j^* = -\frac{G_j}{H_j + \lambda}, \quad \text{Score}_j = -\frac{1}{2} \frac{G_j^2}{H_j + \lambda} + \gamma
+\]</span></p>
+<p>Here, <span class="math display">\[\lambda\]</span> acts as an L2 regularizer on the leaf weights, and <span class="math display">\[\gamma\]</span> acts as a threshold for creating new leaves. A split is only accepted if the difference between the child scores and the parent score (the gain) exceeds <span class="math display">\[\gamma\]</span>. This interaction between the magnitude of our derivatives (<span class="math display">\[G, H\]</span>) and the regularization parameters (<span class="math display">\[\lambda, \gamma\]</span>) becomes critical when we apply this model to volatility forecasting later.</p>
+<blockquote class="blockquote">
+<p>Why is the Hessian a vector in <code>XGBoost</code></p>
+<p>For a dataset of size <span class="math display">\[N\]</span>, the Hessian is strictly an <span class="math display">\[N \times N\]</span> matrix. However, <code>XGBoost</code> (and most boosting libraries) requests a vector of size <span class="math display">\[N\]</span>. This is because <code>XGBoost</code> cannot handle an <span class="math display">\[N \times N\]</span> matrix due to memory constraints. For 1 million rows, the matrix has <span class="math display">\[10^{12}\]</span> entries and is in general not feasible to store. Computationally, inverting or decomposing this matrix to find optimal tree splits is also impossible (<span class="math display">\[O(N^3)\]</span>).</p>
+<p>To make the problem solvable, <code>XGBoost</code> makes a <strong>diagonal approximation</strong>. It assumes that for the purpose of finding the next split, the rows are independent. It ignores the cross-dependencies and only asks for the diagonal elements:</p>
+<p><span class="math display">\[
+h_t = \frac{\partial^2 L}{\partial z_t^2}
+\]</span></p>
+<p>and the “Hessian” becomes a <span class="math display">\[N\]</span>-dimensional vector. This independence assumption is why the method is an approximation. However, because we update the model iteratively (boosting), errors from this approximation are corrected in subsequent rounds, allowing <code>XGBoost</code> to converge even with this simplified curvature information.</p>
+</blockquote>
+<section id="previous-implementation" class="level3">
+<h3 class="anchored" data-anchor-id="previous-implementation">Previous Implementation</h3>
+<p>We chose to break the dependency loop to avoid computing the recursive gradient and Hessian vectors. If we assume the variance path is fixed, we can algebraically invert the recursion to find the “optimal” gate <span class="math display">\[\alpha_t^*\]</span> that would minimize the error at a single step. Rearranging the recursion equation for <span class="math display">\[\alpha_t\]</span>:</p>
+<p><span class="math display">\[
+\alpha_t^* = \frac{r_{t+1}^2 - v_t}{r_t^2 - v_t}
+\]</span></p>
+<p>We can then train <code>XGBoost</code> to predict this target <span class="math display">\[\alpha_t^*\]</span> from features <span class="math display">\[X_t\]</span>, using a standard squared error objective. This transforms the recursive problem into a standard supervised regression problem.</p>
+<p>This method aligns with Expectation-Maximization (EM) algorithms often used in latent variable models. We treat the unobservable gate <span class="math display">\[\alpha_t\]</span> as a latent variable. In the ‘E-step’, we infer the optimal gate values given the data; in the ‘M-step’, we train the model to predict these values. This transforms a difficult sequential optimization problem into a simpler supervised regression task—effectively generating an intermediate “Teacher” (the algebraic inversion) to guide the learner.</p>
+<p>However, in our specific context, this Teacher is numerically brittle. The denominator in the equation above is the difference between the squared return and the current variance estimate. When the market is quiet or when the forecast is accurate, this denominator approaches zero, causing the target <span class="math display">\[\alpha_t^*\]</span> to explode or flip signs arbitrarily. The model effectively learns from an unstable “Oracle” that provides high-variance instructions and optimizes a noisy surrogate rather than the true recursive error.</p>
+<p>Indeed this brittleness is the cause of our model underperforming <code>STES</code>. The “Teacher” of our model is an ill-tempered one. Figure 1 below shows the <span class="math display">\[\alpha_t^*\]</span> (<code>alpha_clip</code>) vs the prediction from the tree model (<code>alpha_pred</code>).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../assets/img/post_assets/volatility-forecasts-3/synth_xgb_alpha_diag.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 1. <span class="math display">\[\alpha_t^*\]</span> vs fitted alpha</figcaption>
+</figure>
+</div>
+<p>The realized variance are extremely noisy, pushing the implied <span class="math display">\[\alpha^*\]</span> to either <span class="math display">\[0\]</span> or <span class="math display">\[1\]</span> after clipping most of the time, and is undefined when <span class="math display">\[v_t = r_t^2\]</span>. The real variance process obviously do not follow the simple recursive relationship. As a result, our tree model learns an <span class="math display">\[\alpha\]</span> process that is roughly around <span class="math display">\[0.4\]</span>. The constant <code>ES</code> fit has <span class="math display">\[\alpha_{ES} = 0.101\]</span>.</p>
+</section>
+<section id="revised-method-end-to-end-optimization" class="level3">
+<h3 class="anchored" data-anchor-id="revised-method-end-to-end-optimization">Revised Method: End-to-End Optimization</h3>
+<p>The theoretically correct approach is to compute the exact gradient of the cumulative loss <span class="math display">\[L = \sum \ell_t\]</span> with respect to the model outputs <span class="math display">\[z_t\]</span>, accounting for the full recursive chain by backpropagating through time.</p>
+<p>We define the adjoint variable <span class="math display">\[\delta_t\]</span> as the sensitivity of the total loss to the variance state <span class="math display">\[v_t\]</span>:</p>
+<p><span class="math display">\[
+\delta_t = \frac{\partial L}{\partial v_t} = \frac{\partial \ell_{t-1}}{\partial v_t} + \frac{\partial v_{t+1}}{\partial v_t} \delta_{t+1}
+\]</span></p>
+<p>From the <code>STES</code> recursion, the term <span class="math display">\[\frac{\partial v_{t+1}}{\partial v_t} = (1 - \alpha_t)\]</span>. Substituting this into the equation, we get a backward recurrence relation:</p>
+<p><span class="math display">\[
+\delta_t = (v_t - r_t^2) + \delta_{t+1}(1 - \alpha_t)
+\]</span></p>
+<p>This recursion mirrors the forward pass but runs backward in time. Once we have computed the adjoints <span class="math display">\[\delta\]</span> for the entire sequence, we can compute the correct gradient <span class="math display">\[g_t\]</span> for the <code>XGBoost</code> input <span class="math display">\[z_t\]</span>:</p>
+<p><span class="math display">\[
+g_t = \frac{\partial L}{\partial z_t} = \delta_{t+1} \frac{\partial v_{t+1}}{\partial \alpha_t} \frac{\partial \alpha_t}{\partial z_t} = \delta_{t+1} (r_t^2 - v_t) \alpha_t (1 - \alpha_t)
+\]</span></p>
+<p>For the Hessian <span class="math display">\[h_t\]</span>, calculating the exact second derivative involves complex terms including the second derivative of the recursion itself. Instead, we employ the Gauss-Newton approximation. We treat the model as locally linear and approximate the Hessian using the square of the Jacobian of the model output with respect to the parameters. This simplifies to:</p>
+<p><span class="math display">\[
+h_t \approx \left( \frac{\partial v_{t+1}}{\partial z_t} \right)^2 = \left[ (r_t^2 - v_t) \alpha_t (1 - \alpha_t) \right]^2
+\]</span></p>
+<p>In our recursive model like <code>STES</code>, the off-diagonal terms (e.g., <span class="math display">\[\frac{\partial^2 L}{\partial z_1 \partial z_5}\]</span>) are not zero. Changing the gate at <span class="math display">\[t=1\]</span> changes the variance at <span class="math display">\[t=5\]</span>. The true Hessian is a dense, lower-triangular matrix. However, this approximation is numerically stable and guarantees a positive Hessian, which is essential for the convexity required by <code>XGBoost</code>.</p>
+<blockquote class="blockquote">
+<p>Gauss-Newton approximation is a standard technique in non-linear least squares optimization. We approximate the curvature of the loss function by assuming the underlying model is locally linear, effectively ignoring the second-order complexity of the model itself.</p>
+<p>Our objective function <span class="math display">\[L(z)\]</span> is a composition of two functions: 1. The <strong>Prediction Model</strong> <span class="math display">\[f(z)\]</span>: Maps the input margin <span class="math display">\[z\]</span> to a prediction <span class="math display">\[\hat{y}\]</span> (in our case, the variance <span class="math display">\[v\]</span>). 2. The <strong>Loss Function</strong> <span class="math display">\[\ell(\hat{y}, y)\]</span>: Measures the error. For Least Squares, this is <span class="math display">\[\ell = \frac{1}{2}(\hat{y} - y)^2\]</span>.</p>
+<p><span class="math display">\[
+L(z) = \frac{1}{2}(f(z) - y)^2
+\]</span></p>
+<p>To find the gradient, we apply the Chain Rule:</p>
+<p><span class="math display">\[
+L'(z) = (f(z) - y) \cdot f'(z)
+\]</span></p>
+<p>and to find the Hessian, we differentiate <span class="math display">\[L'(z)\]</span> again. Product Rule yields:</p>
+<p><span class="math display">\[
+L''(z) = \underbrace{(f'(z))^2}_{\text{Term 1}} + \underbrace{(f(z) - y) \cdot f''(z)}_{\text{Term 2}}
+\]</span></p>
+<ul>
+<li><strong>Term 1</strong>: The square of the Jacobian. This term is always positive.</li>
+<li><strong>Term 2</strong>: The interaction between the current error and the second derivative of the model <span class="math display">\[f(z)\]</span>.</li>
+</ul>
+<p>The Gauss-Newton method drops <strong>Term 2</strong>.</p>
+<p><span class="math display">\[
+h_{GN} \approx (f'(z))^2
+\]</span></p>
+<p>We justify this simplification for three reasons: 1. <strong>Small Residuals</strong>: If the model is fitting well, the term <span class="math display">\[(f(z) - y)\]</span> is small (close to zero), making Term 2 negligible. 2. <strong>Linearization</strong>: We assume that locally, the model <span class="math display">\[f(z)\]</span> is linear, implying <span class="math display">\[f''(z) \approx 0\]</span>. 3. <strong>Convexity</strong>: Term 1 is a square, so it is guaranteed to be non-negative (<span class="math display">\[h \ge 0\]</span>). Term 2 involves <span class="math display">\[f''(z)\]</span>, which can be negative. If the total Hessian becomes negative, XGBoost sees a “concave” objective (like a hill instead of a valley) and the optimization diverges. The approximation forces the objective to be convex.</p>
+</blockquote>
+<section id="the-scaling-problem" class="level4">
+<h4 class="anchored" data-anchor-id="the-scaling-problem">The Scaling Problem</h4>
+<p>When we initially ran the End-to-End method, we found that the model refused to learn. The tree ensemble would not make any splits, effectively outputting a constant prediction. The root cause lay in the interaction between the scale of our data and the regularization mechanics of XGBoost.</p>
+<p>Financial returns are small numbers; a daily return of 1% is <span class="math display">\[0.01\]</span>, and a squared return is <span class="math display">\[10^{-4}\]</span>. Consequently, the prediction errors (<span class="math display">\[r_{t+1}^2 - v_{t+1}\]</span>) are of order <span class="math display">\[10^{-4}\]</span>, and the sensitivities <span class="math display">\[(r_t^2 - v_t)\]</span> are also of order <span class="math display">\[10^{-4}\]</span>. The gradient <span class="math display">\[g_t\]</span>, being the product of these terms, falls to the order of <span class="math display">\[10^{-8}\]</span>.</p>
+<p>Recall the <code>XGBoost</code> structure score formula:</p>
+<p><span class="math display">\[
+\text{Score} = -\frac{1}{2} \frac{G^2}{H + \lambda}
+\]</span></p>
+<p>wheer <span class="math display">\[G \approx 10^{-8}\]</span> and <span class="math display">\[H \approx 10^{-16}\]</span>, and the default regularization parameter <span class="math display">\[\lambda = 1\]</span>, the denominator is dominated by <span class="math display">\[\lambda\]</span>. The resulting score is roughly <span class="math display">\[10^{-16}\]</span>, which is numerically indistinguishable from zero. Furthermore, we initially ran with the default <code>min_child_weight</code> parameter, which requires the sum of Hessians in a leaf to exceed 1. Our Hessians at <span class="math display">\[10^{-16}\]</span> is just on a different scale.</p>
+<p>This is analogous to the scaling issues found in Lasso or Ridge regression, where unstandardized features can lead to disproportionate penalization. Here, the “feature” is the gradient signal itself. To fix this, we multiply returns by 100 before squaring them. This scales the variance targets by <span class="math display">\[10,000\]</span>. The gradient, which is quadratic in the scale of returns, increases by a factor of <span class="math display">\[10^8\]</span>, bringing it to order <span class="math display">\[O(1)\]</span>. With this adjustment, the standard <code>XGBoost</code> hyperparameters function as intended.</p>
+<blockquote class="blockquote">
+<p>The <code>min_child_weight</code> relates to the Hessian and measures the quantity of the curvature or the number of samples in a leaf. A split is only allowed if <span class="math display">\[H_\mathrm{left} \ge \text{min_child_weight}\]</span> and <span class="math display">\[H_\mathrm{right} \ge \text{min_child_weight}\]</span>. In second order optimization, the curvature measures the steepness of the surface. When curvature is high, a small change in prediction changes the error massively. The model has a strong motivation to split here. On the other hand, when the curvature is small, the loss function is a flat plain. The optimizaer can change the prediction wildly and the error barely changes. The model would have no strong incentive to split here.</p>
+<p>To see how the quantity of curvature relates to the number of sample, we only need to look at the mean squared error objective function.</p>
+<p><span class="math display">\[
+\ell = \frac{1}{2} \left(\hat{y} - y\right)^2 \rightarrow \frac{\partial^2 \ell}{\partial \hat{y}^2} = 1
+\]</span></p>
+<p><span class="math display">\[H_m = \sum_{i\in I_m} 1\]</span></p>
+<p>is just the number of sample.</p>
+<p>The Hessian in logistic regression varies depending on how confident the model is. The Hessian for a single data point <span class="math display">\[i\]</span> is:</p>
+<p><span class="math display">\[
+h_i = p_i (1 - p_i)
+\]</span></p>
+<p>where <span class="math display">\[p_i\]</span> is the predicted probability. If the model predicts <span class="math display">\[p = 0.5\]</span>, then <span class="math display">\[h_i = 0.5 \times 0.5 = 0.25\]</span> is at the maximum curvature. The loss function is steep and a split here make sense. If the model predicts <span class="math display">\[p = 0.99\]</span>, then <span class="math display">\[h_i = 0.99 \times 0.01 \approx 0.01\]</span>. The model is already sure about this prediction. The loss function is flat and the model should decide not to split further.</p>
+<p><code>min_child_weight</code> measures whether there is there enough <em>unsolved</em> data?</p>
+</blockquote>
+</section>
+</section>
+<section id="hyperparameter-tuning-with-time-series-cross-validation" class="level3">
+<h3 class="anchored" data-anchor-id="hyperparameter-tuning-with-time-series-cross-validation">Hyperparameter Tuning with Time-Series Cross-Validation</h3>
+<p>Even after we apply the scale adjustment, the <code>XGBoost</code> algorithm has many other tunable hyperparameters. Moreover, validating a recursive model requires care. Standard K-fold cross-validation breaks the temporal structure, and standard time-series splits fail to account for the hidden state <span class="math display">\[v_t\]</span>. If we start a validation fold at time <span class="math display">\[T\]</span>, we cannot simply initialize <span class="math display">\[v_T\]</span> with the global starting variance; we must “warm start” the filter to reflect the accumulated history.</p>
+<p>We implemented a custom Time-Series Cross-Validation loop that approximates the initial state for each validation fold using the realized variance of the recent training data (<code>v0_va</code> below).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_cv_e2e(<span class="va">self</span>, X, y, returns, ...):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ...</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> fold_idx, (train_idx, valid_idx) <span class="kw">in</span> <span class="bu">enumerate</span>(tscv.split(X_np)):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Slice data for this fold</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        X_tr, X_va <span class="op">=</span> X_np[train_idx], X_np[valid_idx]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        r2_tr, r2_va <span class="op">=</span> returns2_np[train_idx], returns2_np[valid_idx]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Warm Start Initialization for Validation</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="co"># We approximate v_start using the mean of the last 20 days of training data</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        v0_va <span class="op">=</span> <span class="bu">float</span>(np.mean(r2_tr[<span class="op">-</span><span class="dv">20</span>:]))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Create custom objectives bound to this fold's data</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        feval <span class="op">=</span> <span class="va">self</span>._make_e2e_objective(</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            returns2<span class="op">=</span>r2_va, y<span class="op">=</span>y_va, init_var<span class="op">=</span>v0_va</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        )[<span class="dv">1</span>]</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Train and Evaluate</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># ...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This ensures that our cross-validation scores accurately reflect the model’s ability to maintain a volatility forecast over time, rather than measuring its ability to recover from a bad initialization.</p>
+</section>
+</section>
+<section id="results-and-discussion" class="level2">
+<h2 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h2>
+<p>We evaluated both the Alternating (Algorithm 1) and End-to-End (Algorithm 2) implementations on SPY returns from 2000 to 2023. We also added the cross-validation to Algorithm 1 for comparison so the number might be different from the last post.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model</th>
+<th style="text-align: left;">IS RMSE</th>
+<th style="text-align: left;">OS RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>ES</strong></td>
+<td style="text-align: left;">5.06e-4</td>
+<td style="text-align: left;">4.64e-4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>STES-EAESE</strong></td>
+<td style="text-align: left;"><strong>4.98e-4</strong></td>
+<td style="text-align: left;">4.49e-4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>XGBSTES-EAESE (Algorithm 1)</strong></td>
+<td style="text-align: left;">5.18e-4</td>
+<td style="text-align: left;"><strong>4.35e-4</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>XGBSTES-EAESE (Algorithm 2)</strong></td>
+<td style="text-align: left;">5.02e-4</td>
+<td style="text-align: left;">4.43e-4</td>
+</tr>
+</tbody>
+</table>
+<p>Even though the Algorithm 1 has the lowest OS RMSE, its in-sample performance is inferior to all other algorithms. A more informative comparison would be on the alpha values. Figure 2 below shows that <code>XGBSTES-EAESE (Algorithm 1)</code> still suffers from learning the brittle <span class="math display">\[\alpha^*\]</span> target. <code>XGBSTES-EAESE (Algorithm 2)</code>, on the other hand, produce more sensible <span class="math display">\[\alpha\]</span> values.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../assets/img/post_assets/volatility-forecasts-3/alpha_comp.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 2. <span class="math display">\[\alpha\]</span> of our Models</figcaption>
+</figure>
+</div>
+<p>That’s it for this post. We will diagnose the XGBSTES model further in future posts. See you then.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/steveya\.github\.io");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© Steve Yang</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

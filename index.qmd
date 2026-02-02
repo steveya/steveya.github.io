@@ -1,0 +1,9 @@
+---
+title: "Steve Yang"
+listing:
+  contents: posts/*/index.qmd
+  sort: "date desc"
+  max-items: 10
+---
+
+Welcome to my blog. Here you'll find posts on quantitative finance, data science, and machine learning education.

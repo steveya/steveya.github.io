@@ -27,3 +27,5 @@ assets/js/dist
 .DS_Store
 
 assets/.DS_Store
+
+/.quarto/
