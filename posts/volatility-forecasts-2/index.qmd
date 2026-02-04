@@ -1,14 +1,22 @@
 ---
-layout: post
 title: "Volatility Forecasts (Part 2 - XGBSTES Algorithm 1)"
 date: 2024-07-18
-categories: [Quantitative Finance, Volatility Forecast, Machine Learning, Research]
+categories: [Quantitative Finance]
+description: >-
+  In the previous post, we replicated the Smooth Transition Exponential Smoothing (STES) model from (Taylor 2004) and (Liu, Taylor, Choo
+  2020). In a small replication study on SPY returns, STES delivered modest improvements in out-of-sample RMSE relative to simple Exponential
+  Smoothing (ES). Here, we ask a natural follow-up: if we keep the same feature set (lag returns, lag squared returns, and lag absolute
+  returns), can a more flexible gate improve the forecast further? This post is motivated by (Coulombe 2020), which shows how tree-based
+  models can be used to predict time-varying coefficients in otherwise classical econometric settings. Many traditional models accommodate
+  regimes and nonlinearity via Markov switching, time-varying parameters, or thresholds; Coulombe’s key point is that decision trees can often
+  approximate these regime mappings directly. The paper considers a regression of the form: where is the customized random forest that maps
+  the features to the coefficients . The customized tree
 ---
 
 (Code snippets for this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/blob/main/examples/volatility_forecast_2.py).)
 
 ## Recap
-In the [previous post](../volatility-forecasts-1/), we replicated the Smooth Transition Exponential Smoothing (``STES``) model from [(Taylor 2004)](https://doi.org/10.1016/j.ijforecast.2003.09.010) and [(Liu, Taylor, Choo 2020)](https://doi.org/10.1016/j.econmod.2020.02.021). In a small replication study on ``SPY`` returns, ``STES`` delivered modest improvements in out-of-sample ``RMSE`` relative to simple Exponential Smoothing (``ES``). Here, we ask a natural follow-up: if we keep the same feature set $X_t$ (lag returns, lag squared returns, and lag absolute returns), can a more flexible gate improve the forecast further?
+In the [previous post](../volatility-forecasts-1/), we replicated the Smooth Transition Exponential Smoothing (``STES``) model from [(Taylor 2004)](https://doi.org/10.1016/j.ijforecast.2003.09.010) and [(Liu, Taylor, Choo 2020)](https://doi.org/10.1016/j.econmod.2020.02.021). In a small replication study on ``SPY`` returns, ``STES`` delivered modest improvements in out-of-sample ``RMSE`` relative to simple Exponential Smoothing (``ES``). Here, we ask a natural follow-up: if we keep the same feature set $$X_t$$ (lag returns, lag squared returns, and lag absolute returns), can a more flexible gate improve the forecast further?
 
 This post is motivated by [(Coulombe 2020)](https://arxiv.org/abs/2006.12724), which shows how tree-based models can be used to predict time-varying coefficients in otherwise classical econometric settings. Many traditional models accommodate regimes and nonlinearity via Markov switching, time-varying parameters, or thresholds; Coulombe’s key point is that decision trees can often approximate these regime mappings directly. The paper considers a regression of the form:
 
@@ -21,7 +29,7 @@ y_t &= X_t \beta_t + \epsilon_t \\
 \end{equation}
 $$
 
-where $\mathcal{F}$ is the customized random forest that maps the features $X_t$ to the coefficients $\beta_t$. The customized tree model uses a bagging technique appropriate for time-series data and adds temporal smoothness regularization to the predicted $\beta_t$.
+where $$\mathcal{F}$$ is the customized random forest that maps the features $$X_t$$ to the coefficients $$\beta_t$$. The customized tree model uses a bagging technique appropriate for time-series data and adds temporal smoothness regularization to the predicted $$\beta_t$$.
 
 ## XGBSTES
 
@@ -36,7 +44,7 @@ $$
 \end{equation}
 $$
 
-By replacing the linear equation $X^\top\beta$ with a tree ensemble model, we can perhaps better separate the feature space into regions where recent realized volatility plays a more critical role in forecasting future realized volatility from regions where long-term historical realized volatility is a better forecast. Volatility time series exhibit non-linear behaviour, and several models already use modern machine learning architectures (such as the Neural Network Heterogeneous Autoregressive Model). 
+By replacing the linear equation $$X^\top\beta$$ with a tree ensemble model, we can perhaps better separate the feature space into regions where recent realized volatility plays a more critical role in forecasting future realized volatility from regions where long-term historical realized volatility is a better forecast. Volatility time series exhibit non-linear behaviour, and several models already use modern machine learning architectures (such as the Neural Network Heterogeneous Autoregressive Model). 
 
 The ``XGBSTES`` model is formulated as
 
@@ -49,13 +57,13 @@ $$
 \end{equation}
 $$
 
-We fit the model by minimizing mean squared error (MSE) between the forecasted variance $\sigma_t^2$ and realized squared returns.
+We fit the model by minimizing mean squared error (MSE) between the forecasted variance $$\sigma_t^2$$ and realized squared returns.
 
 $$
 \mathtt{loss} = \frac{1}{T}\sum_{t=1}^{T}\left(r_t^2 - \widehat{\sigma}_t^2\right)^2
 $$
 
-For each time step $t$, the forecasted variance $\sigma_t^2$ is a weighted combination of the previous period’s squared return $r_{t-1}^2$ and the previous forecast $\widehat{\sigma}_{t-1}^2$. The weight $\alpha_{t-1}$ is produced by an XGBoost model applied to the transition variable $X_{t-1}$ and passed through a sigmoid so it lies in $(0,1)$. In other words, we do not predict next-day variance directly; instead, we predict a time-varying update weight and then generate the variance forecast recursively over contiguous blocks of the feature matrix.
+For each time step $$t$$, the forecasted variance $$\sigma_t^2$$ is a weighted combination of the previous period’s squared return $$r_{t-1}^2$$ and the previous forecast $$\widehat{\sigma}_{t-1}^2$$. The weight $$\alpha_{t-1}$$ is produced by an XGBoost model applied to the transition variable $$X_{t-1}$$ and passed through a sigmoid so it lies in $(0,1)$. In other words, we do not predict next-day variance directly; instead, we predict a time-varying update weight and then generate the variance forecast recursively over contiguous blocks of the feature matrix.
 
 Below we discuss how it can be implemented.
 
@@ -69,7 +77,7 @@ $$
 f_{t-1}=\mathcal{F}(X_{t-1}),
 $$
 
-and we trained the tree model $\mathcal{F}$ by minimizing the same ``MSE`` objective used in [Part 1](../volatility-forecasts-1/):
+and we trained the tree model $$\mathcal{F}$$ by minimizing the same ``MSE`` objective used in [Part 1](../volatility-forecasts-1/):
 
 $$
 L=\sum_{t=1}^T\left(y_t-\widehat{\sigma}_t^2\right)^2,\qquad y_t=r_t^2
@@ -89,12 +97,12 @@ $$
 L \approx \sum_{t=1}^T \ell_t(y_t,f_{t-1})
 $$
 
-so each row $t$ contributes a gradient and Hessian that depends on $f_{t-1}$ locally.
+so each row $$t$$ contributes a gradient and Hessian that depends on $$f_{t-1}$$ locally.
 
-In ``STES``, the prediction at time $t-1$ depends on the entire history of gates:
+In ``STES``, the prediction at time $$t$-1$ depends on the entire history of gates:
 
 $$
-\widehat{\sigma}_t^2 = g(\alpha_{t-1},\dots,\alpha_1),
+\widehat{\sigma}t^2 = g(\alpha{t-1},\dots,\alpha_1),
 \qquad \alpha_s=\mathrm{expit}(f_s)
 $$
 
@@ -104,7 +112,7 @@ $$
 L = \sum_{t=1}^T \ell_t\left(y_t; f_1,f_2,\dots,f_t\right)
 $$
 
-This matters because tree building assumes that splitting row $t$ affects the loss mostly through that row’s own gradient signal. However, here, changing $f_t$ changes the state recursion and can alter many later terms $\ell_{t+1},\ell_{t+2},\dots$. The objective is effectively coupled sequentially, while the booster is designed for per-row aggregation.
+This matters because tree building assumes that splitting row $$t$$ affects the loss mostly through that row’s own gradient signal. However, here, changing $$f_t$$ changes the state recursion and can alter many later terms $$\ell_{t+1},\ell_{t+2},\dots$$. The objective is effectively coupled sequentially, while the booster is designed for per-row aggregation.
 
 2. The gradients used are typically truncated
 
@@ -159,7 +167,7 @@ $$
 \alpha_t(1-\alpha_t)
 $$
 
-However, in the true objective, $f_t$ affects all future states, so the true gradient is
+However, in the true objective, $$f_t$$ affects all future states, so the true gradient is
 
 $$
 \frac{\partial L}{\partial f_t}
@@ -167,9 +175,9 @@ $$
 \sum_{k=t}^T \frac{\partial \ell_k}{\partial f_t}
 $$
 
-The missing terms $k>t$ can be non-negligible when volatility persistence is high, because the recursion propagates forward with factors roughly proportional to $(1-\alpha_s)$. In other words, the booster is not minimizing the stated loss $L$; it is minimizing a surrogate that only partially accounts for temporal effects. That makes training sensitive to hyperparameters, window length, and initialization choices.
+The missing terms $$k>t$$ can be non-negligible when volatility persistence is high, because the recursion propagates forward with factors roughly proportional to $$(1-\alpha_s)$$. In other words, the booster is not minimizing the stated loss $$L$$; it is minimizing a surrogate that only partially accounts for temporal effects. That makes training sensitive to hyperparameters, window length, and initialization choices.
 
-Even if we correct our gradient to include $\frac{\partial \ell_k}{\partial f_t}$ for $k>t$, training may still suffer long-range dependency, much like an ``RNN``. The sigmoid function can create an additional vanishing gradient problem, causing training to stall.
+Even if we correct our gradient to include $$\frac{\partial \ell_k}{\partial f_t}$$ for $$k>t$$, training may still suffer long-range dependency, much like an ``RNN``. The sigmoid function can create an additional vanishing gradient problem, causing training to stall.
 
 The Hessian computation is even more problematic. 
 
@@ -191,9 +199,9 @@ $$
 \alpha_t = \mathrm{expit}(s_t) = \frac{1}{1+\exp(-s_t)}, \qquad s_t = \mathcal{F}(X_t).
 $$
 
-We first invert the recursion to get a pseudo-target for $\alpha_t$
+We first invert the recursion to get a pseudo-target for $$\alpha_t$$
 
-If $\widehat{\sigma}_t^2$ and $\widehat{\sigma}^2_{t-1}$ were known, then the recursion can be solved for $\alpha_t$ algebraically:
+If $$\widehat{\sigma}_t^2$$ and $$\widehat{\sigma}^2_{t-1}$$ were known, then the recursion can be solved for $$\alpha_t$$ algebraically:
 
 $$
 \widehat{\sigma}_t^2 = \alpha - \widehat{\sigma}^2_{t-1} = \alpha_t \left(r_{t-1}^2 - \widehat{\sigma}^2_{t-1}\right)
@@ -201,13 +209,13 @@ $$
 \alpha_t = \frac{\widehat{\sigma}^2_t - \widehat{\sigma}^2_{t-1}}{r_{t-1}^2 - \widehat{\sigma}^2_{t-1}}.
 $$
 
-Since $\widehat{\sigma}^2_t$ is not observed, but our supervision target is:
+Since $$\widehat{\sigma}^2_t$$ is not observed, but our supervision target is:
 
 $$
 y_t = r_t^2
 $$
 
-We use the current estimate of the previous state $\widehat{\sigma}^{2,(m)}_{t-1}$ (iteration $m$) to form a pseudo-label:
+We use the current estimate of the previous state $$\widehat{\sigma}^{2,(m)}_{t-1}$$ (iteration $$m$$) to form a pseudo-label:
 
 $$
 \widetilde{\alpha}t^{(m)} =
@@ -217,15 +225,15 @@ $$
 \right).
 $$
 
-Since the denominator can get small or change sign, and because we need $\widetilde{\alpha}\in(0,1)$ to match the expit gate, we clip the pseudo-label to be between 0 and 1.
+Since the denominator can get small or change sign, and because we need $$\widetilde{\alpha}\in(0,1)$$ to match the expit gate, we clip the pseudo-label to be between 0 and 1.
 
 Given the pseudo-label, we can now fit the gate model as a standard supervised problem. The tree model is trained in the usual way, with row-wise targets:
-- inputs: $X_t$
-- labels: $\widetilde{\alpha}_t^{(m)}$ (or equivalently $\mathrm{logit}(\widetilde{\alpha}_t^{(m)})$)
+- inputs: $$X_t$$
+- labels: $$\widetilde{\alpha}_t^{(m)}$$ (or equivalently $$\mathrm{logit}(\widetilde{\alpha}_t^{(m)})$$)
 
 XGBoost now sees a normal regression task, instead of a recursive loss that couples all rows together.
 
-After fitting $\mathcal{F}^{(m)}$, form:
+After fitting $$\mathcal{F}^{(m)}$$, form:
 
 $$
 \widehat \alpha_t^{(m)} = \mathrm{expit}\left(\mathcal{F}^{(m)}(X_t)\right),
@@ -247,7 +255,7 @@ $$
 
 or until we hit a max number of outer iterations. This is an alternating scheme:
 - Given a variance state estimate, infer what gate would have reduced error at each time step.
-- Given that inferred gate sequence, fit a nonlinear model to reproduce it from $X_t$.
+- Given that inferred gate sequence, fit a nonlinear model to reproduce it from $$X_t$$.
 - Then recompute the variance path implied by the learned gates.
 
 This avoids needing to differentiate through the entire recursion inside XGBoost (which is the source of the “non-separable objective” mismatch).
@@ -266,26 +274,26 @@ and the one-step-ahead variance recursion
 $$
 \widehat{\sigma}_t^2 = \alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\widehat{\sigma}_{t-1}^2
 $$
-with labels $y_t=r_t^2$ and per-time loss $\ell_t=(y_t-\widehat{\sigma}_t^2)^2$.
+with labels $$y_t=r_t^2$$ and per-time loss $$\ell_t=(y_t-\widehat{\sigma}_t^2)^2$$.
 
-1. **Inputs (for one objective call).** A contiguous training block $t=1,\dots,T$ with feature rows $X_t$ (inside the `DMatrix`), labels $y_t$ (from `dtrain.get_label()`), and an aligned array $r_{t-1}^2$. The objective receives the current raw predictions $s_t$ from XGBoost.
+1. **Inputs (for one objective call).** A contiguous training block $$t=1,\dots,T$$ with feature rows $$X_t$$ (inside the `DMatrix`), labels $$y_t$$ (from `dtrain.get_label()`), and an aligned array $$r_{t-1}^2$$. The objective receives the current raw predictions $$s_t$$ from XGBoost.
 
-2. **Initialization (variance state).** Choose an initial variance level $\widehat{\sigma}_0^2$. In our implementation we use a fixed warm-start such as
+2. **Initialization (variance state).** Choose an initial variance level $$\widehat{\sigma}_0^2$$. In our implementation we use a fixed warm-start such as
 
     $$
     \widehat{\sigma}_0^2 = \frac{1}{M}\sum_{i=0}^{M-1} r_i^2
     $$
 
-    for some window length $M$ (e.g. $M=500$).
+    for some window length $$M$$ (e.g. $$M=500$$).
 
-3. **Forward pass (compute gate and variance forecast).** For $t=1,\dots,T$:
+3. **Forward pass (compute gate and variance forecast).** For $$t=1,\dots,T$$:
 
    3.1. Compute the gate output for this row:
    $$
    \alpha_t = \mathrm{sigmoid}(s_t).
    $$
 
-   3.2. Update the one-step variance forecast using the *previous* gate value $\alpha_{t-1}$:
+   3.2. Update the one-step variance forecast using the *previous* gate value $$\alpha_{t-1}$$:
    $$
    \widehat{\sigma}_t^2 = \alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\widehat{\sigma}_{t-1}^2.
    $$
@@ -301,13 +309,13 @@ with labels $y_t=r_t^2$ and per-time loss $\ell_t=(y_t-\widehat{\sigma}_t^2)^2$.
    \frac{\partial \alpha_{t-1}}{\partial s_{t-1}} = \alpha_{t-1}(1-\alpha_{t-1})
    $$
 
-   Since $\widehat{\sigma}_t^2$ depends on $s_{t-1}$ only through $\alpha_{t-1}$,
+   Since $$\widehat{\sigma}_t^2$$ depends on $$s_{t-1}$$ only through $$\alpha_{t-1}$$,
 
    $$
    \frac{\partial \widehat{\sigma}_t^2}{\partial s_{t-1}} = \Delta_{t-1}\,\alpha_{t-1}(1-\alpha_{t-1})
    $$
 
-   Therefore, using $\ell_t=(y_t-\widehat{\sigma}_t^2)^2$, we return the per-row quantities (aligned so that $g_{t-1}$ and $h_{t-1}$ correspond to row $t-1$):
+   Therefore, using $$\ell_t=(y_t-\widehat{\sigma}_t^2)^2$$, we return the per-row quantities (aligned so that $$g_{t-1}$$ and $$h_{t-1}$$ correspond to row $$t-1$$):
 
    $$
    g_{t-1} = \frac{\partial \ell_t}{\partial s_{t-1}}
@@ -320,7 +328,7 @@ with labels $y_t=r_t^2$ and per-time loss $\ell_t=(y_t-\widehat{\sigma}_t^2)^2$.
 
    (The Hessian uses a Gauss–Newton-style approximation)
 
-5. **Termination (outer boosting loop).** XGBoost repeatedly calls this objective across boosting rounds until reaching `num_boost_round` or an early-stopping criterion (if enabled). Each call performs Steps 2–4 on the current raw prediction vector $\{s_t\}$.
+5. **Termination (outer boosting loop).** XGBoost repeatedly calls this objective across boosting rounds until reaching `num_boost_round` or an early-stopping criterion (if enabled). Each call performs Steps 2–4 on the current raw prediction vector $$\{s_t\}$$.
 
 We fit the model on the same data as in my (now updated) [last post](https://steveya.github.io/posts/volatility-forecast-1/). The results are presented in the next section.
 
@@ -330,23 +338,23 @@ We fit the model on the same data as in my (now updated) [last post](https://ste
 We test several configurations of the ``XGBSTES`` model to understand how different design choices affect performance:
 
 1. **``XGBSTES_BASE``**: Baseline configuration with default hyperparameters (fewer boosting rounds)
-2. **``XGBSTES_BASE_MONO``**: With monotonicity constraints ($\uparrow$ `abs_return`, $\downarrow$ `return`)
+2. **``XGBSTES_BASE_MONO``**: With monotonicity constraints ($$\uparrow$$ `abs_return`, $$\downarrow$$ `return`)
 3. **``XGBSTES_BASE_HUBER``**: Using Pseudo-Huber loss (`reg:pseudohubererror`) for robustness to outliers
 4. **``XGBSTES_BASE_RESID``**: Residual learning mode (learns deviation from ES baseline via `base_margin`)
 5. **Combined variants**: ``XGBSTES_BASE_MONO_HUBER``, ``XGBSTES_BASE_MONO_RESID``, ``XGBSTES_BASE_HUBER_RESID``, ``XGBSTES_BASE_MONO_HUBER_RESID``
 
 The key hyperparameter variations tested:
-- **Monotonicity constraints**: Encode domain knowledge that higher absolute returns should increase $\alpha_t$ (faster updates), while signed returns should decrease it. Right now we only enforce positive monotonicity for all features. 
+- **Monotonicity constraints**: Encode domain knowledge that higher absolute returns should increase $$\alpha_t$$ (faster updates), while signed returns should decrease it. Right now we only enforce positive monotonicity for all features. 
 - **Pseudo-Huber objective**: Robust loss function versus standard MSE
-- **Residual mode**: Learn $\alpha_t - \alpha_{ES}$ instead of $\alpha_t$ directly, leveraging ES as a strong baseline
-- **Denominator filtering**: Exclude training samples where $\lvert r_t^2 - v_t \rvert$ is very small (via `denom_quantile` parameter) to prevent noisy pseudo-labels
+- **Residual mode**: Learn $$\alpha_t - \alpha_{ES}$$ instead of $$\alpha_t$$ directly, leveraging ES as a strong baseline
+- **Denominator filtering**: Exclude training samples where $$\lvert r_t^2 - v_t \rvert$$ is very small (via `denom_quantile` parameter) to prevent noisy pseudo-labels
 
 See [tree_stes_model.py](https://github.com/steveya/volatility-forecast/blob/main/volatility_forecast/model/tree_stes_model.py) for implementation details.
 
 ### ``XGBSTES`` vs ``STES`` on Simulated Returns
 On simulated GARCH returns, the simpler ``ES``/``STES`` family remains hard to beat: the data-generating process is largely stable with occasional shocks, so a smooth, low-variance forecaster is close to the truth.
 
-To make the comparison more informative than ``RMSE`` alone, Table 1 reports ``RMSE``/``MAE``/``MedAE`` on the simulated dataset. The numbers below are from 20 independent simulated runs (same simulation settings as the script, $\eta=4$). Most ``XGBSTES`` variants track the ``STES`` family closely on ``RMSE``, but ``XGBSTES_BASE`` is a clear outlier with worse ``RMSE`` and much better ``MAE``/``MedAE``.
+To make the comparison more informative than ``RMSE`` alone, Table 1 reports ``RMSE``/``MAE``/``MedAE`` on the simulated dataset. The numbers below are from 20 independent simulated runs (same simulation settings as the script, $$\eta=4$$). Most ``XGBSTES`` variants track the ``STES`` family closely on ``RMSE``, but ``XGBSTES_BASE`` is a clear outlier with worse ``RMSE`` and much better ``MAE``/``MedAE``.
 
 | Model | ``RMSE`` | ``MAE`` | ``MedAE`` |
 | --- | --- | --- | --- |
@@ -412,7 +420,7 @@ The complete ``SPY`` results reveal several interesting patterns:
 
 2. **``XGBSTES`` variants excel at ``MAE``/``MedAE``**: The tree-gated models show a clear advantage on median and mean absolute errors. `XGBSTES_BASE_MONO_HUBER` achieves the best ``MedAE`` (2.30e-05) and second-best ``MAE`` (1.26e-04), while `XGBSTES_BASE_RESID` posts the lowest ``MAE`` (1.24e-04).
 
-3. **Monotonicity + Huber loss is the winning ``XGBSTES`` configuration**: `XGBSTES_BASE_MONO_HUBER` consistently performs best among the tree variants, suggesting that domain-informed constraints (higher absolute returns → higher $\alpha_t$) combined with robust loss functions are beneficial for real data.
+3. **Monotonicity + Huber loss is the winning ``XGBSTES`` configuration**: `XGBSTES_BASE_MONO_HUBER` consistently performs best among the tree variants, suggesting that domain-informed constraints (higher absolute returns → higher $$\alpha_t$$) combined with robust loss functions are beneficial for real data.
 
 4. **Walk-forward results confirm the pattern, with ``ES`` still very competitive on ``RMSE``**: The expanding-window evaluation (Table 3) validates the ``RMSE`` vs. ``MAE``/``MedAE`` tradeoff. The ``STES`` family leads on ``RMSE`` (3.54-3.65e-04), and ``ES`` is essentially tied with the best ``STES`` (3.56e-04), while ``XGBSTES`` variants dominate the lower tail (``MedAE``: 3.52e-05 for `XGBSTES_BASE_MONO_HUBER` vs. 6.77e-05 for best ``STES``).
 
@@ -462,13 +470,13 @@ $$
 D_t = (y_t - \hat y_t^{STES})^2 - (y_t - \hat y_t^{XGB})^2,
 $$
 
-so that $D_t > 0$ means XGB is better at time $t$, while $D_t < 0$ means XGB is worse.
+so that $$D_t > 0$$ means XGB is better at time $$t$$, while $$D_t < 0$$ means XGB is worse.
 
 ![Figure 1. ``SPY`` fixed-split OOS: STES_EAESE vs XGBSTES_BASE forecasts and loss differential](/assets/img/post_assets/volatility-forecasts-2/spy_stes_vs_xgb_forecasts_and_D.png)
 
 The top panel overlays the OOS target variance proxy and one-step forecasts from ``STES`` and ``XGBSTES``. The curves are visually close most days, indicating that both models learn a broadly similar level for day-to-day volatility.
 
-The bottom panel plots the loss differential $D_t$. The key pattern is **rare, high-amplitude negative spikes** in $D_t$. Those spikes correspond to a small number of dates where ``XGBSTES`` makes a large miss (typically under-reacting to a variance surge, or over-reacting when variance collapses). This is consistent with the headline metric divergence.
+The bottom panel plots the loss differential $$D_t$$. The key pattern is **rare, high-amplitude negative spikes** in $$D_t$$. Those spikes correspond to a small number of dates where ``XGBSTES`` makes a large miss (typically under-reacting to a variance surge, or over-reacting when variance collapses). This is consistent with the headline metric divergence.
 
 ### Regime-conditional performance
 To see whether the tree-gated models win on “most days” but lose in turbulent periods, Table 5 slices the OOS sample into low/medium/high realized-variance regimes (based on quantiles of the realized variance proxy ``y``), and reports ``RMSE`` and ``MedAE`` within each regime.
@@ -485,22 +493,22 @@ We see more clear tradeoffs ``XGBSTES`` is materially better in low/medium-volat
 
 The event-study plots below summarize what the ``WIN`` and ``LOSS`` look like in the OOS sample, where ``WIN``/``LOSS`` are defined by the top/bottom quantiles of the per-date squared-error differential (``STES`` error minus ``XGB`` error) similar to what we did in Post 1.
 
-![Figure 2. Event study: $\lvert r_t \rvert$ around XGB win vs lose dates](/assets/img/post_assets/volatility-forecasts-2/spy_event_absr_stes_vs_xgb.png)
+![Figure 2. Event study: $$\lvert r_t \rvert$$ around XGB win vs lose dates](/assets/img/post_assets/volatility-forecasts-2/spy_event_absr_stes_vs_xgb.png)
 
-The return-magnitude event study shows that ``LOSE`` dates are associated with a large spike in $\lvert r \rvert$ at $k=1$, whereas ``WIN`` dates show a dip at $k=1$. This is consistent with the interpretation that ``LOSE`` episodes coincide with large shocks arriving immediately after the forecast date.
+The return-magnitude event study shows that ``LOSE`` dates are associated with a large spike in $$\lvert r \rvert$$ at $$k=1$$, whereas ``WIN`` dates show a dip at $$k=1$$. This is consistent with the interpretation that ``LOSE`` episodes coincide with large shocks arriving immediately after the forecast date.
 
-![Figure 3. Event study: innovation proxy $u_t$ around XGB win vs lose dates](/assets/img/post_assets/volatility-forecasts-2/spy_event_u_stes_vs_xgb.png)
+![Figure 3. Event study: innovation proxy $$u_t$$ around XGB win vs lose dates](/assets/img/post_assets/volatility-forecasts-2/spy_event_u_stes_vs_xgb.png)
 
-The innovation event study shows that ``LOSE`` dates coincide with large positive $u$ (realized variance exceeding the ``STES``-based state estimate), while ``WIN`` dates coincide with large negative $u$ (variance lower than the ``STES`` estimate). This suggests a strong asymmetry: ``XGB`` tends to win when ``STES`` is too high, and tends to lose when variance surges.
+The innovation event study shows that ``LOSE`` dates coincide with large positive $$u$$ (realized variance exceeding the ``STES``-based state estimate), while ``WIN`` dates coincide with large negative $$u$$ (variance lower than the ``STES`` estimate). This suggests a strong asymmetry: ``XGB`` tends to win when ``STES`` is too high, and tends to lose when variance surges.
 
 ![Figure 4. Event study: gate alpha around ``XGB`` win vs lose dates](/assets/img/post_assets/volatility-forecasts-2/spy_event_alpha_stes_vs_xgb.png)
 
-The gate event chart indicate that ``STES`` $\alpha$ remains relatively stable and similar across ``WIN``/``LOSE`` events. However, ``XGB`` $\alpha$ diverges strongly: it spikes around ``WIN`` events and collapses around ``LOSE`` events near the shock timing.
+The gate event chart indicate that ``STES`` $$\alpha$$ remains relatively stable and similar across ``WIN``/``LOSE`` events. However, ``XGB`` $$\alpha$$ diverges strongly: it spikes around ``WIN`` events and collapses around ``LOSE`` events near the shock timing.
 
-``XGBSTES`` can become overly conservative (low $\alpha$) precisely when a fast update is required, producing large forecast errors on shock days.
+``XGBSTES`` can become overly conservative (low $$\alpha$$) precisely when a fast update is required, producing large forecast errors on shock days.
 
-### Gate behavior ($\alpha_t$)
-Since ``STES`` uses a parametric logistic gate and ``XGBSTES`` uses a nonparametric tree gate, we compare the implied $\alpha_t$ behavior directly. Table 6 summarizes the distribution of $\alpha_t$ and how often each model saturates near 0 or 1.
+### Gate behavior ($$\alpha_t$$)
+Since ``STES`` uses a parametric logistic gate and ``XGBSTES`` uses a nonparametric tree gate, we compare the implied $$\alpha_t$$ behavior directly. Table 6 summarizes the distribution of $$\alpha_t$$ and how often each model saturates near 0 or 1.
 
 | Model | alpha mean | alpha std | pct alpha < 0.1 | pct alpha > 0.9 |
 | --- | --- | --- | --- | --- |
@@ -512,17 +520,17 @@ Since ``STES`` uses a parametric logistic gate and ``XGBSTES`` uses a nonparamet
 
 Relative to ``STES_EAESE``, the tree-gated models produce a much more dispersed gate: they spend far more time near a “very slow update” regime (alpha < 0.1), but also occasionally jump to near-1 (fast update). This kind of switching can reduce typical errors while still being vulnerable to rare mis-timed updates during volatility spikes.
 
-![Figure 5. Gate diagnostics (``STES_EAESE``): alpha distribution and helpfulness vs $\lvert r \rvert$](/assets/img/post_assets/volatility-forecasts-2/spy_oos_stes_gate_helpfulness_2x2.png)
+![Figure 5. Gate diagnostics (``STES_EAESE``): alpha distribution and helpfulness vs $$\lvert r \rvert$$](/assets/img/post_assets/volatility-forecasts-2/spy_oos_stes_gate_helpfulness_2x2.png)
 
-In the STES panel, $\alpha_t$ is concentrated around a narrow band (roughly 0.10–0.15) with occasional spikes. More importantly, the binned mean $\alpha_t$ versus $\lvert r_t \rvert$ quantiles is monotone increasing: larger shocks tend to produce larger update weights, which matches the intended volatility logic.
+In the STES panel, $$\alpha_t$$ is concentrated around a narrow band (roughly 0.10–0.15) with occasional spikes. More importantly, the binned mean $$\alpha_t$$ versus $$\lvert r_t \rvert$$ quantiles is monotone increasing: larger shocks tend to produce larger update weights, which matches the intended volatility logic.
 
-![Figure 6. Gate diagnostics (``XGBSTES_BASE``): alpha distribution and helpfulness vs $\vert r \rvert$](/assets/img/post_assets/volatility-forecasts-2/spy_oos_xgb_gate_helpfulness_2x2.png)
+![Figure 6. Gate diagnostics (``XGBSTES_BASE``): alpha distribution and helpfulness vs $$\vert r \rvert$$](/assets/img/post_assets/volatility-forecasts-2/spy_oos_xgb_gate_helpfulness_2x2.png)
 
-In the ``XGBSTES`` panel, $\alpha_t$ is far more dispersed, with frequent near-0 and near-1 values. The binned mean $\alpha_t$ versus $\lvert r_t \rvert$ suggests that the relationship, rather than increasing monotonically, is **hump-shaped**. ``XGBSTES`` assigns very high $\alpha$ at moderate $\lvert r \rvert$, but reduces $\alpha$ in the most extreme $\lvert r \rvert$ bins.
+In the ``XGBSTES`` panel, $$\alpha_t$$ is far more dispersed, with frequent near-0 and near-1 values. The binned mean $$\alpha_t$$ versus $$\lvert r_t \rvert$$ suggests that the relationship, rather than increasing monotonically, is **hump-shaped**. ``XGBSTES`` assigns very high $$\alpha$$ at moderate $$\lvert r \rvert$$, but reduces $$\alpha$$ in the most extreme $$\lvert r \rvert$$ bins.
 
 This explains why typical errors are small but ``RMSE`` is poor. In calm/moderate regimes, aggressive gating can reduce typical tracking error and give better ``MAE``/``MedAE``. In extreme tail regimes, the gate falls when it should rise, causing under-reaction and create rare large misses, worsening ``RMSE``.
 
-![Figure 7. Mechanism view: $\Delta\alpha_t=\alpha^{XGB}_t-\alpha^{STES}_t$ vs innovation proxy $u_t$](/assets/img/post_assets/volatility-forecasts-2/spy_delta_alpha_vs_u_stes_vs_xgb.png)
+![Figure 7. Mechanism view: $$\Delta\alpha_t=\alpha^{XGB}_t-\alpha^{STES}_t$$ vs innovation proxy $$u_t$$](/assets/img/post_assets/volatility-forecasts-2/spy_delta_alpha_vs_u_stes_vs_xgb.png)
 
 This plot compares the gate difference
 
@@ -536,7 +544,7 @@ $$
 u_t = r_t^2 - \hat v_t^{STES}.
 $$
 
-The scatter shows that $\Delta\alpha_t$ is highly variable even when $u_t$ is near 0, and does not reliably become positive when $u_t$ is large and positive. This indicates that ``XGBSTES`` does not learn a clean sign-consistent adjustment rule relative to innovations, which makes it vulnerable to under-reaction episodes.
+The scatter shows that $$\Delta\alpha_t$$ is highly variable even when $$u_t$$ is near 0, and does not reliably become positive when $$u_t$$ is large and positive. This indicates that ``XGBSTES`` does not learn a clean sign-consistent adjustment rule relative to innovations, which makes it vulnerable to under-reaction episodes.
 
 ![Figure 8. STES gate-score contribution differences (XGB win minus lose)](/assets/img/post_assets/volatility-forecasts-2/spy_stes_gate_contrib_xgb_win_minus_lose.png)
 

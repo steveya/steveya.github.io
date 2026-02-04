@@ -4,13 +4,12 @@ listing:
   contents: posts
   sort: "date desc"
   type: default
-  categories: true
   sort-ui: false
   filter-ui: false
   image-height: 0px 
   feed: true
-  # This line is the key fix to show your tags (categories) as text
   fields: [date, title, description, categories, reading-time]
+  max-description-length: 150
 page-layout: full
 title-block-banner: false
 sidebar:

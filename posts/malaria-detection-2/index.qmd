@@ -1,20 +1,12 @@
 ---
-layout: post
 title: "Malaria Detection (Part 2: Model Building and Training)"
 date: 2024-06-13
-categories: [Study Notes, Machine Learning, Data Science, Cnn, Deep Learning]
+categories: [Machine Learning]
+description: >-
+  The notebook for this post can be found here.
 ---
 
 The notebook for this post can be found [here](https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb).
-
-## Table of Contents
-1. [Recap](#recap)
-2. [Base Model](#base-model)
-3. [Model 1: Going Deeper](#model-1-going-deeper)
-4. [Model 2: Changing the Activation Function](#model-2-changing-the-activation-function)
-5. [Model 3: Tackling Data Scarcity and Misclassified Data](#model-3-tackling-data-scarcity-and-misclassified-data)
-6. [Model 4: Standing on the Shoulders of Giants](#model-4-standing-on-the-shoulders-of-giants)
-7. [Wrapping Up](#wrapping-up)
 
 ## Recap
 In the [previous post](../malaria-detection-1/) of this series, we introduced the problem of Malaria detection and prepared and preprocessed our dataset. Now, let's build and train a few deep-learning models to see if we can detect Malaria with good accuracy and recall.

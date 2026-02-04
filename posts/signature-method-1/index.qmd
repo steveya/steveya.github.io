@@ -1,9 +1,14 @@
 ---
-layout: post
 title: Signature Methods (Part 1 - Motivation)
 date: 2025-12-14
-categories: [Study Notes, Signature Method, Quantitative Finance, Machine Learning, Research]
+categories: [Quantitative Finance]
 math: true
+description: >-
+  I am starting a series on the **signature method** now that I have some free time on my hands over the 2025 holiday season. In this post I
+  talk about what motivates me to study the signature method, and as the series progresses I will build up examples and applications to see
+  how well it works in practice. The signature method has deep connections with rough path theory and Lie algebra, neither of which I have
+  studied enough to write about intelligently. Hopefully, towards the end of the series I will have accumulated enough knowledge to write
+  about their connections to the signature method.
 ---
 
 I am starting a series on the **signature method** now that I have some free time on my hands over the 2025 holiday season. In this post I talk about what motivates me to study the signature method, and as the series progresses I will build up examples and applications to see how well it works in practice. The signature method has deep connections with rough path theory and Lie algebra, neither of which I have studied enough to write about intelligently. Hopefully, towards the end of the series I will have accumulated enough knowledge to write about their connections to the signature method.
@@ -17,45 +22,46 @@ The signature method starts from a different premise: instead of choosing a smal
 
 Another useful way to motivate the method before defining it is to view it as a path analogue of polynomial feature maps.
 
-For scalar inputs $x$, we can use the polynomial features
+For scalar inputs $$x$$, we can use the polynomial features
 
-$$ 
-\phi(x) = (1, x, x^2, x^3, \dots) 
+$$
+\phi(x) = (1, x, x^2, x^3, \dots)
 $$
 
-to approximate many nonlinear targets $f(x)$ using a linear model in the truncated (up to $m$-th order polynomial) feature space:
+to approximate many nonlinear targets $$f(x)$$ using a linear model in the truncated (up to $$m$$-th order polynomial) feature space:
 
-$$ 
-f(x) \approx \langle w,\ \phi^{\le m}(x)\rangle 
+$$
+f(x) \approx \langle w,\ \phi^{\le m}(x)\rangle
 $$
 
-For sequential inputs $X_{[a, b]} = \left\{X_t \vert t \in [a, b], X_t \in \mathbb{R}^d \right\}$, we seek an analogous map from a window of a multivariate time series (a path) to a feature vector, such that many continuous, path-dependent targets can be approximated by linear functionals of those features:
+For sequential inputs $$X_{[a, b]} = \left\{X_t \vert t \in [a, b], X_t \in \mathbb{R}^d \right\}$$, we seek an analogous map from a window of a multivariate time series (a path) to a feature vector, such that many continuous, path-dependent targets can be approximated by linear functionals of those features:
 
-$$ 
-F(X_{[a,b]}) \approx \langle \ell,\ S^{\le m}(X_{[a,b]})\rangle 
+$$
+F(X_{[a,b]}) \approx \langle \ell,\ S^{\le m}(X_{[a,b]})\rangle
 $$
 
-Signatures provide precisely such features $S(X_{[a,b]})$. Similar to polynomial features, the full signature is infinite dimensional, and the approximation is done using the truncated signature up to level $m$. Here $S^{\le m}(X)$ is the truncated signature up to level $m$, a finite-dimensional vector.
+Signatures provide precisely such features $$S(X_{[a,b]})$$. Similar to polynomial features, the full signature is infinite dimensional, and the approximation is done using the truncated signature up to level $$m$$. Here $$S^{\le m}(X)$$ is the truncated signature up to level $$m$$, a finite-dimensional vector.
 
 More precisely, the signature has the following universal approximation property:
 
-> Let $\mathcal{P}$ be a set of $d$-dimensional paths on $[a,b]$ (for example, continuous paths of bounded variation), and let $S(X_{[a,b]})$ denote the (full) signature of a path $X$ on $[a,b]$. Fix a compact subset $K\subset\mathcal{P}$ (compact in a topology where the signature map is continuous).
+> Let $$\mathcal{P}$$ be a set of $$d$$-dimensional paths on $$[a,b]$$ (for example, continuous paths of bounded variation), and let $$S(X_{[a,b]})$$ denote the (full) signature of a path $$X$$ on $$[a,b]$$. Fix a compact subset $$K\subset\mathcal{P}$$ (compact in a topology where the signature map is continuous).
 >
->For any continuous functional $F:K\to\mathbb{R}$ and any $\varepsilon>0$, there exist:
-> - a truncation depth $m$, and
-> - a coefficient vector $\ell$ supported on signature coordinates up to level $m$,
+>For any continuous functional $$F:K\to\mathbb{R}$$ and any $$\varepsilon>0$$, there exist:
+> - a truncation depth $$m$$, and
+> - a coefficient vector $$\ell$$ supported on signature coordinates up to level $$m$$,
 >
 >such that
 >
->$\sup_{X\in K}\left|F(X)-\langle \ell,\ S^{\le m}(X)\rangle\right|<\varepsilon$
+>$$\sup_{X\in K}\left|F(X)-\langle \ell,\ S^{\le m}(X)\rangle\right|<\varepsilon$$
 
-Here $\ell$ is simply a vector in the same space as the truncated signature up to level $m$, and $\langle \ell, S^{\le m}(X)\rangle$ means an ordinary dot product: it is a finite linear combination of signature coordinates,
+Here $$\ell$$ is simply a vector in the same space as the truncated signature up to level $$m$$, and $$\langle \ell, S^{\le m}(X)\rangle$$ means an ordinary dot product: it is a finite linear combination of signature coordinates,
 
-$\langle \ell, S^{\le m}(X)\rangle= \ell_{\varnothing}\cdot 1+ \sum_{i} \ell_{(i)}\, S^{(i)}(X)+ \sum_{i,j} \ell_{(i,j)}\, S^{(i,j)}(X)+ \cdots+ \sum_{i_1,\dots,i_m} \ell_{(i_1,\dots,i_m)}\, S^{(i_1,\dots,i_m)}(X)$
+$$\langle \ell, S^{\le m}(X)\rangle= \ell_{\varnothing}\cdot 1+ \sum_{i} \ell_{(i)}\, S^{(i)}(X)+ \sum_{i,j} \ell_{(i,j)}\, S^{(i,j)}(X)+ \cdots+ \sum_{i_1,\dots,i_m} \ell_{(i_1,\dots,i_m)}\, S^{(i_1,\dots,i_m)}(X)$$
 
 At first glance, signatures can sound like a silver bullet that eliminates the need to hand-craft time-series-based trading signals: if many path-dependent targets can be approximated by linear functionals of signatures, why not dump our panel data into a signature transformer, take the outputs, and run a linear regression? In practice, there are still important design choices to make in order to use signature features effectively:
 
 1. **Path Construction**: Signatures operate on a path representation of the inputs. To leverage the universality property, the path must contain the information that the target depends on. This is usually achieved through augmentations such as time augmentation, lead–lag augmentation, and the inclusion of additional channels (macro variables, microstructure variables, signals, etc.). This is where we decide which invariances we want and which statistics we want to make easy to learn.
-2. **Truncation and Rgularization**: The full signature is an infinite collection of features. In practice we truncate at depth $m$ and rely on regularization and model selection to control complexity.
+2. **Truncation and Rgularization**: The full signature is an infinite collection of features. In practice we truncate at depth $$m$$ and rely on regularization and model selection to control complexity.
 
 In the next post we will define signatures explicitly and provide a few examples.
+

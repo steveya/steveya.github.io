@@ -15,6 +15,10 @@ MATHJAX_SCRIPT_RE = re.compile(
     r"^<script[^>]*mathjax[^>]*></script>$", re.IGNORECASE
 )
 POST_URL_RE = re.compile(r"\{\%\s*post_url\s+([^\s\%]+)\s*\%\}")
+TOC_HEADING_RE = re.compile(r"^#{2,6}\s+Table of Contents\b", re.IGNORECASE)
+HEADING_RE = re.compile(r"^#{1,6}\s+")
+INTRO_HEADING_RE = re.compile(r"^#{2,6}\s+Introduction\b", re.IGNORECASE)
+NOISE_LINE_RE = re.compile(r"^(\(|\[)?\s*code snippets|^update:", re.IGNORECASE)
 
 
 class MigrationWarning(Exception):
@@ -55,6 +59,86 @@ def strip_mathjax_script(lines: list[str]) -> list[str]:
     return lines
 
 
+def strip_toc_section(lines: list[str]) -> list[str]:
+    cleaned: list[str] = []
+    skipping = False
+    for line in lines:
+        if TOC_HEADING_RE.match(line.strip()):
+            skipping = True
+            continue
+        if skipping and HEADING_RE.match(line.strip()):
+            skipping = False
+        if not skipping:
+            cleaned.append(line)
+    return cleaned
+
+
+def build_description(lines: list[str], max_words: int = 150) -> str:
+    cleaned_lines = strip_toc_section(lines)
+    cleaned_lines = strip_mathjax_script(cleaned_lines)
+    cleaned_lines = [line for line in cleaned_lines if line.strip()]
+    if cleaned_lines and INTRO_HEADING_RE.match(cleaned_lines[0].strip()):
+        cleaned_lines = cleaned_lines[1:]
+    snippet_lines: list[str] = []
+    started = False
+    for line in cleaned_lines:
+        stripped = line.strip()
+        if NOISE_LINE_RE.match(stripped):
+            continue
+        if HEADING_RE.match(stripped):
+            if started:
+                break
+            continue
+        snippet_lines.append(line)
+        started = True
+    text = "\n".join(snippet_lines)
+    text = re.sub(r"```.*?```", " ", text, flags=re.S)
+    text = re.sub(r"^#{1,6}\s+", "", text, flags=re.M)
+    text = re.sub(r"^\s*[-*+]\s+", "", text, flags=re.M)
+    text = re.sub(r"^\s*\d+\.\s+", "", text, flags=re.M)
+    text = re.sub(r"!\[[^\]]*\]\([^)]+\)", " ", text)
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\$\$.*?\$\$", " ", text, flags=re.S)
+    text = re.sub(r"\$(.+?)\$", " ", text)
+    text = re.sub(r"`([^`]*)`", r"\1", text)
+    words = text.split()
+    return " ".join(words[:max_words])
+
+
+def ensure_description(front_matter: list[str], body_lines: list[str]) -> list[str]:
+    if any(line.strip().startswith("description:") for line in front_matter):
+        return front_matter
+    description = build_description(body_lines)
+    if not description:
+        return front_matter
+    wrapped = wrap_description(description)
+    updated = front_matter
+    if updated and updated[0].strip() == "---":
+        updated = updated[1:]
+    if updated and updated[-1].strip() == "---":
+        updated = updated[:-1]
+    updated = updated + ["description: >-"] + [f"  {line}" for line in wrapped]
+    return ["---"] + updated + ["---"]
+
+def wrap_description(description: str, width: int = 140) -> list[str]:
+    words = description.split()
+    lines: list[str] = []
+    current: list[str] = []
+    length = 0
+    for word in words:
+        if length + len(word) + (1 if current else 0) > width:
+            lines.append(" ".join(current))
+            current = [word]
+            length = len(word)
+        else:
+            current.append(word)
+            length += len(word) + (1 if current else 0)
+    if current:
+        lines.append(" ".join(current))
+    return lines
+
+
 def migrate_post(source: Path, dest_dir: Path) -> None:
     filename = source.name
     slug = slug_from_filename(filename)
@@ -74,16 +158,22 @@ def migrate_post(source: Path, dest_dir: Path) -> None:
         except ValueError as exc:
             raise MigrationWarning(f"Front matter not closed in {filename}") from exc
 
-        front_matter = lines[: end_index + 1]
+        front_matter = [
+            line
+            for line in lines[: end_index + 1]
+            if not line.strip().startswith("layout:") and not line.strip().startswith("tags:")
+        ]
         body_lines = lines[end_index + 1 :]
     else:
         front_matter = ["---", f"title: {slug}", "---"]
         body_lines = lines
 
     body_lines = strip_mathjax_script(body_lines)
+    body_lines = strip_toc_section(body_lines)
     body = "\n".join(body_lines).lstrip("\n")
 
     body = convert_post_urls(body, prefix="../")
+    front_matter = ensure_description(front_matter, body_lines)
 
     target_file.write_text("\n".join(front_matter) + "\n\n" + body + "\n", encoding="utf-8")
 

@@ -1,18 +1,12 @@
 ---
-layout: post
 title: "Malaria Detection (Part 1: Introduction and Data Preparation)"
 date: 2024-06-12
-categories: [Study Notes, Machine Learning, Data Science, Cnn, Deep Learning]
+categories: [Machine Learning]
+description: >-
+  The notebook for this post can be found here.
 ---
 
 The notebook for this post can be found [here](https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb).
-
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Data Exploration and Visualization](#data-exploration-and-visualization)
-3. [Data Preprocessing](#data-preprocessing)
-4. [Next Step](#next-step)
-
 
 ## Introduction
 I recently learned more about convolutional neural networks (CNNs) and how they are used to analyze images. Now that I understand the basics, I've decided to apply this knowledge to a real-world healthcare problem, an area I am passionate about. I found the Malaria dataset on Kaggle and decided to analyze it.

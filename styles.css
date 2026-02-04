@@ -60,6 +60,21 @@ nav {
     padding-bottom: 1rem;
 }
 
+.site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.site-nav a {
+    border-bottom: none;
+}
+
 a {
     color: #8B4513;
     text-decoration: none;
@@ -169,11 +184,18 @@ a.listing-title:hover {
     margin-bottom: 1rem;
 }
 
+.listing-description .toc {
+    display: none;
+}
+
 /* 6. Categories (Tags) */
 /* --- Minimalist Categories (No Box) --- */
 .listing-categories {
     margin-top: 0.5rem;
     /* Tighter to the description */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .listing-category {
@@ -194,8 +216,7 @@ a.listing-title:hover {
     /* Light grey, subtle */
 
     /* Layout */
-    margin-right: 1.5rem;
-    /* Space between tags */
+    margin-right: 0;
     cursor: pointer;
     transition: color 0.2s ease;
 }

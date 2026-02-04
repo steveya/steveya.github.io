@@ -29,6 +29,7 @@ format:
   html:
     theme: none
     css: styles.css
+    include-before-body: _includes/nav.html
     mainfont: '"Charter", "Georgia", serif'  # Wrapped in single quotes
     fontsize: 1.15rem
     fontcolor: "#292524"
