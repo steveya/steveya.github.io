@@ -1,0 +1,217 @@
+/* --- 1. The Layout Skeleton (Crucial Fixes) --- */
+body {
+    /* Center the page content */
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    /* Top/Bottom padding, Side gutters */
+
+    /* Typography Foundation */
+    font-family: "Charter", "Bitstream Charter", "Sitka Text", Cambria, serif;
+    background-color: #FDFCF9;
+    color: #292524;
+    line-height: 1.6;
+}
+
+/* --- 2. Taming the "Overblown" Images --- */
+/* This forces images to never exceed the text column width */
+img,
+figure {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 2rem auto;
+    /* Center images vertically and horizontally */
+    border-radius: 2px;
+    /* Slight polish */
+}
+
+/* Optional: Add a subtle border to white-background charts so they don't bleed into the page */
+img {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* --- 3. Math & Code Layout --- */
+/* Ensure code blocks don't stretch the page */
+pre,
+code {
+    background-color: #F7F5F0;
+    /* Slightly darker than body */
+    border-radius: 4px;
+    font-size: 0.9em;
+    overflow-x: auto;
+    /* Scroll horizontally if code is too long */
+}
+
+/* Display Math Spacing */
+.katex-display {
+    margin: 2em 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* --- 4. Navigation & Header Polish --- */
+/* If you have a navbar, we need to constrain it too if theme is 'none' */
+header,
+nav {
+    max-width: 100%;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 1rem;
+}
+
+a {
+    color: #8B4513;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 75, 135, 0.2);
+    border-bottom-color: rgba(139, 69, 19, 0.2);
+}
+
+a:hover {
+    color: #A55233;
+    /* Rust */
+    border-bottom-color: #A55233;
+}
+
+/* --- 5. Theorem Environments (Refined) --- */
+.theorem,
+.lemma,
+.proof {
+    margin: 2em 0;
+    padding-left: 1.5em;
+    border-left: 3px solid #2E2E2E;
+}
+
+.theorem-title {
+    font-weight: bold;
+    font-family: sans-serif;
+    /* Contrast against serif body */
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5em;
+    display: block;
+}
+
+/* --- MAIN PAGE: The "Journal" Listing Layout --- */
+
+/* 1. Container Reset */
+.quarto-listing-default {
+    max-width: 750px;
+    /* Slightly narrower than posts for elegance */
+    margin: 0 auto;
+}
+
+.list {
+    list-style: none;
+    /* No bullets */
+    padding: 0;
+}
+
+/* 2. The Individual Article Card */
+.quarto-post {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+/* Optional: Slight shift on hover */
+.quarto-post:hover {
+    transform: translateX(5px);
+}
+
+/* 3. The Date & Metadata (Top Line) */
+.listing-date,
+.listing-reading-time {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* Add a separator between date and reading time */
+.listing-reading-time::before {
+    content: "•";
+    margin: 0 0.5em;
+    color: #ccc;
+}
+
+/* 4. The Title */
+a.listing-title {
+    display: block;
+    font-family: "Charter", serif;
+    font-size: 1.8rem;
+    /* Large and confident */
+    font-weight: 700;
+    color: #2E2B2B !important;
+    /* Almost black */
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    border-bottom: none !important;
+    /* Remove link underline for title */
+}
+
+a.listing-title:hover {
+    color: #A55233 !important;
+    /* Oxford Blue on hover */
+}
+
+/* 5. The Abstract/Description */
+.listing-description {
+    font-family: "Charter", serif;
+    font-size: 1.1rem;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+/* 6. Categories (Tags) */
+/* --- Minimalist Categories (No Box) --- */
+.listing-categories {
+    margin-top: 0.5rem;
+    /* Tighter to the description */
+}
+
+.listing-category {
+    /* Resetting the box model */
+    border: none;
+    background-color: transparent;
+    border-radius: 0;
+    padding: 0;
+
+    /* Typography */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    /* Wide spacing for elegance */
+    color: #78716C;
+    /* Light grey, subtle */
+
+    /* Layout */
+    margin-right: 1.5rem;
+    /* Space between tags */
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+/* Optional: Add a subtle hash symbol before tags to denote topic */
+.listing-category::before {
+    content: "#";
+    color: #ddd;
+    /* Very faint hash */
+    margin-right: 2px;
+}
+
+/* Interaction */
+.listing-category:hover {
+    color: #A55233;
+    /* Oxford Blue */
+    background-color: transparent;
+    border-color: transparent;
+}

@@ -1,9 +1,8 @@
----
+--- 
 layout: post
 title: "Malaria Detection (Part 3: Results and Reflections)"
 date: 2024-07-17
-categories: [Machine Learning]
-tags: [study-notes, machine-learning, data-science, cnn, deep-learning]
+categories: [Study Notes, Machine Learning, Data Science, Cnn, Deep Learning]
 ---
 
 The notebook for this post can be found [here](https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb).
@@ -15,7 +14,7 @@ The notebook for this post can be found [here](https://github.com/steveya/data-s
 4. [What's Next?](#whats-next)
 5. [Closing Thoughts](#closing-thoughts)
 
-Welcome back to our journey in building a malaria detection model. If you've been following along, you've seen how I prepared the data and built various models to detect Malaria from cell images. How well did our models perform on a relative basis?
+Welcome back to our journey in building a malaria detection model. If you've been following along, you'veseen how I prepared the data and built various models to detect Malaria from cell images. How well did our models perform on a relative basis?
 
 ## Model Performances
 
@@ -37,23 +36,23 @@ I was honestly amazed by these results. Even the base model achieved 98% accurac
 
 1. **Accuracy**: This is the proportion of correct predictions (both true positives and true negatives) among the total number of cases examined. Mathematically, it's:
 
-   $$\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}$$
+   $\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}$
 
    While 98% accuracy sounds excellent, we must look closer at false negatives in medical applications.
 
 2. **Precision**: This tells us how many of our positive predictions were actually correct:
 
-   $$\text{Precision} = \frac{TP}{TP + FP}$$
+   $\text{Precision} = \frac{TP}{TP + FP}$
 
 3. **Recall**: This is the proportion of actual positives that were correctly identified:
 
-   $$\text{Recall} = \frac{TP}{TP + FN}$$
+   $\text{Recall} = \frac{TP}{TP + FN}$
 
    In our case, a high recall for parasitized cells is crucial to avoid potential malaria cases.
 
 4. **F1-Score**: This is the harmonic mean of precision and recall:
 
-   $$F1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$$
+   $F1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$
 
    It gives us a single score that balances both precision and recall.
 

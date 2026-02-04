@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.8.27">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -24,52 +24,32 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
-  "copy-button": false,
-  "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
-  "limit": 50,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
-  "show-item-context": false,
-  "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
-    "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
-  }
-}</script>
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -82,7 +62,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -98,120 +78,42 @@ window.Quarto = {
 };
 </script>
 
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body>
 
-<div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Steve Yang</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../index.html"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/projects.html"> 
-<span class="menu-text">Projects</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/archives.html"> 
-<span class="menu-text">Archives</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/categories.html"> 
-<span class="menu-text">Categories</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/tags.html"> 
-<span class="menu-text">Tags</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/about.html"> 
-<span class="menu-text">About</span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
-</div>
-      </div> <!-- /container-fluid -->
-    </nav>
+
+<header id="title-block-header">
+<h1 class="title">Volatility Forecasts (Part 1 - STES Model)</h1>
+
+<p class="date">2021-09-07</p>
 </header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
-<!-- sidebar -->
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+
+<nav id="TOC" role="doc-toc">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#table-of-contents" id="toc-table-of-contents" class="nav-link active" data-scroll-target="#table-of-contents">Table of Contents</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#smooth-transition-exponential-smoothing" id="toc-smooth-transition-exponential-smoothing" class="nav-link" data-scroll-target="#smooth-transition-exponential-smoothing">Smooth Transition Exponential Smoothing</a></li>
-  <li><a href="#roadmap-for-this-series" id="toc-roadmap-for-this-series" class="nav-link" data-scroll-target="#roadmap-for-this-series">Roadmap for this series</a></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
-  <ul class="collapse">
-  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
-  <li><a href="#stes-vs-es-on-simulated-returns" id="toc-stes-vs-es-on-simulated-returns" class="nav-link" data-scroll-target="#stes-vs-es-on-simulated-returns"><code>STES</code> vs <code>ES</code> on simulated returns</a></li>
-  <li><a href="#stes-vs-es-on-spy-returns" id="toc-stes-vs-es-on-spy-returns" class="nav-link" data-scroll-target="#stes-vs-es-on-spy-returns"><code>STES</code> vs <code>ES</code> on <code>SPY</code> returns</a></li>
-  <li><a href="#when-does-stes-beat-es-oos-mechanism-diagnostics" id="toc-when-does-stes-beat-es-oos-mechanism-diagnostics" class="nav-link" data-scroll-target="#when-does-stes-beat-es-oos-mechanism-diagnostics">When does STES beat ES? (OOS mechanism diagnostics)</a></li>
-  <li><a href="#event-study-around-win-vs-lose-dates" id="toc-event-study-around-win-vs-lose-dates" class="nav-link" data-scroll-target="#event-study-around-win-vs-lose-dates">Event study around <code>WIN</code> vs <code>LOSE</code> dates</a></li>
-  <li><a href="#which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates" id="toc-which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates" class="nav-link" data-scroll-target="#which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates">Which transition variables drive the gate differently on <code>WIN</code> vs <code>LOSE</code> dates?</a></li>
+  <li><a href="#table-of-contents" id="toc-table-of-contents"><span class="header-section-number">1</span> Table of Contents</a></li>
+  <li><a href="#introduction" id="toc-introduction"><span class="header-section-number">2</span> Introduction</a></li>
+  <li><a href="#smooth-transition-exponential-smoothing" id="toc-smooth-transition-exponential-smoothing"><span class="header-section-number">3</span> Smooth Transition Exponential Smoothing</a></li>
+  <li><a href="#roadmap-for-this-series" id="toc-roadmap-for-this-series"><span class="header-section-number">4</span> Roadmap for this series</a></li>
+  <li><a href="#results" id="toc-results"><span class="header-section-number">5</span> Results</a>
+  <ul>
+  <li><a href="#preprocessing" id="toc-preprocessing"><span class="header-section-number">5.1</span> Preprocessing</a></li>
+  <li><a href="#stes-vs-es-on-simulated-returns" id="toc-stes-vs-es-on-simulated-returns"><span class="header-section-number">5.2</span> <code>STES</code> vs <code>ES</code> on simulated returns</a></li>
+  <li><a href="#stes-vs-es-on-spy-returns" id="toc-stes-vs-es-on-spy-returns"><span class="header-section-number">5.3</span> <code>STES</code> vs <code>ES</code> on <code>SPY</code> returns</a></li>
+  <li><a href="#when-does-stes-beat-es-oos-mechanism-diagnostics" id="toc-when-does-stes-beat-es-oos-mechanism-diagnostics"><span class="header-section-number">5.4</span> When does STES beat ES? (OOS mechanism diagnostics)</a></li>
+  <li><a href="#event-study-around-win-vs-lose-dates" id="toc-event-study-around-win-vs-lose-dates"><span class="header-section-number">5.5</span> Event study around <code>WIN</code> vs <code>LOSE</code> dates</a></li>
+  <li><a href="#which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates" id="toc-which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates"><span class="header-section-number">5.6</span> Which transition variables drive the gate differently on <code>WIN</code> vs <code>LOSE</code> dates?</a></li>
   </ul></li>
-  <li><a href="#wrapping-up" id="toc-wrapping-up" class="nav-link" data-scroll-target="#wrapping-up">Wrapping Up</a></li>
+  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">6</span> Wrapping Up</a></li>
   </ul>
 </nav>
-    </div>
-<!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Volatility Forecasts (Part 1 - STES Model)</h1>
-  <div class="quarto-categories">
-    <div class="quarto-category">Quantitative Finance</div>
-  </div>
-  </div>
-
-
-
-<div class="quarto-title-meta">
-
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">September 7, 2021</p>
-    </div>
-  </div>
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<section id="updates" class="level4">
-<h4 class="anchored" data-anchor-id="updates">Updates</h4>
+<h4 data-number="0.0.1" id="updates" class="anchored"><span class="header-section-number">0.0.1</span> Updates</h4>
 <p>20260113: This post is updated with more mathematical analysis</p>
 <p>(The code for this post can be found in the <a href="https://github.com/steveya/volatility-forecast/examples/volatility_forecast_1.py">Github repository</a>.)</p>
-</section>
-<section id="table-of-contents" class="level2">
-<h2 class="anchored" data-anchor-id="table-of-contents">Table of Contents</h2>
+<h2 data-number="1" id="table-of-contents" class="anchored"><span class="header-section-number">1</span> Table of Contents</h2>
 <ol type="1">
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#smooth-transition-exponential-smoothing">Smooth Transition Exponential Smoothing</a></li>
@@ -219,18 +121,16 @@ window.Quarto = {
 <li><a href="#results">Results</a></li>
 <li><a href="#wrapping-up">Wrapping Up</a></li>
 </ol>
-</section>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<h2 data-number="2" id="introduction" class="anchored"><span class="header-section-number">2</span> Introduction</h2>
 <p>Exponential smoothing (<code>ES</code>) is a simple yet widely used approach to volatility forecasting in finance and economics. It is formulated as</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \begin{equation}\label{eq:expsmooth}
     \widehat{\sigma}_t^2 = \alpha r_{t-1}^2 + (1-\alpha)\widehat{\sigma}_{t-1}^2
 \end{equation}
-\]</span></p>
-<p>where <span class="math display">\[\widehat{\sigma}_t\]</span> denotes the estimated volatility at time <span class="math display">\[t\]</span> and <span class="math display">\[r_t\]</span> is the asset log return at time <span class="math display">\[t\]</span>. The recursion defines <span class="math display">\[\widehat{\sigma}_t^2\]</span> as a weighted average of the most recent squared log return and the previous volatility estimate. In this post, we will often refer <span class="math display">\[\alpha\]</span> as <strong>gate</strong> or <strong>learning rate</strong> that controls how much new information is incorporated into our next period variance forecasts.</p>
+</span></p>
+<p>where <span class="math inline">\widehat{\sigma}_t</span> denotes the estimated volatility at time <span class="math inline">t</span> and <span class="math inline">r_t</span> is the asset log return at time <span class="math inline">t</span>. The recursion defines <span class="math inline">\widehat{\sigma}_t^2</span> as a weighted average of the most recent squared log return and the previous volatility estimate. In this post, we will often refer <span class="math inline">\alpha</span> as <strong>gate</strong> or <strong>learning rate</strong> that controls how much new information is incorporated into our next period variance forecasts.</p>
 <p>Unrolling the recursion yields</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \begin{equation}\label{eq:expsmooth_unrolled}
     \begin{aligned}
         \widehat{\sigma}_t^2 &amp;= \alpha r_{t-1}^2 + (1-\alpha)\widehat{\sigma}_{t-1}^2 \\
@@ -238,72 +138,63 @@ window.Quarto = {
         &amp;= \alpha r_{t-1}^2 + \alpha(1-\alpha)r_{t-2}^2 + \alpha(1-\alpha)^2r_{t-3}^2 + \dots \\
     \end{aligned}
 \end{equation}
-\]</span></p>
-<p>We see that <code>ES</code> is an exponential-weighted moving average (<code>EWMA</code>) of past squared log returns <span class="math display">\[r_t^2\]</span>. <code>EWMA</code> itself is a popular linear filter used across many fields; in finance, it appears in a range of applications beyond volatility forecasting.</p>
+</span></p>
+<p>We see that <code>ES</code> is an exponential-weighted moving average (<code>EWMA</code>) of past squared log returns <span class="math inline">r_t^2</span>. <code>EWMA</code> itself is a popular linear filter used across many fields; in finance, it appears in a range of applications beyond volatility forecasting.</p>
 <p>If a process is generated by <code>ARIMA(0,1,1)</code>, then <code>EWMA</code> is the one-step-ahead optimal linear forecast. An <code>ARIMA(0,1,1)</code> is a random walk with a moving-average innovation, and the implied recursion for the conditional mean takes exactly the <code>EWMA</code> form.</p>
-<p>More concretely, let <span class="math display">\[y_t\]</span> follow <code>ARIMA(0,1,1)</code>:</p>
-<p><span class="math display">\[
+<p>More concretely, let <span class="math inline">y_t</span> follow <code>ARIMA(0,1,1)</code>:</p>
+<p><span class="math display">
 \Delta y_t = y_t - y_{t-1} = \varepsilon_t + \theta \varepsilon_{t-1},
 \qquad \varepsilon_t \sim \text{i.i.d. } (0,\sigma_\varepsilon^2)
-\]</span></p>
-<p>and let <span class="math display">\[\mathcal{F}_t\]</span> denote the information set up to time <span class="math display">\[t\]</span>. Since <span class="math display">\[\mathbb{E}[\varepsilon_{t+1}\mid \mathcal{F}_t]=0\]</span>, the one-step-ahead conditional expectation is</p>
-<p><span class="math display">\[
+</span></p>
+<p>and let <span class="math inline">\mathcal{F}_t</span> denote the information set up to time <span class="math inline">t</span>. Since <span class="math inline">\mathbb{E}[\varepsilon_{t+1}\mid \mathcal{F}_t]=0</span>, the one-step-ahead conditional expectation is</p>
+<p><span class="math display">
 \mathbb{E}[y_{t+1}\mid \mathcal{F}_t]
 = y_t + \mathbb{E}[\Delta y_{t+1}\mid \mathcal{F}_t]
 = y_t + \theta \varepsilon_t
-\]</span></p>
-<p>Define the one-step forecast <span class="math display">\[\widehat{y}_{t+1 \mid t} = \mathbb{E}[y_{t+1}\mid \mathcal{F}_t]\]</span>. The forecast error is</p>
-<p><span class="math display">\[
+</span></p>
+<p>Define the one-step forecast <span class="math inline">\widehat{y}_{t+1 \mid t} = \mathbb{E}[y_{t+1}\mid \mathcal{F}_t]</span>. The forecast error is</p>
+<p><span class="math display">
 e_t = y_t - \widehat{y}_{t \mid t-1}
-\]</span></p>
-<p>Under the model, the innovations coincide with forecast errors, i.e.&nbsp;<span class="math display">\[\varepsilon_t = e_t\]</span>. Substituting this into the forecasting formula gives</p>
-<p><span class="math display">\[
+</span></p>
+<p>Under the model, the innovations coincide with forecast errors, i.e.&nbsp;<span class="math inline">\varepsilon_t = e_t</span>. Substituting this into the forecasting formula gives</p>
+<p><span class="math display">
 \widehat{y}_{t+1 \mid t} = y_t + \theta e_t
 = y_t + \theta\left(y_t - \widehat{y}_{t \mid t-1}\right)
 = (1+\theta)y_t - \theta \widehat{y}_{t \mid t-1}
-\]</span></p>
+</span></p>
 <p>Rearranging we get</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \widehat{y}_{t+1 \mid t} = \alpha y_t + (1-\alpha)\widehat{y}_{t \mid t-1},
 \qquad \alpha = 1+\theta
-\]</span></p>
-<p>This is exactly the exponential smoothing recursion where the next forecast is a convex combination of the latest observation and the previous forecast. For the usual invertibility condition of <code>MA(1)</code> (which requires <span class="math display">\[\lvert \theta \rvert&lt;1\]</span>), we have <span class="math display">\[\alpha \in (0,2)\]</span>; in many practical applications (including classical exponential smoothing), one restricts to <span class="math display">\[\alpha\in(0,1)\]</span>, which corresponds to <span class="math display">\[\theta\in(-1,0)\]</span>. <code>ARIMA(0,1,1)</code> implies an <code>EWMA</code> forecasting rule, and under correct specification, that rule is one-step-ahead optimal because it is the conditional expectation under the data-generating model.</p>
-</section>
-<section id="smooth-transition-exponential-smoothing" class="level2">
-<h2 class="anchored" data-anchor-id="smooth-transition-exponential-smoothing">Smooth Transition Exponential Smoothing</h2>
+</span></p>
+<p>This is exactly the exponential smoothing recursion where the next forecast is a convex combination of the latest observation and the previous forecast. For the usual invertibility condition of <code>MA(1)</code> (which requires <span class="math inline">\lvert \theta \rvert&lt;1</span>), we have <span class="math inline">\alpha \in (0,2)</span>; in many practical applications (including classical exponential smoothing), one restricts to <span class="math inline">\alpha\in(0,1)</span>, which corresponds to <span class="math inline">\theta\in(-1,0)</span>. <code>ARIMA(0,1,1)</code> implies an <code>EWMA</code> forecasting rule, and under correct specification, that rule is one-step-ahead optimal because it is the conditional expectation under the data-generating model.</p>
+<h2 data-number="3" id="smooth-transition-exponential-smoothing" class="anchored"><span class="header-section-number">3</span> Smooth Transition Exponential Smoothing</h2>
 <p><code>Taylor (2004)</code> introduces the Smooth Transition Exponential Smoothing (<code>STES</code>). It is motivated by an empirical regularity: past return shocks can have an asymmetric relationship with future realized volatility. A natural implication is that the effective update rate in an <code>EWMA</code> filter should vary with the characteristics of recent shocks rather than remain constant.</p>
 <p><code>STES</code> modifies <code>ES</code> by allowing the smoothing parameter to respond to a set of <strong>transition variables</strong>. Specifically, it is formulated as</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \begin{equation}\label{eq:stexpsmooth}
     \begin{aligned}
         \widehat{\sigma}_t^2 &amp;= \alpha_{t-1} r_{t-1}^2 + (1-\alpha_{t-1})\widehat{\sigma}_{t-1}^2 \\
         \alpha_{t-1} &amp;= \mathrm{sigmoid}\left(-X_{t-1}^\top \beta\right) \\
     \end{aligned}
 \end{equation}
-\]</span></p>
-<blockquote class="blockquote">
-<p>Note on sign convention: the authors write <span class="math display">\[\alpha_t = \frac{1}{1+\exp\left(X_t \beta\right)}\]</span>. This is mathematically equivalent to writing <span class="math display">\[\alpha_t = \frac{1}{1+\exp\left(-X_t \tilde\beta\right)}\]</span> after the re-parameterization <span class="math display">\[\tilde\beta = -\beta\]</span>. In code and in this series we use the sigmoid form (which is implemented using the scipy’s <code>expit</code> function) that is monotone increasing in its argument.</p>
+</span></p>
+<blockquote>
+<p>Note on sign convention: the authors write <span class="math inline">\alpha_t = \frac{1}{1+\exp\left(X_t \beta\right)}</span>. This is mathematically equivalent to writing <span class="math inline">\alpha_t = \frac{1}{1+\exp\left(-X_t \tilde\beta\right)}</span> after the re-parameterization <span class="math inline">\tilde\beta = -\beta</span>. In code and in this series we use the sigmoid form (which is implemented using the scipy’s <code>expit</code> function) that is monotone increasing in its argument.</p>
 </blockquote>
-<p>In contrast to <code>ES</code>, <span class="math display">\[\alpha_t\]</span> is no longer constant. It is determined by the transition variables <span class="math display">\[X_t\]</span>, which may include a constant term and functions of recent returns such as <span class="math display">\[\lvert r_t \rvert\]</span> or <span class="math display">\[r_t^2\]</span> (to capture shock magnitude), as well as <span class="math display">\[r_t\]</span> itself (to allow for sign effects, often discussed under “leverage” or asymmetry). By conditioning the update rate on these variables, <code>STES</code> retains the interpretability and computational simplicity of <code>EWMA</code> while permitting the <span class="math display">\[\alpha_t\]</span> to adapt across market conditions.</p>
+<p>In contrast to <code>ES</code>, <span class="math inline">\alpha_t</span> is no longer constant. It is determined by the transition variables <span class="math inline">X_t</span>, which may include a constant term and functions of recent returns such as <span class="math inline">\lvert r_t \rvert</span> or <span class="math inline">r_t^2</span> (to capture shock magnitude), as well as <span class="math inline">r_t</span> itself (to allow for sign effects, often discussed under “leverage” or asymmetry). By conditioning the update rate on these variables, <code>STES</code> retains the interpretability and computational simplicity of <code>EWMA</code> while permitting the <span class="math inline">\alpha_t</span> to adapt across market conditions.</p>
 <p><a href="https://doi.org/10.1016/j.ijforecast.2003.09.010"><code>Taylor (2004)</code></a> reports that <code>STES</code> performs competitively against <code>ES</code> and benchmark <code>GARCH</code>-type models in terms of one-step-ahead forecasting accuracy for major equity indices. A later study, <a href="ttps://doi.org/10.1016/j.econmod.2020.02.021"><code>Liu, Taylor, and Choo (2020)</code></a>, extends the framework to investigate whether trading volume adds incremental predictive value for realized volatility and to assess the robustness of <code>STES</code> to outliers.</p>
-<p>A time-varying update rate can be beneficial in theory and in practice. If the volatility process behaves as if it has different effective persistence in different regions of the state space—e.g., calm periods with slow-moving variance and crisis periods with sharp variance re-pricing—then any constant-<span class="math display">\[\alpha\]</span> filter is forced to compromise. It will either react too slowly in stressed regimes or too quickly in calm regimes. <code>STES</code> addresses this mismatch in the most conservative way possible: it retains the stable <code>EWMA</code> recursion but lets the learning rate <span class="math display">\[\alpha_t\]</span> be a smooth function of observable state variables. In that sense, <code>STES</code> can be interpreted as a low-dimensional, regime-adaptive approximation to richer conditional variance dynamics.</p>
-<p>From a modeling perspective, <code>STES</code> remains deliberately restrictive. Rather than forecasting volatility level directly with a rich parametric dynamics, it focuses on estimating the time-varying smoothing parameter <span class="math display">\[\alpha_t\]</span> that governs how quickly the volatility estimate incorporates new information.</p>
-</section>
-<section id="roadmap-for-this-series" class="level2">
-<h2 class="anchored" data-anchor-id="roadmap-for-this-series">Roadmap for this series</h2>
+<p>A time-varying update rate can be beneficial in theory and in practice. If the volatility process behaves as if it has different effective persistence in different regions of the state space—e.g., calm periods with slow-moving variance and crisis periods with sharp variance re-pricing—then any constant-<span class="math inline">\alpha</span> filter is forced to compromise. It will either react too slowly in stressed regimes or too quickly in calm regimes. <code>STES</code> addresses this mismatch in the most conservative way possible: it retains the stable <code>EWMA</code> recursion but lets the learning rate <span class="math inline">\alpha_t</span> be a smooth function of observable state variables. In that sense, <code>STES</code> can be interpreted as a low-dimensional, regime-adaptive approximation to richer conditional variance dynamics.</p>
+<p>From a modeling perspective, <code>STES</code> remains deliberately restrictive. Rather than forecasting volatility level directly with a rich parametric dynamics, it focuses on estimating the time-varying smoothing parameter <span class="math inline">\alpha_t</span> that governs how quickly the volatility estimate incorporates new information.</p>
+<h2 data-number="4" id="roadmap-for-this-series" class="anchored"><span class="header-section-number">4</span> Roadmap for this series</h2>
 <p>In this Volatility Forecasts series, we will explore extensions of the <code>STES</code> idea. In <a href="../volatility-forecasts-2/">Part 2</a> and <a href="../volatility-forecasts-3/">Part 3</a>, we replace the linear transition function in <code>STES</code> with a tree-ensemble model.</p>
-</section>
-<section id="results" class="level2">
-<h2 class="anchored" data-anchor-id="results">Results</h2>
-<section id="preprocessing" class="level3">
-<h3 class="anchored" data-anchor-id="preprocessing">Preprocessing</h3>
+<h2 data-number="5" id="results" class="anchored"><span class="header-section-number">5</span> Results</h2>
+<h3 data-number="5.1" id="preprocessing" class="anchored"><span class="header-section-number">5.1</span> Preprocessing</h3>
 <p>All results use standardized inputs: features (excluding the constant term) are normalized using <code>StandardScaler</code> fit on the training split, then applied identically to both training and test splits.</p>
-</section>
-<section id="stes-vs-es-on-simulated-returns" class="level3">
-<h3 class="anchored" data-anchor-id="stes-vs-es-on-simulated-returns"><code>STES</code> vs <code>ES</code> on simulated returns</h3>
+<h3 data-number="5.2" id="stes-vs-es-on-simulated-returns" class="anchored"><span class="header-section-number">5.2</span> <code>STES</code> vs <code>ES</code> on simulated returns</h3>
 <p>We begin by replicating a subset of results from <code>Liu et al. (2020)</code> using data and simulation procedures available to us. The authors compare (among other models) <code>ES</code> and several <code>STES</code> variants by estimating parameters on a training window and evaluating out-of-sample metrics such as <code>RMSE</code>, <code>MAE</code>, and <code>MedAE</code> (median absolute error). They first conduct a controlled experiment on simulated <code>GARCH</code> returns contaminated by extreme outliers, and report that <code>STES</code> can outperform <code>ES</code> in terms of <code>MAE</code> and <code>MedAE</code>, and handle outliers more effectively. As we will see below, <code>STES</code> perform only similarly to <code>ES</code> in terms of <code>RMSE</code>.</p>
 <p>Table 1 reports our <code>RMSE</code> results alongside those from <code>Liu et al. (2020)</code>. Although we do not reproduce their numbers exactly, the overall pattern is similar: the models are close, and the <code>STES</code> variants differ only marginally from <code>ES</code>. We follow the naming convention used by the authors: <code>STES-AE</code> uses absolute return (<code>AE</code>) as the transition variable; <code>STES-E&amp;AE&amp;SE</code> uses returns (<code>E</code>), absolute returns (<code>AE</code>), and squared returns (<code>SE</code>) jointly.</p>
-<table class="caption-top table">
+<table class="caption-top">
 <thead>
 <tr class="header">
 <th>Model</th>
@@ -349,16 +240,16 @@ e_t = y_t - \widehat{y}_{t \mid t-1}
 </tr>
 </tbody>
 </table>
-<p>[Table 1: Comparison of the <code>STES</code> and <code>ES</code> models on simulated data (<span class="math display">\[\eta = 4\]</span>). <em>Standardized inputs using StandardScaler on training features; reflects 100 Monte Carlo runs.</em>]</p>
+<p>[Table 1: Comparison of the <code>STES</code> and <code>ES</code> models on simulated data (<span class="math inline">\eta = 4</span>). <em>Standardized inputs using StandardScaler on training features; reflects 100 Monte Carlo runs.</em>]</p>
 <p>Table 1 shows that <code>STES</code> barely improves upon <code>ES</code> on simulated <code>GARCH</code> paths in terms of <code>RMSE</code>. One might presume that <code>STES</code> can outperform <code>ES</code> on <code>GARCH</code> given that it is a conditional variance model and <code>STES</code> is adapting the variance filter through a time-varying learning rate. That intuition is misleading: <strong>under a vanilla GARCH data-generating process, there is essentially no signal for a time-varying update rate to exploit</strong>, and therefore <code>STES</code> cannot systematically reduce expected one-step-ahead <code>RMSE</code> relative to <code>ES</code>.</p>
-<p>We first show that the <code>MSE</code>-optimal forecast is the conditional expectation. Let <span class="math display">\[Y_t\]</span> be the object we are trying to predict at time <span class="math display">\[t-1\]</span> (in our experiments, <span class="math display">\[Y_t = r_t^2\]</span>). Among all <span class="math display">\[\mathcal{F}_{t-1}\]</span>-measurable predictors <span class="math display">\[f_{t-1}\]</span>, the predictor that minimizes one-step mean squared error satisfies</p>
-<p><span class="math display">\[
+<p>We first show that the <code>MSE</code>-optimal forecast is the conditional expectation. Let <span class="math inline">Y_t</span> be the object we are trying to predict at time <span class="math inline">t-1</span> (in our experiments, <span class="math inline">Y_t = r_t^2</span>). Among all <span class="math inline">\mathcal{F}_{t-1}</span>-measurable predictors <span class="math inline">f_{t-1}</span>, the predictor that minimizes one-step mean squared error satisfies</p>
+<p><span class="math display">
 f_{t-1}^* = \arg\min_{f_{t-1}\in \mathcal{F}_{t-1}} \mathbb{E}\left[(Y_t - f_{t-1})^2\right]
 \quad \Longrightarrow \quad
 f_{t-1}^* = \mathbb{E}\left[Y_t \mid \mathcal{F}_{t-1}\right]
-\]</span></p>
-<p>For any <span class="math display">\[f_{t-1}\]</span>,</p>
-<p><span class="math display">\[
+</span></p>
+<p>For any <span class="math inline">f_{t-1}</span>,</p>
+<p><span class="math display">
 \mathbb{E}\left[(Y_t - f_{t-1})^2\right]
 =
 \mathbb{E}\left[(Y_t - f_{t-1}^* + f_{t-1}^* - f_{t-1})^2\right]
@@ -366,21 +257,21 @@ f_{t-1}^* = \mathbb{E}\left[Y_t \mid \mathcal{F}_{t-1}\right]
 \mathbb{E}\left[(Y_t - f_{t-1}^*)^2\right]
 +
 \mathbb{E}\left[(f_{t-1}^* - f_{t-1})^2\right]
-\]</span></p>
-<p>where the cross term vanishes because <span class="math display">\[Y_t - f_{t-1}^*\]</span> is orthogonal to all <span class="math display">\[\mathcal{F}_{t-1}\]</span>-measurable random variables. The second term is nonnegative, hence the minimum is achieved uniquely at <span class="math display">\[f_{t-1}^*\]</span>.</p>
+</span></p>
+<p>where the cross term vanishes because <span class="math inline">Y_t - f_{t-1}^*</span> is orthogonal to all <span class="math inline">\mathcal{F}_{t-1}</span>-measurable random variables. The second term is nonnegative, hence the minimum is achieved uniquely at <span class="math inline">f_{t-1}^*</span>.</p>
 <p>Consider the standard <code>GARCH(1,1)</code> return model (which is used in the simulation study)</p>
-<p><span class="math display">\[
+<p><span class="math display">
 r_t = \sigma_t z_t,
 \qquad
 \mathbb{E}[z_t]=0,\quad \mathbb{E}[z_t^2]=1,\quad z_t \perp \mathcal{F}_{t-1}
-\]</span></p>
+</span></p>
 <p>with conditional variance recursion</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \sigma_t^2 = \omega + \alpha r_{t-1}^2 + \beta \sigma_{t-1}^2,
 \qquad \omega&gt;0,\ \alpha\ge 0,\ \beta\ge 0
-\]</span></p>
+</span></p>
 <p>Then the conditional expectation of next-day squared return is</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \mathbb{E}\left[r_t^2\mid \mathcal{F}_{t-1}\right]
 =
 \mathbb{E}\left[\sigma_t^2 z_t^2 \mid \mathcal{F}_{t-1}\right]
@@ -388,13 +279,13 @@ r_t = \sigma_t z_t,
 \sigma_t^2 \mathbb{E}\left[z_t^2\right]
 =
 \sigma_t^2
-\]</span></p>
+</span></p>
 <p>The <code>ES</code> recursion is</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \widehat{\sigma}_t^2 = \alpha_{\mathrm{ES}} r_{t-1}^2 + (1-\alpha_{\mathrm{ES}})\widehat{\sigma}_{t-1}^2
-\]</span></p>
+</span></p>
 <p>A <code>GARCH</code> recursion can be rewritten to highlight its <code>EWMA</code> structure:</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \sigma_t^2
 = \omega + \alpha r_{t-1}^2 + \beta \sigma_{t-1}^2
 = \omega + (\alpha+\beta)\left(
@@ -402,39 +293,37 @@ r_t = \sigma_t z_t,
 +
 \underbrace{\frac{\beta}{\alpha+\beta}}_{=1-\alpha_{\mathrm{eff}}}\sigma_{t-1}^2
 \right)
-\]</span></p>
-<p>So <code>GARCH</code> is “intercept + persistence × EWMA”. When <span class="math display">\[\alpha+\beta\]</span> is close to 1 and <span class="math display">\[\omega\]</span> is small relative to the prevailing variance level, the conditional variance behaves very similarly to a constant-<span class="math display">\[\alpha\]</span> <code>EWMA</code> with</p>
-<p><span class="math display">\[
+</span></p>
+<p>So <code>GARCH</code> is “intercept + persistence × EWMA”. When <span class="math inline">\alpha+\beta</span> is close to 1 and <span class="math inline">\omega</span> is small relative to the prevailing variance level, the conditional variance behaves very similarly to a constant-<span class="math inline">\alpha</span> <code>EWMA</code> with</p>
+<p><span class="math display">
 \alpha_{\mathrm{eff}} = \frac{\alpha}{\alpha+\beta}
-\]</span></p>
-<p>In our simulation setup (which is the same as what is used in <code>Liu et al 2020</code>), <span class="math display">\[\alpha=0.11\]</span> and <span class="math display">\[\beta=0.87\]</span>, hence <span class="math display">\[\alpha+\beta=0.98\]</span> and <span class="math display">\[\alpha_{\mathrm{eff}}\approx 0.112\]</span>. This already explains why <code>ES</code> is a strong baseline: <strong>it is very close to the true one-step conditional variance mapping</strong>, leaving limited headroom for further improvements in <code>RMSE</code>.</p>
-<p>In vanilaa <code>GARCH(1,1)</code>, the coefficient on <span class="math display">\[r_{t-1}^2\]</span> in the conditional variance recursion is a <strong>constant</strong>. There is no mechanism in the DGP that says “use a different update rate after a large shock” or “use a different update rate after a negative return.” In fact, under symmetry and i.i.d. innovations, the sign of <span class="math display">\[r_{t-1}\]</span> contains no information for <span class="math display">\[\sigma_t^2\]</span> beyond <span class="math display">\[r_{t-1}^2\]</span>. The optimal solution within the <code>STES</code> family is to set <span class="math display">\[X_t\beta\]</span> to be (approximately) constant, so that <span class="math display">\[\alpha_t\]</span> becomes (approximately) constant. In other words:</p>
-<blockquote class="blockquote">
+</span></p>
+<p>In our simulation setup (which is the same as what is used in <code>Liu et al 2020</code>), <span class="math inline">\alpha=0.11</span> and <span class="math inline">\beta=0.87</span>, hence <span class="math inline">\alpha+\beta=0.98</span> and <span class="math inline">\alpha_{\mathrm{eff}}\approx 0.112</span>. This already explains why <code>ES</code> is a strong baseline: <strong>it is very close to the true one-step conditional variance mapping</strong>, leaving limited headroom for further improvements in <code>RMSE</code>.</p>
+<p>In vanilaa <code>GARCH(1,1)</code>, the coefficient on <span class="math inline">r_{t-1}^2</span> in the conditional variance recursion is a <strong>constant</strong>. There is no mechanism in the DGP that says “use a different update rate after a large shock” or “use a different update rate after a negative return.” In fact, under symmetry and i.i.d. innovations, the sign of <span class="math inline">r_{t-1}</span> contains no information for <span class="math inline">\sigma_t^2</span> beyond <span class="math inline">r_{t-1}^2</span>. The optimal solution within the <code>STES</code> family is to set <span class="math inline">X_t\beta</span> to be (approximately) constant, so that <span class="math inline">\alpha_t</span> becomes (approximately) constant. In other words:</p>
+<blockquote>
 <p>If the true DGP implies an approximately constant optimal update rate, the best <code>STES</code> reduces to <code>ES</code>.</p>
 </blockquote>
-<p>There is also an irreducible noise floor in this evaluation protocol. Even an oracle predictor that knows the true conditional variance cannot predict the realized innovation <span class="math display">\[z_t^2\]</span>. Writing</p>
-<p><span class="math display">\[
+<p>There is also an irreducible noise floor in this evaluation protocol. Even an oracle predictor that knows the true conditional variance cannot predict the realized innovation <span class="math inline">z_t^2</span>. Writing</p>
+<p><span class="math display">
 r_t^2 = \sigma_t^2 z_t^2
-\]</span></p>
+</span></p>
 <p>we have</p>
-<p><span class="math display">\[
+<p><span class="math display">
 r_t^2 - \sigma_t^2 = \sigma_t^2(z_t^2 - 1)
-\]</span></p>
+</span></p>
 <p>so the minimum achievable one-step <code>MSE</code> is</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \mathbb{E}\left[\left(r_t^2 - \mathbb{E}[r_t^2\mid \mathcal{F}_{t-1}]\right)^2\right]
 =
 \mathbb{E}\left[\mathrm{Var}(r_t^2\mid \mathcal{F}_{t-1})\right]
 =
 \mathbb{E}[\sigma_t^4]\cdot \mathrm{Var}(z_t^2)
-\]</span></p>
-<p>With heavy-tailed innovations (as in the Student-<span class="math display">\[t\]</span> setting), <span class="math display">\[\mathrm{Var}(z_t^2)\]</span> can be large, and this irreducible component dominates the <code>RMSE</code>. As a result, even meaningful improvements in forecasting <span class="math display">\[\sigma_t^2\]</span> may translate into small changes in <code>RMSE</code> measured against <span class="math display">\[r_t^2\]</span>.</p>
+</span></p>
+<p>With heavy-tailed innovations (as in the Student-<span class="math inline">t</span> setting), <span class="math inline">\mathrm{Var}(z_t^2)</span> can be large, and this irreducible component dominates the <code>RMSE</code>. As a result, even meaningful improvements in forecasting <span class="math inline">\sigma_t^2</span> may translate into small changes in <code>RMSE</code> measured against <span class="math inline">r_t^2</span>.</p>
 <p>On our simulated <code>GARCH</code> paths, it is not surprising that <code>STES</code> fails to materially beat <code>ES</code> in <code>RMSE</code>. Under that DGP, the optimal one-step forecast is the <code>GARCH</code> conditional variance itself; <code>ES</code> already approximates it well when persistence is high; and the additional flexibility of a time-varying gate has no stable signal to exploit and can only fit noise.</p>
-</section>
-<section id="stes-vs-es-on-spy-returns" class="level3">
-<h3 class="anchored" data-anchor-id="stes-vs-es-on-spy-returns"><code>STES</code> vs <code>ES</code> on <code>SPY</code> returns</h3>
-<p>On real equity-index data, <code>STES</code> has more opportunity to add value because the transition variables can capture state dependence that a constant <span class="math display">\[\alpha\]</span> cannot. Table 2 reports out-of-sample <code>RMSE</code> for <code>ES</code> and several <code>STES</code> variants when forecasting <code>SPY</code> realized variance. Across specifications, <code>STES</code> improvements over <code>ES</code> in terms of <code>RMSE</code> are more significant, with the best-performing variant in this run being <code>STES-E&amp;AE&amp;SE</code>.</p>
-<table class="caption-top table">
+<h3 data-number="5.3" id="stes-vs-es-on-spy-returns" class="anchored"><span class="header-section-number">5.3</span> <code>STES</code> vs <code>ES</code> on <code>SPY</code> returns</h3>
+<p>On real equity-index data, <code>STES</code> has more opportunity to add value because the transition variables can capture state dependence that a constant <span class="math inline">\alpha</span> cannot. Table 2 reports out-of-sample <code>RMSE</code> for <code>ES</code> and several <code>STES</code> variants when forecasting <code>SPY</code> realized variance. Across specifications, <code>STES</code> improvements over <code>ES</code> in terms of <code>RMSE</code> are more significant, with the best-performing variant in this run being <code>STES-E&amp;AE&amp;SE</code>.</p>
+<table class="caption-top">
 <thead>
 <tr class="header">
 <th>Model</th>
@@ -482,11 +371,11 @@ r_t^2 - \sigma_t^2 = \sigma_t^2(z_t^2 - 1)
 </table>
 <p>[Table 2: Comparison of the <code>STES</code> and <code>ES</code> models on <code>SPY</code> returns with standardized inputs. <em>Standardized features (all except constant term) using StandardScaler fit on training split, applied to both training and test. Results are averaged over 100 random initializations. Train sample: 2000-01-01 - 2015-11-26, Test sample: 2015-11-27 - 2023-12-31</em>]</p>
 <p><code>STES-E&amp;AE&amp;SE</code> have better train and test <code>RMSE</code>, setting it apart from the other <code>STES</code> variants, which are themselves significant improvement from <code>ES</code>.</p>
-<p>Table 3 reports the fitted coefficients <span class="math display">\[\beta\]</span> for each variant (best random initialization by <code>OOS RMSE</code>; in this run the optimizer converged very consistently across initializations). Blank entries indicate that the corresponding transition variable is not included in that variant.</p>
-<blockquote class="blockquote">
-<p><code>ES</code> does <em>not</em> have transition coefficients. To make the table comparable, the <code>ES</code> “const” entry should be interpreted as the <em>logit</em> of the fitted constant smoothing parameter, i.e.&nbsp;the constant score level that would reproduce the <code>ES</code> <span class="math display">\[\alpha\]</span> under the same logistic map. <code>ES</code> still uses a single constant <span class="math display">\[\alpha\]</span> and does not respond to features.</p>
+<p>Table 3 reports the fitted coefficients <span class="math inline">\beta</span> for each variant (best random initialization by <code>OOS RMSE</code>; in this run the optimizer converged very consistently across initializations). Blank entries indicate that the corresponding transition variable is not included in that variant.</p>
+<blockquote>
+<p><code>ES</code> does <em>not</em> have transition coefficients. To make the table comparable, the <code>ES</code> “const” entry should be interpreted as the <em>logit</em> of the fitted constant smoothing parameter, i.e.&nbsp;the constant score level that would reproduce the <code>ES</code> <span class="math inline">\alpha</span> under the same logistic map. <code>ES</code> still uses a single constant <span class="math inline">\alpha</span> and does not respond to features.</p>
 </blockquote>
-<table class="caption-top table">
+<table class="caption-top">
 <colgroup>
 <col style="width: 9%">
 <col style="width: 12%">
@@ -552,364 +441,352 @@ r_t^2 - \sigma_t^2 = \sigma_t^2(z_t^2 - 1)
 </tr>
 </tbody>
 </table>
-<p>[Table 3: Fitted logistic gate coefficients <span class="math display">\[\beta\]</span> for <code>ES</code> and <code>STES</code> variants on <code>SPY</code> (standardized inputs).]</p>
-<p>Each coefficient <span class="math display">\[\beta_j\]</span> controls the direction and strength <span class="math display">\[x_{j,t}\]</span> pushes the score and <span class="math display">\[\alpha_t\]</span>. Increasing <span class="math display">\[x_{j,t}\]</span> shifts the score by <span class="math display">\[\Delta s_t = \beta_j\Delta x_{j,t}\]</span>, which increases <span class="math display">\[\alpha_t\]</span> if <span class="math display">\[\beta_j\Delta x_{j,t} &gt; 0\]</span> and decreases <span class="math display">\[\alpha_t\]</span> if it is negative. Therefore, a negative <span class="math display">\[\beta\]</span> coefficient above implies a negative relationship between the variable and <span class="math display">\[\alpha\]</span>, all else equal. Since <span class="math display">\[\alpha_t\]</span> is logistic, its responsiveness depends on the level of the score: <span class="math display">\[\partial\alpha_t/\partial s_t = \alpha_t(1-\alpha_t)\]</span>, which is largest near <span class="math display">\[\alpha_t\approx 0.5\]</span> and small when <span class="math display">\[\alpha_t\]</span> is near 0 or 1.</p>
-<p>Since the three variables are not independent, centeris paribus interpretation is a little difficult. However, we can see consistently that a negative SPY return shock increase the weights on recent observation, but its magnitude, as captured by <code>sqlogret</code> and <code>abslogret</code>, can dampen its effect, so large negative return does not increase <span class="math display">\[\alpha\]</span> as much as a medium-sized one.</p>
-</section>
-<section id="when-does-stes-beat-es-oos-mechanism-diagnostics" class="level3">
-<h3 class="anchored" data-anchor-id="when-does-stes-beat-es-oos-mechanism-diagnostics">When does STES beat ES? (OOS mechanism diagnostics)</h3>
+<p>[Table 3: Fitted logistic gate coefficients <span class="math inline">\beta</span> for <code>ES</code> and <code>STES</code> variants on <code>SPY</code> (standardized inputs).]</p>
+<p>Each coefficient <span class="math inline">\beta_j</span> controls the direction and strength <span class="math inline">x_{j,t}</span> pushes the score and <span class="math inline">\alpha_t</span>. Increasing <span class="math inline">x_{j,t}</span> shifts the score by <span class="math inline">\Delta s_t = \beta_j\Delta x_{j,t}</span>, which increases <span class="math inline">\alpha_t</span> if <span class="math inline">\beta_j\Delta x_{j,t} &gt; 0</span> and decreases <span class="math inline">\alpha_t</span> if it is negative. Therefore, a negative <span class="math inline">\beta</span> coefficient above implies a negative relationship between the variable and <span class="math inline">\alpha</span>, all else equal. Since <span class="math inline">\alpha_t</span> is logistic, its responsiveness depends on the level of the score: <span class="math inline">\partial\alpha_t/\partial s_t = \alpha_t(1-\alpha_t)</span>, which is largest near <span class="math inline">\alpha_t\approx 0.5</span> and small when <span class="math inline">\alpha_t</span> is near 0 or 1.</p>
+<p>Since the three variables are not independent, centeris paribus interpretation is a little difficult. However, we can see consistently that a negative SPY return shock increase the weights on recent observation, but its magnitude, as captured by <code>sqlogret</code> and <code>abslogret</code>, can dampen its effect, so large negative return does not increase <span class="math inline">\alpha</span> as much as a medium-sized one.</p>
+<h3 data-number="5.4" id="when-does-stes-beat-es-oos-mechanism-diagnostics" class="anchored"><span class="header-section-number">5.4</span> When does STES beat ES? (OOS mechanism diagnostics)</h3>
 <p>Define the per-date squared loss differential:</p>
-<p><span class="math display">\[
+<p><span class="math display">
 D_t = (y_t - \hat y^{ES}_t)^2 - (y_t - \hat y^{STES}_t)^2
-\]</span></p>
-<p>so <span class="math display">\[D_t&gt;0\]</span> means STES is better on date <span class="math display">\[t\]</span> under squared error. We also define:</p>
+</span></p>
+<p>so <span class="math inline">D_t&gt;0</span> means STES is better on date <span class="math inline">t</span> under squared error. We also define:</p>
 <ul>
-<li><strong><code>WIN</code> events</strong> = dates in the <strong>top 10%</strong> of <span class="math display">\[D_t\]</span> in the OOS sample.</li>
-<li><strong><code>LOSE</code> events</strong> = dates in the <strong>bottom 10%</strong> of <span class="math display">\[D_t\]</span> in the OOS sample.</li>
+<li><strong><code>WIN</code> events</strong> = dates in the <strong>top 10%</strong> of <span class="math inline">D_t</span> in the OOS sample.</li>
+<li><strong><code>LOSE</code> events</strong> = dates in the <strong>bottom 10%</strong> of <span class="math inline">D_t</span> in the OOS sample.</li>
 </ul>
-<p>Note this is a <em>quantile definition</em>: “<code>WIN</code>” does not mathematically guarantee <span class="math display">\[D_t&gt;0\]</span> (though in practice the top tail is typically positive), and similarly “<code>LOSE</code>” does not guarantee <span class="math display">\[D_t&lt;0\]</span>. It is simply “best vs worst relative days for <code>STES</code>.”</p>
-<section id="forecasts-and-loss-differential-over-time" class="level4">
-<h4 class="anchored" data-anchor-id="forecasts-and-loss-differential-over-time">Forecasts and loss differential over time</h4>
+<p>Note this is a <em>quantile definition</em>: “<code>WIN</code>” does not mathematically guarantee <span class="math inline">D_t&gt;0</span> (though in practice the top tail is typically positive), and similarly “<code>LOSE</code>” does not guarantee <span class="math inline">D_t&lt;0</span>. It is simply “best vs worst relative days for <code>STES</code>.”</p>
+<h4 data-number="5.4.1" id="forecasts-and-loss-differential-over-time" class="anchored"><span class="header-section-number">5.4.1</span> Forecasts and loss differential over time</h4>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_forecasts_and_D.png" class="img-fluid figure-img"></p>
+<figure>
+<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_forecasts_and_D.png" class="img-fluid"></p>
 <figcaption>Figure 1.</figcaption>
 </figure>
 </div>
-<p>Figure 1 shows the target <span class="math display">\[y_t\]</span> and the two one-step forecasts in the <code>OOS</code> period, together with <span class="math display">\[D_t\]</span>. Most of the time the curves overlap. <code>ES</code> and <code>STES</code> often make nearly identical forecasts. <code>RMSE</code> differences are driven by a few episodes. Large spikes in <span class="math display">\[D_t\]</span> concentrate in rare periods where volatility moves sharply (notably around the 2020 shock). This is common with squared-error objectives: the overall <code>RMSE</code> can be dominated by a small set of high-variance days.</p>
+<p>Figure 1 shows the target <span class="math inline">y_t</span> and the two one-step forecasts in the <code>OOS</code> period, together with <span class="math inline">D_t</span>. Most of the time the curves overlap. <code>ES</code> and <code>STES</code> often make nearly identical forecasts. <code>RMSE</code> differences are driven by a few episodes. Large spikes in <span class="math inline">D_t</span> concentrate in rare periods where volatility moves sharply (notably around the 2020 shock). This is common with squared-error objectives: the overall <code>RMSE</code> can be dominated by a small set of high-variance days.</p>
 <hr>
-</section>
-</section>
-<section id="event-study-around-win-vs-lose-dates" class="level3">
-<h3 class="anchored" data-anchor-id="event-study-around-win-vs-lose-dates">Event study around <code>WIN</code> vs <code>LOSE</code> dates</h3>
-<p>What is different in the days around dates where STES is relatively much better vs relatively much worse? To answer this, we perform an “event study” centered at each OOS date <span class="math display">\[t\]</span> that is a <code>WIN</code> (or <code>LOSE</code>) event. Let event time be <span class="math display">\[k \in [-10,10]\]</span> where <span class="math display">\[k=0\]</span> corresponds to the <code>WIN</code>/<code>LOSE</code> date <span class="math display">\[t\]</span> (the date whose <span class="math display">\[D_t\]</span> places it in the tail). For a series <span class="math display">\[z_t\]</span> we plot the cross-event mean:</p>
-<p><span class="math display">\[
+<h3 data-number="5.5" id="event-study-around-win-vs-lose-dates" class="anchored"><span class="header-section-number">5.5</span> Event study around <code>WIN</code> vs <code>LOSE</code> dates</h3>
+<p>What is different in the days around dates where STES is relatively much better vs relatively much worse? To answer this, we perform an “event study” centered at each OOS date <span class="math inline">t</span> that is a <code>WIN</code> (or <code>LOSE</code>) event. Let event time be <span class="math inline">k \in [-10,10]</span> where <span class="math inline">k=0</span> corresponds to the <code>WIN</code>/<code>LOSE</code> date <span class="math inline">t</span> (the date whose <span class="math inline">D_t</span> places it in the tail). For a series <span class="math inline">z_t</span> we plot the cross-event mean:</p>
+<p><span class="math display">
 \mathbb{E}\left[z_{t+k}\mid t \in \texttt{WIN}\right]
 \quad\text{and}\quad
 \mathbb{E}\left[z_{t+k}\mid t \in \texttt{``LOSE``}\right].
-\]</span></p>
-<section id="a-realized-absolute-return-around-events" class="level4">
-<h4 class="anchored" data-anchor-id="a-realized-absolute-return-around-events">(A) Realized absolute return around events</h4>
+</span></p>
+<h4 data-number="5.5.1" id="a-realized-absolute-return-around-events" class="anchored"><span class="header-section-number">5.5.1</span> (A) Realized absolute return around events</h4>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_event_absr.png" class="img-fluid figure-img"></p>
+<figure>
+<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_event_absr.png" class="img-fluid"></p>
 <figcaption>Figure 2.</figcaption>
 </figure>
 </div>
-<p>The y-axis is <strong>mean <span class="math display">\[\lvert r_{t+k} \rvert\]</span></strong> across <code>WIN</code> events (blue) and <code>LOSE</code> events (orange). We observe that <code>WIN</code> events tend to be associated with <strong>larger moves</strong> (especially immediately after the event date), consistent with the idea that “big shocks” are exactly where a state-dependent update rate can matter. <code>LOSE</code> events look like cases where volatility does not persist in the same way after the event date. Being more reactive is helpful when volatility persists, but harmful when volatility mean-reverts quickly.</p>
-</section>
-<section id="b-gate-level-used-for-the-forecast-at-date-t" class="level4">
-<h4 class="anchored" data-anchor-id="b-gate-level-used-for-the-forecast-at-date-t">(B) Gate level used for the forecast at date t</h4>
+<p>The y-axis is <strong>mean <span class="math inline">\lvert r_{t+k} \rvert</span></strong> across <code>WIN</code> events (blue) and <code>LOSE</code> events (orange). We observe that <code>WIN</code> events tend to be associated with <strong>larger moves</strong> (especially immediately after the event date), consistent with the idea that “big shocks” are exactly where a state-dependent update rate can matter. <code>LOSE</code> events look like cases where volatility does not persist in the same way after the event date. Being more reactive is helpful when volatility persists, but harmful when volatility mean-reverts quickly.</p>
+<h4 data-number="5.5.2" id="b-gate-level-used-for-the-forecast-at-date-t" class="anchored"><span class="header-section-number">5.5.2</span> (B) Gate level used for the forecast at date t</h4>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_event_alpha.png" class="img-fluid figure-img"></p>
+<figure>
+<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_event_alpha.png" class="img-fluid"></p>
 <figcaption>Figure 3.</figcaption>
 </figure>
 </div>
-<p>The y-axis is <strong>mean <span class="math display">\[\alpha_{t+k-1}\]</span></strong>, i.e.&nbsp;the gate value <em>used in the forecast for date <span class="math display">\[t+k\]</span></em> (since <code>STES</code> updates <span class="math display">\[\hat\sigma^2_{t}\]</span> using <span class="math display">\[\alpha_{t-1}\]</span>). The green line is the constant <code>ES</code> <span class="math display">\[\alpha\]</span>.</p>
-<p>We see that <code>STES</code> has a <strong>higher effective update rate</strong> than <code>ES</code> on average in this run (blue/orange both above the green baseline). Around the most “<code>WIN</code>” dates, the gate is often elevated and shows a distinct hump shortly after the event date, consistent with “shock → faster updating.” However, <code>LOSE</code> events also show elevated gate levels. <strong>High <span class="math display">\[\alpha\]</span> is not automatically good.</strong> The same reactivity that helps in persistent volatility regimes can hurt when the shock is followed by fast normalization.</p>
-<p><code>STES</code> adds value when it increases <span class="math display">\[\alpha\]</span> in <em>the right episodes</em>—i.e., when a shock is followed by persistent high variance.</p>
-</section>
-<section id="c-innovation-proxy-around-events" class="level4">
-<h4 class="anchored" data-anchor-id="c-innovation-proxy-around-events">(C) Innovation proxy around events</h4>
+<p>The y-axis is <strong>mean <span class="math inline">\alpha_{t+k-1}</span></strong>, i.e.&nbsp;the gate value <em>used in the forecast for date <span class="math inline">t+k</span></em> (since <code>STES</code> updates <span class="math inline">\hat\sigma^2_{t}</span> using <span class="math inline">\alpha_{t-1}</span>). The green line is the constant <code>ES</code> <span class="math inline">\alpha</span>.</p>
+<p>We see that <code>STES</code> has a <strong>higher effective update rate</strong> than <code>ES</code> on average in this run (blue/orange both above the green baseline). Around the most “<code>WIN</code>” dates, the gate is often elevated and shows a distinct hump shortly after the event date, consistent with “shock → faster updating.” However, <code>LOSE</code> events also show elevated gate levels. <strong>High <span class="math inline">\alpha</span> is not automatically good.</strong> The same reactivity that helps in persistent volatility regimes can hurt when the shock is followed by fast normalization.</p>
+<p><code>STES</code> adds value when it increases <span class="math inline">\alpha</span> in <em>the right episodes</em>—i.e., when a shock is followed by persistent high variance.</p>
+<h4 data-number="5.5.3" id="c-innovation-proxy-around-events" class="anchored"><span class="header-section-number">5.5.3</span> (C) Innovation proxy around events</h4>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_event_u.png" class="img-fluid figure-img"></p>
+<figure>
+<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_event_u.png" class="img-fluid"></p>
 <figcaption>Figure 4.</figcaption>
 </figure>
 </div>
 <p>The y-axis is <strong>mean innovation</strong>:</p>
-<p><span class="math display">\[
+<p><span class="math display">
 u_{t-1} = r_{t-1}^2 - \hat v^{ES}_{t-1}
-\]</span></p>
-<p>where <span class="math display">\[\hat v^{ES}_{t-1}\]</span> is the <code>ES</code> variance forecast at <span class="math display">\[t-1\]</span> (so <span class="math display">\[u_{t-1}\]</span> measures whether the realized squared return was above or below what <code>ES</code> expected). <code>WIN</code> events tend to align with patterns where the <code>ES</code> innovation is followed by persistence (so increasing reactivity helps).<code>LOSE</code> events often look like cases where the innovation is more transient (so increasing reactivity can lead to overshooting and larger error). We observe again that the gate is attempting to react to a surprise, but surprises come in at least two flavors—persistent vs transitory. <code>STES-E&amp;AE&amp;SE</code> outperforms <code>ES</code> in our test sample perhaps due to the presence of persistent high vol regime.</p>
-</section>
-</section>
-<section id="which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates" class="level3">
-<h3 class="anchored" data-anchor-id="which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates">Which transition variables drive the gate differently on <code>WIN</code> vs <code>LOSE</code> dates?</h3>
+</span></p>
+<p>where <span class="math inline">\hat v^{ES}_{t-1}</span> is the <code>ES</code> variance forecast at <span class="math inline">t-1</span> (so <span class="math inline">u_{t-1}</span> measures whether the realized squared return was above or below what <code>ES</code> expected). <code>WIN</code> events tend to align with patterns where the <code>ES</code> innovation is followed by persistence (so increasing reactivity helps).<code>LOSE</code> events often look like cases where the innovation is more transient (so increasing reactivity can lead to overshooting and larger error). We observe again that the gate is attempting to react to a surprise, but surprises come in at least two flavors—persistent vs transitory. <code>STES-E&amp;AE&amp;SE</code> outperforms <code>ES</code> in our test sample perhaps due to the presence of persistent high vol regime.</p>
+<h3 data-number="5.6" id="which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates" class="anchored"><span class="header-section-number">5.6</span> Which transition variables drive the gate differently on <code>WIN</code> vs <code>LOSE</code> dates?</h3>
 <p>To interpret the fitted gate, we decompose the logit score into per-feature contributions:</p>
-<p><span class="math display">\[
+<p><span class="math display">
 c_{j,t} = x_{j,t}\beta_j
-\]</span></p>
-<p>so the score is <span class="math display">\[s_t=\sum_j c_{j,t}\]</span> and <span class="math display">\[\alpha_t=\mathrm{expit}(s_t)\]</span>. Since <span class="math display">\[\alpha_t=\mathrm{expit}(s_t)\]</span> is monotone increasing in <span class="math display">\[s_t\]</span>, a positive contribution pushes <span class="math display">\[\alpha_t\]</span> up (faster update), while a negative contribution pushes <span class="math display">\[\alpha_t\]</span> down (slower update).</p>
+</span></p>
+<p>so the score is <span class="math inline">s_t=\sum_j c_{j,t}</span> and <span class="math inline">\alpha_t=\mathrm{expit}(s_t)</span>. Since <span class="math inline">\alpha_t=\mathrm{expit}(s_t)</span> is monotone increasing in <span class="math inline">s_t</span>, a positive contribution pushes <span class="math inline">\alpha_t</span> up (faster update), while a negative contribution pushes <span class="math inline">\alpha_t</span> down (slower update).</p>
 <p>Figure 5 reports the difference in mean contributions between <code>WIN</code> and <code>LOSE</code> events:</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \mathbb{E}[c_{j,t-1}\mid \texttt{WIN}] - \mathbb{E}[c_{j,t-1}\mid \texttt{LOSE}]
-\]</span></p>
+</span></p>
 <div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_gate_contrib_win_minus_lose.png" class="img-fluid figure-img"></p>
+<figure>
+<p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_gate_contrib_win_minus_lose.png" class="img-fluid"></p>
 <figcaption>Figure 5.</figcaption>
 </figure>
 </div>
-<p>A positive bar means the feature’s mean score contribution is higher on <code>WIN</code> than on <code>LOSE</code>, i.e. it pushes the logit score and <span class="math display">\[\alpha\]</span> upward more on <code>WIN</code> dates than on <code>LOSE</code> dates. A negative bar means the feature pushes the score downward more on <code>WIN</code> than on <code>LOSE</code>. These are relative, conditional means: a negative bar does not imply <span class="math display">\[\alpha\]</span> is lower on <code>WIN</code> dates overall, because other features (and the intercept) may more than offset it.</p>
-<p>In the <code>WIN</code>/<code>LOSE</code> decomposition, a “<code>WIN</code> event” is defined as the top 10% of the loss differential <span class="math display">\[D_t = \ell^{ES}t-\ell^{STES}t\]</span> (<code>STES</code> substantially better than <code>ES</code>), and a “<code>LOSE</code> event” is the bottom 10% (<code>STES</code> substantially worse). The bar chart reports</p>
-<p><span class="math display">\[
+<p>A positive bar means the feature’s mean score contribution is higher on <code>WIN</code> than on <code>LOSE</code>, i.e. it pushes the logit score and <span class="math inline">\alpha</span> upward more on <code>WIN</code> dates than on <code>LOSE</code> dates. A negative bar means the feature pushes the score downward more on <code>WIN</code> than on <code>LOSE</code>. These are relative, conditional means: a negative bar does not imply <span class="math inline">\alpha</span> is lower on <code>WIN</code> dates overall, because other features (and the intercept) may more than offset it.</p>
+<p>In the <code>WIN</code>/<code>LOSE</code> decomposition, a “<code>WIN</code> event” is defined as the top 10% of the loss differential <span class="math inline">D_t = \ell^{ES}t-\ell^{STES}t</span> (<code>STES</code> substantially better than <code>ES</code>), and a “<code>LOSE</code> event” is the bottom 10% (<code>STES</code> substantially worse). The bar chart reports</p>
+<p><span class="math display">
 \mathbb{E}[c{j,t}\mid WIN] - \mathbb{E}[c{j,t}\mid LOSE]
-\]</span></p>
+</span></p>
 <p>i.e., how the average score contributions differ between the two tails.</p>
 <p>Empirically, the lag-return term contributes more positively on <code>WIN</code> events than on <code>LOSE</code> events (about -1.1e-3), while the magnitude terms (absolute and squared returns) have mixed contribution (at 0.0002.57e-4 and -3.07e-5, respectively). Summing across features yields a net score difference of roughly</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \Delta s \equiv \mathbb{E}[s\mid WIN]-\mathbb{E}[s\mid LOSE]\approx -0.001
-\]</span></p>
-<p>which implies a slightly lower gate on <code>WIN</code> events because <span class="math display">\[\mathrm{expit}(\cdot)\]</span> is monotone:</p>
-<p><span class="math display">\[
+</span></p>
+<p>which implies a slightly lower gate on <code>WIN</code> events because <span class="math inline">\mathrm{expit}(\cdot)</span> is monotone:</p>
+<p><span class="math display">
 \mathbb{E}[\alpha\mid WIN] &lt; \mathbb{E}[\alpha\mid LOSE]
-\]</span></p>
-<p>The key takeaway is that <code>STES</code> wins not only by reacting more after shocks, but also by not overreacting in precisely the episodes that separate its best from its worst outcomes. This is also why unconditional plots of <span class="math display">\[\alpha_t\]</span> versus <span class="math display">\[\lvert r_t \rvert\]</span> can suggest a rising relationship on average, while the conditional <code>WIN</code>/<code>LOSE</code> decomposition can simultaneously show that, among the most performance-relevant tail events, <code>STES</code>’s gate tends to be slightly lower when it outperforms and slightly higher when it underperforms.</p>
+</span></p>
+<p>The key takeaway is that <code>STES</code> wins not only by reacting more after shocks, but also by not overreacting in precisely the episodes that separate its best from its worst outcomes. This is also why unconditional plots of <span class="math inline">\alpha_t</span> versus <span class="math inline">\lvert r_t \rvert</span> can suggest a rising relationship on average, while the conditional <code>WIN</code>/<code>LOSE</code> decomposition can simultaneously show that, among the most performance-relevant tail events, <code>STES</code>’s gate tends to be slightly lower when it outperforms and slightly higher when it underperforms.</p>
 <p>The analysis supports a few concrete “stylized facts” about variance dynamics:</p>
 <ol type="1">
-<li><strong>Tail predictability:</strong> improvements in squared-error loss are concentrated in the extreme tail of <span class="math display">\[\lvert r_{t-1} \rvert\]</span>. Most normal days show little difference between <code>ES</code> and <code>STES</code>.</li>
+<li><strong>Tail predictability:</strong> improvements in squared-error loss are concentrated in the extreme tail of <span class="math inline">\lvert r_{t-1} \rvert</span>. Most normal days show little difference between <code>ES</code> and <code>STES</code>.</li>
 <li><strong>Episodic dominance:</strong> <code>OOS RMSE</code> is heavily influenced by rare, high-volatility episodes. A model can improve <code>RMSE</code> mainly by being less wrong during those few days, even if it behaves similarly to the baseline most of the time.</li>
-<li><strong>Shock-responsive updating:</strong> the <em>average</em> <span class="math display">\[\alpha_{t-1}\]</span> rises with the magnitude of <span class="math display">\[\lvert r_{t-1} \rvert\]</span> (see the binned plot), meaning the fitted gate behaves like “bigger move yesterday → more reactive updating” on average. This statement is about the <em>net realized behavior</em> of the fitted transition function, not about any single <span class="math display">\[\beta\]</span> sign in isolation.</li>
-<li><strong>Reactivity is not always beneficial:</strong> both the <code>WIN</code> and <code>LOSE</code> sets contain highly reactive gate states. The key is not merely raising <span class="math display">\[\alpha\]</span>, but raising it when volatility is about to persist and avoiding overreaction when volatility mean-reverts.</li>
+<li><strong>Shock-responsive updating:</strong> the <em>average</em> <span class="math inline">\alpha_{t-1}</span> rises with the magnitude of <span class="math inline">\lvert r_{t-1} \rvert</span> (see the binned plot), meaning the fitted gate behaves like “bigger move yesterday → more reactive updating” on average. This statement is about the <em>net realized behavior</em> of the fitted transition function, not about any single <span class="math inline">\beta</span> sign in isolation.</li>
+<li><strong>Reactivity is not always beneficial:</strong> both the <code>WIN</code> and <code>LOSE</code> sets contain highly reactive gate states. The key is not merely raising <span class="math inline">\alpha</span>, but raising it when volatility is about to persist and avoiding overreaction when volatility mean-reverts.</li>
 </ol>
 <p>On <code>SPY</code> the <code>STES-E&amp;AE&amp;SE</code> mechanism behaves like a state-dependent <code>EWMA</code>: it becomes more reactive after large moves, and that reactivity is precisely where its incremental forecasting value is concentrated.</p>
-</section>
-</section>
-<section id="wrapping-up" class="level2">
-<h2 class="anchored" data-anchor-id="wrapping-up">Wrapping Up</h2>
+<h2 data-number="6" id="wrapping-up" class="anchored"><span class="header-section-number">6</span> Wrapping Up</h2>
 <p><code>Taylor (2004)</code> notes that <code>STES</code> is not a statistical model in the classical parametric sense, which limits the use of conventional significance tests for parameters. Both <code>Taylor (2004)</code> and <code>Liu et al. (2020)</code> nevertheless provide informative interpretation of fitted transition functions. In particular, the estimated transition function implies that volatility updating speed can depend on both the sign and the magnitude of recent shocks (among other variables such as volume), and the mechanism can downweight certain observations depending on how the features combine in the logit score—supporting the empirical claim of improved robustness to outliers.</p>
 <p>In the <a href="../volatility-forecasts-2/">next post</a>, we discuss an extension of STES that replaces the linear transition function with tree-ensemble models.</p>
 
 
-</section>
-
-</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
       }
+      return false;
     }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
       }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
       for (const childEl of codeEl.children) {
         if (isCodeAnnotation(childEl)) {
           childEl.remove();
         }
       }
       return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
     });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/steveya\.github\.io");
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
     }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/steveya\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
-    };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
         }
-        return container.innerHTML
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -917,199 +794,161 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
-</div> <!-- /content -->
-<footer class="footer">
-  <div class="nav-footer">
-    <div class="nav-footer-left">
-      &nbsp;
-    </div>   
-    <div class="nav-footer-center">
-<p>© Steve Yang</p>
-</div>
-    <div class="nav-footer-right">
-      &nbsp;
-    </div>
-  </div>
-</footer>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 
 
 

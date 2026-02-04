@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Steve Yang</title>
+<link>https://steveya.github.io/</link>
+<atom:link href="https://steveya.github.io/index.xml" rel="self" type="application/rss+xml"/>
+<description>Updates on quantitative analysis, data science, and ML education.</description>
+<generator>quarto-1.8.27</generator>
+<lastBuildDate>Sat, 24 Jan 2026 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Volatility Forecasts (Part 3 - XGBSTES Algorithm 2)</title>
+  <link>https://steveya.github.io/posts/volatility-forecasts-3/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Quantitative Finance</category>
+  <category>Volatility Forecast</category>
+  <category>Machine Learning</category>
+  <category>Research</category>
+  <guid>https://steveya.github.io/posts/volatility-forecasts-3/</guid>
+  <pubDate>Sat, 24 Jan 2026 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Signature Methods (Part 3 - Lead–Lag Augmentation and Practical Limitations to the Signature Method)</title>
+  <link>https://steveya.github.io/posts/signature-method-3/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Signature Method</category>
+  <category>Quantitative Finance</category>
+  <category>Machine Learning</category>
+  <category>Research</category>
+  <guid>https://steveya.github.io/posts/signature-method-3/</guid>
+  <pubDate>Thu, 25 Dec 2025 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Signature Methods (Part 2 - Signature and Augmentation)</title>
+  <link>https://steveya.github.io/posts/signature-method-2/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Signature Method</category>
+  <category>Quantitative Finance</category>
+  <category>Machine Learning</category>
+  <category>Research</category>
+  <guid>https://steveya.github.io/posts/signature-method-2/</guid>
+  <pubDate>Sun, 21 Dec 2025 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Signature Methods (Part 1 - Motivation)</title>
+  <link>https://steveya.github.io/posts/signature-method-1/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Signature Method</category>
+  <category>Quantitative Finance</category>
+  <category>Machine Learning</category>
+  <category>Research</category>
+  <guid>https://steveya.github.io/posts/signature-method-1/</guid>
+  <pubDate>Sun, 14 Dec 2025 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Short Rate Models (Part 4: Simulating and Calibrating the Vasicek Model)</title>
+  <link>https://steveya.github.io/posts/short-rate-models-4/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Quantitative Finance</category>
+  <category>Short Rate Models</category>
+  <guid>https://steveya.github.io/posts/short-rate-models-4/</guid>
+  <pubDate>Mon, 16 Sep 2024 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Malaria Detection (Part 4: Finetuning VGG16 with LoRA)</title>
+  <link>https://steveya.github.io/posts/malaria-detection-4/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Machine Learning</category>
+  <category>Data Science</category>
+  <category>Cnn</category>
+  <category>Deep Learning</category>
+  <category>Lora</category>
+  <guid>https://steveya.github.io/posts/malaria-detection-4/</guid>
+  <pubDate>Tue, 20 Aug 2024 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Short Rate Models (Part 3: Introducing Vasicek Model)</title>
+  <link>https://steveya.github.io/posts/short-rate-models-3/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Quantitative Finance</category>
+  <category>Short Rate Models</category>
+  <guid>https://steveya.github.io/posts/short-rate-models-3/</guid>
+  <pubDate>Sat, 10 Aug 2024 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Volatility Forecasts (Part 2 - XGBSTES Algorithm 1)</title>
+  <link>https://steveya.github.io/posts/volatility-forecasts-2/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Quantitative Finance</category>
+  <category>Volatility Forecast</category>
+  <category>Machine Learning</category>
+  <category>Research</category>
+  <guid>https://steveya.github.io/posts/volatility-forecasts-2/</guid>
+  <pubDate>Thu, 18 Jul 2024 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Malaria Detection (Part 3: Results and Reflections)</title>
+  <link>https://steveya.github.io/posts/malaria-detection-3/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Machine Learning</category>
+  <category>Data Science</category>
+  <category>Cnn</category>
+  <category>Deep Learning</category>
+  <guid>https://steveya.github.io/posts/malaria-detection-3/</guid>
+  <pubDate>Wed, 17 Jul 2024 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Malaria Detection (Part 2: Model Building and Training)</title>
+  <link>https://steveya.github.io/posts/malaria-detection-2/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Machine Learning</category>
+  <category>Data Science</category>
+  <category>Cnn</category>
+  <category>Deep Learning</category>
+  <guid>https://steveya.github.io/posts/malaria-detection-2/</guid>
+  <pubDate>Thu, 13 Jun 2024 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Malaria Detection (Part 1: Introduction and Data Preparation)</title>
+  <link>https://steveya.github.io/posts/malaria-detection-1/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Machine Learning</category>
+  <category>Data Science</category>
+  <category>Cnn</category>
+  <category>Deep Learning</category>
+  <guid>https://steveya.github.io/posts/malaria-detection-1/</guid>
+  <pubDate>Wed, 12 Jun 2024 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Short Rate Models (Part 2: Simulating and Calibrating the Merton Model)</title>
+  <link>https://steveya.github.io/posts/short-rate-models-2/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Quantitative Finance</category>
+  <category>Short Rate Models</category>
+  <guid>https://steveya.github.io/posts/short-rate-models-2/</guid>
+  <pubDate>Sun, 19 May 2024 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Short Rate Models (Part 1: Introducing Merton’s Model)</title>
+  <link>https://steveya.github.io/posts/short-rate-models-1/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Study Notes</category>
+  <category>Quantitative Finance</category>
+  <category>Short Rate Models</category>
+  <guid>https://steveya.github.io/posts/short-rate-models-1/</guid>
+  <pubDate>Fri, 10 May 2024 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Expected Performance of a Mean-Reversion Trading Strategy - Part 1</title>
+  <link>https://steveya.github.io/posts/mean-reversion-strategy-1/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Quantitative Finance</category>
+  <guid>https://steveya.github.io/posts/mean-reversion-strategy-1/</guid>
+  <pubDate>Thu, 01 Sep 2022 04:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Volatility Forecasts (Part 1 - STES Model)</title>
+  <link>https://steveya.github.io/posts/volatility-forecasts-1/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Quantitative Finance</category>
+  <category>Volatility Forecast</category>
+  <category>Machine Learning</category>
+  <category>Research</category>
+  <guid>https://steveya.github.io/posts/volatility-forecasts-1/</guid>
+  <pubDate>Tue, 07 Sep 2021 04:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

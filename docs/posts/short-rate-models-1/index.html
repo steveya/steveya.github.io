@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.8.27">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -24,52 +24,32 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
-  "location": "navbar",
-  "copy-button": false,
-  "collapse-after": 3,
-  "panel-placement": "end",
-  "type": "overlay",
-  "limit": 50,
-  "keyboard-shortcut": [
-    "f",
-    "/",
-    "s"
-  ],
-  "show-item-context": false,
-  "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
-    "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
-  }
-}</script>
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -82,7 +62,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -98,114 +78,38 @@ window.Quarto = {
 };
 </script>
 
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body>
 
-<div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Steve Yang</span>
-    </a>
-  </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-  <span class="navbar-toggler-icon"></span>
-</button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../../index.html"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/projects.html"> 
-<span class="menu-text">Projects</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/archives.html"> 
-<span class="menu-text">Archives</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/categories.html"> 
-<span class="menu-text">Categories</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/tags.html"> 
-<span class="menu-text">Tags</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../pages/about.html"> 
-<span class="menu-text">About</span></a>
-  </li>  
-</ul>
-          </div> <!-- /navcollapse -->
-            <div class="quarto-navbar-tools">
-</div>
-      </div> <!-- /container-fluid -->
-    </nav>
+
+<header id="title-block-header">
+<h1 class="title">Short Rate Models (Part 1: Introducing Merton’s Model)</h1>
+
+<p class="date">2024-05-10</p>
 </header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
-<!-- sidebar -->
-<!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+
+<nav id="TOC" role="doc-toc">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#table-of-contents" id="toc-table-of-contents" class="nav-link active" data-scroll-target="#table-of-contents">Table of Contents</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#recap-of-bond-pricing-from-short-rate-models" id="toc-recap-of-bond-pricing-from-short-rate-models" class="nav-link" data-scroll-target="#recap-of-bond-pricing-from-short-rate-models">Recap of Bond Pricing from Short Rate Models</a></li>
-  <li><a href="#mertons-model-1973" id="toc-mertons-model-1973" class="nav-link" data-scroll-target="#mertons-model-1973">Merton’s Model (1973)</a>
-  <ul class="collapse">
-  <li><a href="#model-specification" id="toc-model-specification" class="nav-link" data-scroll-target="#model-specification">Model Specification</a></li>
-  <li><a href="#key-concepts" id="toc-key-concepts" class="nav-link" data-scroll-target="#key-concepts">Key Concepts</a></li>
-  <li><a href="#derivation-of-the-solution-to-the-short-rate-model" id="toc-derivation-of-the-solution-to-the-short-rate-model" class="nav-link" data-scroll-target="#derivation-of-the-solution-to-the-short-rate-model">Derivation of the solution to the short-rate model</a></li>
-  <li><a href="#derivation-of-the-bond-pricing-in-mertons-model" id="toc-derivation-of-the-bond-pricing-in-mertons-model" class="nav-link" data-scroll-target="#derivation-of-the-bond-pricing-in-mertons-model">Derivation of the Bond Pricing in Merton’s Model</a></li>
-  <li><a href="#dynamic-of-the-zero-coupon-bond-yield" id="toc-dynamic-of-the-zero-coupon-bond-yield" class="nav-link" data-scroll-target="#dynamic-of-the-zero-coupon-bond-yield">Dynamic of the zero-coupon bond yield</a></li>
+  <li><a href="#table-of-contents" id="toc-table-of-contents"><span class="header-section-number">1</span> Table of Contents</a></li>
+  <li><a href="#introduction" id="toc-introduction"><span class="header-section-number">2</span> Introduction</a></li>
+  <li><a href="#recap-of-bond-pricing-from-short-rate-models" id="toc-recap-of-bond-pricing-from-short-rate-models"><span class="header-section-number">3</span> Recap of Bond Pricing from Short Rate Models</a></li>
+  <li><a href="#mertons-model-1973" id="toc-mertons-model-1973"><span class="header-section-number">4</span> Merton’s Model (1973)</a>
+  <ul>
+  <li><a href="#model-specification" id="toc-model-specification"><span class="header-section-number">4.1</span> Model Specification</a></li>
+  <li><a href="#key-concepts" id="toc-key-concepts"><span class="header-section-number">4.2</span> Key Concepts</a></li>
+  <li><a href="#derivation-of-the-solution-to-the-short-rate-model" id="toc-derivation-of-the-solution-to-the-short-rate-model"><span class="header-section-number">4.3</span> Derivation of the solution to the short-rate model</a></li>
+  <li><a href="#derivation-of-the-bond-pricing-in-mertons-model" id="toc-derivation-of-the-bond-pricing-in-mertons-model"><span class="header-section-number">4.4</span> Derivation of the Bond Pricing in Merton’s Model</a></li>
+  <li><a href="#dynamic-of-the-zero-coupon-bond-yield" id="toc-dynamic-of-the-zero-coupon-bond-yield"><span class="header-section-number">4.5</span> Dynamic of the zero-coupon bond yield</a></li>
   </ul></li>
-  <li><a href="#wrapping-up" id="toc-wrapping-up" class="nav-link" data-scroll-target="#wrapping-up">Wrapping Up</a></li>
-  <li><a href="#optional-technical-definition-of-the-solution-to-sde" id="toc-optional-technical-definition-of-the-solution-to-sde" class="nav-link" data-scroll-target="#optional-technical-definition-of-the-solution-to-sde">Optional: Technical Definition of the Solution to SDE</a></li>
+  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">5</span> Wrapping Up</a></li>
+  <li><a href="#optional-technical-definition-of-the-solution-to-sde" id="toc-optional-technical-definition-of-the-solution-to-sde"><span class="header-section-number">6</span> Optional: Technical Definition of the Solution to SDE</a></li>
   </ul>
 </nav>
-    </div>
-<!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Short Rate Models (Part 1: Introducing Merton’s Model)</h1>
-  <div class="quarto-categories">
-    <div class="quarto-category">Quantitative Finance</div>
-  </div>
-  </div>
-
-
-
-<div class="quarto-title-meta">
-
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">May 10, 2024</p>
-    </div>
-  </div>
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<section id="table-of-contents" class="level2">
-<h2 class="anchored" data-anchor-id="table-of-contents">Table of Contents</h2>
+<h2 data-number="1" id="table-of-contents" class="anchored"><span class="header-section-number">1</span> Table of Contents</h2>
 <ol type="1">
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#recap-of-bond-pricing-from-short-rate-models">Recap of Bond Pricing from Short Rate Models</a></li>
@@ -213,432 +117,409 @@ window.Quarto = {
 <li><a href="#wrapping-up">Wrapping Up</a></li>
 <li><a href="#optional-technical-definition-of-the-solution-to-sde">Optional: Technical Definition of the Solution to SDE</a></li>
 </ol>
-</section>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<h2 data-number="2" id="introduction" class="anchored"><span class="header-section-number">2</span> Introduction</h2>
 <p>Welcome to my refresher series on short-rate models, dear reader! These mathematical marvels are not just academic curiosities but crucial tools in finance. They are among the main workhorses of interest rate modelling, used in the ivory towers of academic research and by the fast-paced world of Wall Street desk quants. This refresher series aims to help you understand, formulate, and solve these models by deriving and implementing well-known and newer models of varying complexity and generality. Code snippets included in this post (and more) can be found in the <a href="https://github.com/steveya/short-rate-models/notebook/merton_model.ipynb">Github repository</a>. The code library will evolve with the series as we build out more types of models and can exploit the benefits of more abstraction.</p>
 <p>Despite their seeming simplicity, short-rate models are incredibly versatile for modelling interest rates. The short rate is also known as the instantaneous spot interest rate, at which one can borrow money for an infinitesimally short period in the market. A short-rate model specifies the evolution of the short rate according to a stochastic differential equation (SDE). Using the no-arbitrage principle, we can then use its solution to derive the price of a zero-coupon bond and other interest-rate derivatives. The wide array of stochastic processes one can articulate makes the short-rate models a highly versatile tool and a key component of many financial models and strategies.</p>
 <p>In this first post, we start with some preliminaries. These are the foundational concepts and tools we will need to understand and implement the short-rate models. We’ll then go step-by-step to derive the solution of the short rates and the price of a zero-coupon bond for one of the simplest short-rate models: the Merton model. By the end of this post, we will have a good grasp of the basic concepts and tools needed to understand and implement the short-rate models.</p>
-</section>
-<section id="recap-of-bond-pricing-from-short-rate-models" class="level2">
-<h2 class="anchored" data-anchor-id="recap-of-bond-pricing-from-short-rate-models">Recap of Bond Pricing from Short Rate Models</h2>
-<p>Zero-coupon bonds (ZCB) form the foundation of term structure modelling. The price of a <span class="math display">\[T\]</span>-year ZCB at time <span class="math display">\[t\]</span> (<span class="math display">\[P(t, T)\]</span>) is the risk-adjusted present value of 1-dollar in <span class="math display">\[T\]</span>-years. The (continuously compounded) yield-to-maturity (YTM) <span class="math display">\[y(t, T)\]</span> at time <span class="math display">\[t\]</span> is given by</p>
+<h2 data-number="3" id="recap-of-bond-pricing-from-short-rate-models" class="anchored"><span class="header-section-number">3</span> Recap of Bond Pricing from Short Rate Models</h2>
+<p>Zero-coupon bonds (ZCB) form the foundation of term structure modelling. The price of a <span class="math inline">T</span>-year ZCB at time <span class="math inline">t</span> (<span class="math inline">P(t, T)</span>) is the risk-adjusted present value of 1-dollar in <span class="math inline">T</span>-years. The (continuously compounded) yield-to-maturity (YTM) <span class="math inline">y(t, T)</span> at time <span class="math inline">t</span> is given by</p>
 <ul>
 <li>YTM to Price:</li>
 </ul>
-<p><span class="math display">\[P\left(t, T\right) = \exp\left(-y_t^T \left(T-t\right)\right)\]</span></p>
+<p><span class="math inline">P\left(t, T\right) = \exp\left(-y_t^T \left(T-t\right)\right)</span></p>
 <ul>
 <li>Price to YTM:</li>
 </ul>
-<p><span class="math display">\[y\left(t, T\right) = -\frac{\ln\left(P_t^T\right)}{T-t}\]</span></p>
-<p>As we explicitly model the short rate dynamic, the YTM is the expected average (under the risk-neutral measure <span class="math display">\[Q\]</span>) of the short rate from <span class="math display">\[t\]</span> to <span class="math display">\[T\]</span>.</p>
+<p><span class="math inline">y\left(t, T\right) = -\frac{\ln\left(P_t^T\right)}{T-t}</span></p>
+<p>As we explicitly model the short rate dynamic, the YTM is the expected average (under the risk-neutral measure <span class="math inline">Q</span>) of the short rate from <span class="math inline">t</span> to <span class="math inline">T</span>.</p>
 <ul>
 <li>Short Rate to YTM:</li>
 </ul>
-<p><span class="math display">\[y\left(t, T\right) = \frac{1}{T-t}\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]\]</span></p>
+<p><span class="math inline">y\left(t, T\right) = \frac{1}{T-t}\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]</span></p>
 <ul>
 <li>Short Rate to Price:</li>
 </ul>
-<p><span class="math display">\[P\left(t, T\right) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]\]</span></p>
-<p>These fundamental relationships will be used to calculate the price and yield of ZCB using our specific short-rate process. Readers familiar with asset pricing will notice that the price of a ZCB is calculated with respect to the risk-neutral measure <span class="math display">\[Q\]</span>. We will not be concerned with risk-neutral and physical measures just yet. For the first four posts, we assume the risk-neutral measure in bond pricing and the physical measure in the context of short-rate simulation and parameter estimation. A fuller treatment will be postponed to <a href="#">Post 5</a>, where we establish the relationship between the risk-neutral and physical measures.</p>
-</section>
-<section id="mertons-model-1973" class="level2">
-<h2 class="anchored" data-anchor-id="mertons-model-1973">Merton’s Model (1973)</h2>
+<p><span class="math inline">P\left(t, T\right) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]</span></p>
+<p>These fundamental relationships will be used to calculate the price and yield of ZCB using our specific short-rate process. Readers familiar with asset pricing will notice that the price of a ZCB is calculated with respect to the risk-neutral measure <span class="math inline">Q</span>. We will not be concerned with risk-neutral and physical measures just yet. For the first four posts, we assume the risk-neutral measure in bond pricing and the physical measure in the context of short-rate simulation and parameter estimation. A fuller treatment will be postponed to <a href="#">Post 5</a>, where we establish the relationship between the risk-neutral and physical measures.</p>
+<h2 data-number="4" id="mertons-model-1973" class="anchored"><span class="header-section-number">4</span> Merton’s Model (1973)</h2>
 <p>Merton’s model is one of the first short-rate models and is arguably the simplest one; it laid the foundation for many subsequent short-rate models. It was introduced in 1973 by the renowned economist Robert C. Merton, who extended the concepts of equity option pricing to the bond market by modelling short-rate dynamics as a simple Gaussian process.</p>
-<section id="model-specification" class="level3">
-<h3 class="anchored" data-anchor-id="model-specification">Model Specification</h3>
+<h3 data-number="4.1" id="model-specification" class="anchored"><span class="header-section-number">4.1</span> Model Specification</h3>
 <p>The following stochastic differential equation defines Merton’s model:</p>
-<p><span class="math display">\[dr_t = \mu dt + \sigma dW^Q_t\]</span></p>
-<p>where: - <span class="math display">\[r_t\]</span>: short-term interest rate at time <span class="math display">\[t\]</span> - <span class="math display">\[\mu\]</span>: constant drift term - <span class="math display">\[\sigma\]</span>: constant volatility - <span class="math display">\[W^Q_t\]</span>: Wiener process (standard Brownian motion) under the risk-neutral measure <span class="math display">\[Q\]</span>.</p>
-</section>
-<section id="key-concepts" class="level3">
-<h3 class="anchored" data-anchor-id="key-concepts">Key Concepts</h3>
-<section id="continuous-time-modeling" class="level4">
-<h4 class="anchored" data-anchor-id="continuous-time-modeling">Continuous-Time Modeling</h4>
+<p><span class="math inline">dr_t = \mu dt + \sigma dW^Q_t</span></p>
+<p>where: - <span class="math inline">r_t</span>: short-term interest rate at time <span class="math inline">t</span> - <span class="math inline">\mu</span>: constant drift term - <span class="math inline">\sigma</span>: constant volatility - <span class="math inline">W^Q_t</span>: Wiener process (standard Brownian motion) under the risk-neutral measure <span class="math inline">Q</span>.</p>
+<h3 data-number="4.2" id="key-concepts" class="anchored"><span class="header-section-number">4.2</span> Key Concepts</h3>
+<h4 data-number="4.2.1" id="continuous-time-modeling" class="anchored"><span class="header-section-number">4.2.1</span> Continuous-Time Modeling</h4>
 <p>Merton’s model was one of the first to apply continuous-time stochastic processes to interest rate modelling, paving the way for more sophisticated models. It is a one-factor model, as the only source of randomness is the short rate. This will later be generalized to the multi-factor model, where multiple factors drive the dynamic of the short rate.</p>
-</section>
-<section id="gaussian-process" class="level4">
-<h4 class="anchored" data-anchor-id="gaussian-process">Gaussian Process</h4>
+<h4 data-number="4.2.2" id="gaussian-process" class="anchored"><span class="header-section-number">4.2.2</span> Gaussian Process</h4>
 <p>The model assumes that the short rate follows a Gaussian process, allowing for positive and negative levels. It also assumes that rate volatility is constant and independent of the level of the short rate. This modelling choice needs to be consistent with empirical results. While rates can go negative (though mostly inconceivable in 1973), the short-rate volatility generally depends on the short rate’s level. Short rates also exhibit mean reversion as opposed to having a constant drift. Later generations of short-rate models are invented to address these issues.</p>
-</section>
-<section id="equilibrium-short-rate-model" class="level4">
-<h4 class="anchored" data-anchor-id="equilibrium-short-rate-model">Equilibrium Short-Rate Model</h4>
-<p>Merton’s model belongs to a subclass of the short-rate model called the <strong>equilibrium model</strong>. This class of model cannot fit to the initial term structure exactly. This is because the yield curve generated by some short-rate models can assume only certain forms. There is another class of short-rate models called the <strong>arbitrage-free model</strong>. which allows both the drift <span class="math display">\[\mu = \mu_t\]</span> and <span class="math display">\[\sigma = \sigma_t\]</span> to depend on time. For the Merton model, if we let <span class="math display">\[mu\]</span> to a deterministic function of time, we obtain the <strong>Ho-Lee Model</strong> that can fit the initial term structure exactly by varying <span class="math display">\[\mu_t\]</span> deterministically over time.</p>
-</section>
-</section>
-<section id="derivation-of-the-solution-to-the-short-rate-model" class="level3">
-<h3 class="anchored" data-anchor-id="derivation-of-the-solution-to-the-short-rate-model">Derivation of the solution to the short-rate model</h3>
+<h4 data-number="4.2.3" id="equilibrium-short-rate-model" class="anchored"><span class="header-section-number">4.2.3</span> Equilibrium Short-Rate Model</h4>
+<p>Merton’s model belongs to a subclass of the short-rate model called the <strong>equilibrium model</strong>. This class of model cannot fit to the initial term structure exactly. This is because the yield curve generated by some short-rate models can assume only certain forms. There is another class of short-rate models called the <strong>arbitrage-free model</strong>. which allows both the drift <span class="math inline">\mu = \mu_t</span> and <span class="math inline">\sigma = \sigma_t</span> to depend on time. For the Merton model, if we let <span class="math inline">mu</span> to a deterministic function of time, we obtain the <strong>Ho-Lee Model</strong> that can fit the initial term structure exactly by varying <span class="math inline">\mu_t</span> deterministically over time.</p>
+<h3 data-number="4.3" id="derivation-of-the-solution-to-the-short-rate-model" class="anchored"><span class="header-section-number">4.3</span> Derivation of the solution to the short-rate model</h3>
 <p>The short rate is assumed to follow the SDE:</p>
-<p><span class="math display">\[dr_t = \mu dt + \sigma dW^Q_t\]</span></p>
+<p><span class="math inline">dr_t = \mu dt + \sigma dW^Q_t</span></p>
 <p>The solution to the SDE used by the Merton model is given by</p>
-<p><span class="math display">\[r_t = r_s  + \mu (t-s) + \int_s^t \sigma dW^Q_u\]</span></p>
-<p>We can verify this solution satisfies the SDE by applying Itô’s lemma. As a refresher, Itô’s lemma is a fundamental result in stochastic calculus. It determines how a function <span class="math display">\[f(t, r_t)\]</span> evolves. It allows us to derive the SDE for <span class="math display">\[f\]</span> given the SDE of <span class="math display">\[r_t\]</span>.</p>
-<p>Mathematically, if <span class="math display">\[r_t = \mu(t, r_t)dt + \sigma(t, r_t) dW_t\]</span>, Itô’s lemma says that the dynamic of <span class="math display">\[f\]</span> is</p>
-<p><span class="math display">\[df(t, r_t) = \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial r_t} dr_t + \frac{1}{2}\sigma(t, r_t)^2\frac{\partial^2 f}{\partial r_t^2} dt\]</span></p>
-<p>To verify our solution, we apply Itô’s lemma to the function <span class="math display">\[f(t, r_t) = r_t\]</span> and expand to get</p>
-<p><span class="math display">\[dr_t = \left[\frac{\partial f}{\partial t} + \mu\frac{\partial f}{\partial r} + \frac{1}{2}\sigma^2\frac{\partial^2 f}{\partial r^2}\right]dt + \sigma \frac{\partial f}{\partial r} dW_t\]</span></p>
+<p><span class="math inline">r_t = r_s  + \mu (t-s) + \int_s^t \sigma dW^Q_u</span></p>
+<p>We can verify this solution satisfies the SDE by applying Itô’s lemma. As a refresher, Itô’s lemma is a fundamental result in stochastic calculus. It determines how a function <span class="math inline">f(t, r_t)</span> evolves. It allows us to derive the SDE for <span class="math inline">f</span> given the SDE of <span class="math inline">r_t</span>.</p>
+<p>Mathematically, if <span class="math inline">r_t = \mu(t, r_t)dt + \sigma(t, r_t) dW_t</span>, Itô’s lemma says that the dynamic of <span class="math inline">f</span> is</p>
+<p><span class="math inline">df(t, r_t) = \frac{\partial f}{\partial t} dt + \frac{\partial f}{\partial r_t} dr_t + \frac{1}{2}\sigma(t, r_t)^2\frac{\partial^2 f}{\partial r_t^2} dt</span></p>
+<p>To verify our solution, we apply Itô’s lemma to the function <span class="math inline">f(t, r_t) = r_t</span> and expand to get</p>
+<p><span class="math inline">dr_t = \left[\frac{\partial f}{\partial t} + \mu\frac{\partial f}{\partial r} + \frac{1}{2}\sigma^2\frac{\partial^2 f}{\partial r^2}\right]dt + \sigma \frac{\partial f}{\partial r} dW_t</span></p>
 <p>and arrive trivially at</p>
-<p><span class="math display">\[dr_t = \mu dt + \sigma dW_t\]</span></p>
+<p><span class="math inline">dr_t = \mu dt + \sigma dW_t</span></p>
 <p>which is the same as the SDE of the short rate.</p>
 <p>We will not be overly concerned with the technical definition of the solution to a stochastic differential equation. There are plenty of resources offering rigorous treatment of this topic. However, we will include more technical details in the <a href="#optional-technical-definition-of-the-solution-to-sde">optional section</a> at the end of each post.</p>
-</section>
-<section id="derivation-of-the-bond-pricing-in-mertons-model" class="level3">
-<h3 class="anchored" data-anchor-id="derivation-of-the-bond-pricing-in-mertons-model">Derivation of the Bond Pricing in Merton’s Model</h3>
-<p>The price of a <span class="math display">\[T\]</span>-year ZCB is given by:</p>
-<p><span class="math display">\[P(t,T) = \exp\left(-(T-t)r_t - \frac{\mu \left(T-t\right)^2}{2} + \frac{\sigma^2\left(T-t\right)^3}{6}\right)\]</span></p>
-<p>We will derive this formula in two different ways. The first is to solve stochastic integral directly, and the second is to “guess” the form of the solution and solve it by matching the bond price formula to the guessed solution. Even though I call the second way the “guessed” solution, it is based on the observation that the Merton model falls in the category of the affine term-structure model, whose prices are all of the form <span class="math display">\[A(t, T)exp(-B(t, T) r_t)\]</span>. This will be covered in later posts.</p>
-<section id="direct-solution" class="level4">
-<h4 class="anchored" data-anchor-id="direct-solution">Direct Solution</h4>
+<h3 data-number="4.4" id="derivation-of-the-bond-pricing-in-mertons-model" class="anchored"><span class="header-section-number">4.4</span> Derivation of the Bond Pricing in Merton’s Model</h3>
+<p>The price of a <span class="math inline">T</span>-year ZCB is given by:</p>
+<p><span class="math inline">P(t,T) = \exp\left(-(T-t)r_t - \frac{\mu \left(T-t\right)^2}{2} + \frac{\sigma^2\left(T-t\right)^3}{6}\right)</span></p>
+<p>We will derive this formula in two different ways. The first is to solve stochastic integral directly, and the second is to “guess” the form of the solution and solve it by matching the bond price formula to the guessed solution. Even though I call the second way the “guessed” solution, it is based on the observation that the Merton model falls in the category of the affine term-structure model, whose prices are all of the form <span class="math inline">A(t, T)exp(-B(t, T) r_t)</span>. This will be covered in later posts.</p>
+<h4 data-number="4.4.1" id="direct-solution" class="anchored"><span class="header-section-number">4.4.1</span> Direct Solution</h4>
 <ol type="1">
-<li><p>Start with the general bond pricing equation: <span class="math display">\[P(t,T) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]\]</span> where <span class="math display">\[\mathbb{E}_t^Q\]</span> denotes the expectation under the risk-neutral measure.</p></li>
-<li><p>Since <span class="math display">\[r_t\]</span> follows a Gaussian process, the <span class="math display">\[\int_t^T r_s ds\]</span> is also normally distributed.</p></li>
-<li><p>For a normally distributed variable <span class="math display">\[X\]</span> with mean <span class="math display">\[m\]</span> and variance <span class="math display">\[v\]</span>, we have:</p></li>
+<li><p>Start with the general bond pricing equation: <span class="math inline">P(t,T) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]</span> where <span class="math inline">\mathbb{E}_t^Q</span> denotes the expectation under the risk-neutral measure.</p></li>
+<li><p>Since <span class="math inline">r_t</span> follows a Gaussian process, the <span class="math inline">\int_t^T r_s ds</span> is also normally distributed.</p></li>
+<li><p>For a normally distributed variable <span class="math inline">X</span> with mean <span class="math inline">m</span> and variance <span class="math inline">v</span>, we have:</p></li>
 </ol>
-<p><span class="math display">\[\mathbb{E}\left[\exp\left(-X\right)\right] = \exp\left(-m + \frac{1}{2}v\right)\]</span></p>
+<p><span class="math inline">\mathbb{E}\left[\exp\left(-X\right)\right] = \exp\left(-m + \frac{1}{2}v\right)</span></p>
 <p>If you forget this identity, you can derive it from the definition of expectation.</p>
-<p><span class="math display">\[\mathbb{E}\left[\exp\left(-X\right)\right] = \frac{1}{\sqrt{2\pi v}}\int_{-\infty}^{\infty}\exp\left(-x\right)\exp\left(-\frac{\left(x - m\right)^2}{2v}\right)dx\]</span></p>
+<p><span class="math inline">\mathbb{E}\left[\exp\left(-X\right)\right] = \frac{1}{\sqrt{2\pi v}}\int_{-\infty}^{\infty}\exp\left(-x\right)\exp\left(-\frac{\left(x - m\right)^2}{2v}\right)dx</span></p>
 <p>or you happen to remember the moment-generating function of a normal distribution:</p>
-<p><span class="math display">\[M_X(t) = \mathbb{E}\left[\exp\left(tX\right)\right] = \exp\left(\mu t +\frac{\sigma^2t^2}{2}\right)\]</span></p>
+<p><span class="math inline">M_X(t) = \mathbb{E}\left[\exp\left(tX\right)\right] = \exp\left(\mu t +\frac{\sigma^2t^2}{2}\right)</span></p>
 <ol start="4" type="1">
-<li>Calculate the mean and variance of <span class="math display">\[\int_t^T r_s ds\]</span>, note that</li>
+<li>Calculate the mean and variance of <span class="math inline">\int_t^T r_s ds</span>, note that</li>
 </ol>
-<p><span class="math display">\[\int_t^T r_s ds = \int_t^T r_t ds + \int_t^T \mu\left(s-t\right)ds + \sigma\int_t^T \int_t^s dW_u ds \]</span></p>
+<p>$_t^T r_s ds = _t^T r_t ds + _t^T (s-t)ds + _t^T _t^s dW_u ds $</p>
 <p>The integrals in the last term can be interchanged (why? what condition must be satisfied?), and after integrating all deterministic terms, we have</p>
-<p><span class="math display">\[\int_t^T r_s ds = r_t\left(T-t\right) + \mu\frac{\left(T-t\right)^2}{2} + \sigma\int_t^T \left(s-t\right) dW_s\]</span></p>
+<p><span class="math inline">\int_t^T r_s ds = r_t\left(T-t\right) + \mu\frac{\left(T-t\right)^2}{2} + \sigma\int_t^T \left(s-t\right) dW_s</span></p>
 <p>which has mean and variance of</p>
-<p><span class="math display">\[m = \mathbb{E}_t^Q\left[\int_t^T r_s ds\right] = \left(T-t\right)r_t + \frac{1}{2}\left(T-t\right)^2\mu\]</span></p>
+<p><span class="math inline">m = \mathbb{E}_t^Q\left[\int_t^T r_s ds\right] = \left(T-t\right)r_t + \frac{1}{2}\left(T-t\right)^2\mu</span></p>
 <p>and</p>
-<p><span class="math display">\[v = \text{Var}_t^Q\left[\int_t^T r_s ds\right] = \text{E}_t^Q\left[\int_t^T r_s^2 ds\right] =\frac{1}{3}\left(T-t\right)^3\sigma^2\]</span></p>
+<p><span class="math inline">v = \text{Var}_t^Q\left[\int_t^T r_s ds\right] = \text{E}_t^Q\left[\int_t^T r_s^2 ds\right] =\frac{1}{3}\left(T-t\right)^3\sigma^2</span></p>
 <ol start="5" type="1">
-<li>Apply the formula from step 3: <span class="math display">\[P(t,T) = \exp\left(-(T-t)r_t - \frac{1}{2}(T-t)^2\mu + \frac{1}{6}(T-t)^3\sigma^2\right)\]</span></li>
+<li>Apply the formula from step 3: <span class="math inline">P(t,T) = \exp\left(-(T-t)r_t - \frac{1}{2}(T-t)^2\mu + \frac{1}{6}(T-t)^3\sigma^2\right)</span></li>
 </ol>
-</section>
-<section id="the-guessed-solution" class="level4">
-<h4 class="anchored" data-anchor-id="the-guessed-solution">The Guessed Solution</h4>
+<h4 data-number="4.4.2" id="the-guessed-solution" class="anchored"><span class="header-section-number">4.4.2</span> The Guessed Solution</h4>
 <ol type="1">
 <li>Assume the bond price has the form</li>
 </ol>
-<p><span class="math display">\[P\left(t,T\right) = A\left(t,T\right)exp\left(-B\left(t,T\right)r\right)\]</span></p>
+<p><span class="math inline">P\left(t,T\right) = A\left(t,T\right)exp\left(-B\left(t,T\right)r\right)</span></p>
 <ol start="2" type="1">
-<li>Apply Itô’s lemma to <span class="math display">\[P(t,T)\]</span> (Try!)</li>
+<li>Apply Itô’s lemma to <span class="math inline">P(t,T)</span> (Try!)</li>
 </ol>
-<p><span class="math display">\[\frac{dP}{P} = \left[\frac{\partial A}{\partial t}\frac{1}{A} - \frac{\partial B}{\partial t} r - \mu B + \frac{1}{2} B^2 \sigma^2\right]dt - \sigma B dW_t\]</span></p>
+<p><span class="math display">
+rac{dP}{P} = \left[\frac{\partial A}{\partial t}\frac{1}{A} - \frac{\partial B}{\partial t} r - \mu B + \frac{1}{2} B^2 \sigma^2\right]dt - \sigma B dW_t</span></p>
 <ol start="3" type="1">
-<li>Under the risk-neutral measure, the expected return of the bond <span class="math display">\[dP/P\]</span> is the risk-free rate <span class="math inline">\(r\)</span>; substitute the guessed solution into the equation:</li>
+<li>Under the risk-neutral measure, the expected return of the bond <span class="math inline">dP/P</span> is the risk-free rate <span class="math inline">r</span>; substitute the guessed solution into the equation:</li>
 </ol>
-<p><span class="math display">\[r = \frac{\partial A}{\partial t}\frac{1}{A} - \frac{\partial B}{\partial t} r - \mu B + \frac{1}{2} B^2 \sigma^2\]</span></p>
+<p><span class="math display">r = \frac{\partial A}{\partial t}\frac{1}{A} - \frac{\partial B}{\partial t} r - \mu B + \frac{1}{2} B^2 \sigma^2</span></p>
 <ol start="4" type="1">
-<li>Equate coefficients of <span class="math display">\[r\]</span> and constant terms, we get two equations:</li>
+<li>Equate coefficients of <span class="math inline">r</span> and constant terms, we get two equations:</li>
 </ol>
-<p><span class="math display">\[-\frac{\partial B}{\partial t} = 1\]</span></p>
-<p><span class="math display">\[\frac{\partial A}{\partial t}\frac{1}{A} - \mu B + \frac{1}{2}B^2\sigma^2 = 0\]</span></p>
+<p><span class="math display">-\frac{\partial B}{\partial t} = 1</span></p>
+<p><span class="math display">
+rac{\partial A}{\partial t}\frac{1}{A} - \mu B + \frac{1}{2}B^2\sigma^2 = 0</span></p>
 <ol start="5" type="1">
-<li>Solve for <span class="math display">\[B\left(t,T\right)\]</span></li>
+<li>Solve for <span class="math inline">B\left(t,T\right)</span></li>
 </ol>
-<p>From <span class="math display">\[-\frac{\partial B}{\partial t} = 1\]</span>, we get <span class="math display">\[B\left(t,T\right) = T - t\]</span>. We need the boundary conditions for <span class="math display">\[B\left(T,T\right)\]</span> to arrive at this result. Can you deduce what it is from the assumed bond price formula from point 1 above?</p>
+<p>From <span class="math inline">-\frac{\partial B}{\partial t} = 1</span>, we get <span class="math inline">B\left(t,T\right) = T - t</span>. We need the boundary conditions for <span class="math inline">B\left(T,T\right)</span> to arrive at this result. Can you deduce what it is from the assumed bond price formula from point 1 above?</p>
 <ol start="6" type="1">
-<li>Solve for <span class="math display">\[A\left(t,T\right)\]</span></li>
+<li>Solve for <span class="math inline">A\left(t,T\right)</span></li>
 </ol>
-<p>Substitute <span class="math display">\[B\left(t,T\right)\]</span> into the second equation:</p>
-<p><span class="math display">\[\frac{\partial A}{\partial t}\frac{1}{A} - \mu B + \frac{1}{2}B^2\sigma^2 = 0\]</span></p>
+<p>Substitute <span class="math inline">B\left(t,T\right)</span> into the second equation:</p>
+<p><span class="math inline">\frac{\partial A}{\partial t}\frac{1}{A} - \mu B + \frac{1}{2}B^2\sigma^2 = 0</span></p>
 <p>Solve for the integral, we get</p>
-<p><span class="math display">\[\ln\left(A\left(t,T\right)\right) = -\mu\left(T-t\right)^2/2 + \sigma^2\left(T-t\right)^3/6 + C\]</span></p>
-<p>Where <span class="math display">\[C\]</span> is a constant of integration.</p>
+<p><span class="math inline">\ln\left(A\left(t,T\right)\right) = -\mu\left(T-t\right)^2/2 + \sigma^2\left(T-t\right)^3/6 + C</span></p>
+<p>Where <span class="math inline">C</span> is a constant of integration.</p>
 <ol start="7" type="1">
-<li>Apply the boundary conditionstion <span class="math display">\[P\left(T,T\right) = 1\]</span></li>
+<li>Apply the boundary conditionstion <span class="math inline">P\left(T,T\right) = 1</span></li>
 </ol>
-<p><span class="math display">\[1 = A\left(T,T\right)exp\left(-B\left(T,T\right)r\right) = A\left(T,T\right)\]</span></p>
-<p>Therefore, <span class="math display">\[\ln\left(A\left(T,T\right)\right) = 0 = C\]</span></p>
+<p><span class="math inline">1 = A\left(T,T\right)exp\left(-B\left(T,T\right)r\right) = A\left(T,T\right)</span></p>
+<p>Therefore, <span class="math inline">\ln\left(A\left(T,T\right)\right) = 0 = C</span></p>
 <ol start="8" type="1">
-<li>Write the final expression for <span class="math display">\[A(t,T)\]</span></li>
+<li>Write the final expression for <span class="math inline">A(t,T)</span></li>
 </ol>
-<p><span class="math display">\[A\left(t,T\right) = \exp\left(-\mu\left(T-t\right)^2/2 + \sigma^2\left(T-t\right)^3/6\right)\]</span></p>
+<p><span class="math inline">A\left(t,T\right) = \exp\left(-\mu\left(T-t\right)^2/2 + \sigma^2\left(T-t\right)^3/6\right)</span></p>
 <ol start="9" type="1">
 <li>Apply the formula to the bond price</li>
 </ol>
-<p><span class="math display">\[P\left(t,T\right) = \exp\left(-\mu\left(T-t\right)^2/2 + \sigma^2\left(T-t\right)^3/6 - (T-t)r\right)\]</span></p>
-</section>
-</section>
-<section id="dynamic-of-the-zero-coupon-bond-yield" class="level3">
-<h3 class="anchored" data-anchor-id="dynamic-of-the-zero-coupon-bond-yield">Dynamic of the zero-coupon bond yield</h3>
-<p>For all one-factor affine short-rate models, the risk-neutral dynamic of the zero-coupon bond yield <span class="math display">\[y(t, T)\]</span> can be derived by applying the Itô’s lemma to the zero-coupon bond yield formula. This gives</p>
-<p><span class="math display">\[
+<p>$P(t,T) = (-(T-t)^2/2 + <sup>2(T-t)</sup>3/6 - (T-t)r) $</p>
+<h3 data-number="4.5" id="dynamic-of-the-zero-coupon-bond-yield" class="anchored"><span class="header-section-number">4.5</span> Dynamic of the zero-coupon bond yield</h3>
+<p>For all one-factor affine short-rate models, the risk-neutral dynamic of the zero-coupon bond yield <span class="math inline">y(t, T)</span> can be derived by applying the Itô’s lemma to the zero-coupon bond yield formula. This gives</p>
+<p><span class="math display">
 dy = \frac{\partial y}{\partial t} dt + \frac{\partial y}{\partial r} dr + \frac{1}{2}\frac{\partial^2 y}{\partial r^2} \left(dr\right)^2
-\]</span></p>
+</span></p>
 <p>where</p>
-<p><span class="math display">\[\frac{\partial y}{\partial t} = \frac{1}{T-t}\left(y_t - \frac{dA/dt}{A\left(t, T\right)} + \frac{dB\left(t,T\right)}{dt} r_t\right)\]</span></p>
-<p><span class="math display">\[\frac{\partial y}{\partial r} = \frac{B\left(t, T\right)}{T-t} = 1\]</span></p>
-<p><span class="math display">\[\frac{\partial^2 y}{\partial r^2} = 0\]</span></p>
-<p>The resulting dynamic for <span class="math display">\[y\]</span> is a stochastic process that depends on both <span class="math display">\[y\]</span> and <span class="math display">\[r\]</span> in its diffusion term. Let <span class="math display">\[\tau = T-t\]</span> then</p>
-<p><span class="math display">\[dy = \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\tau\sigma^2\right] dt + \sigma dW_t\]</span></p>
-<p>The drift term can be interpreted as the sum of the annualized carry/rolldown <span class="math display">\[\left(y_t - r_t\right)/\tau\]</span> and the convexity adjustment term <span class="math display">\[\frac{1}{2}\tau\sigma^2\]</span>. The diffusion term is the volatility of the short rate <span class="math display">\[\sigma\]</span>, which is the same regardless of <span class="math display">\[\tau\]</span>. This is inconsistent with empirical observation: the short rates are much more volatile than long rates in general. For short-rate models that include mean-reversion, such as the Vasicek model, tend to have the opposite problem where long-rate volatility is too low. As we will see when we introduce the Vasicek model.</p>
-</section>
-</section>
-<section id="wrapping-up" class="level2">
-<h2 class="anchored" data-anchor-id="wrapping-up">Wrapping Up</h2>
-<p>While simplistic in its assumptions, Merton’s model serves as an excellent starting point for understanding short-rate models in terms of technicality and historical development. It already exhibits some of the key features and limitations of short-rate models. In the <a href="../short-rate-models-2/">next post</a>, we’ll review how to simulate short rates from <span class="math display">\[\mu\]</span> and <span class="math display">\[\sigma\]</span>, as well as how to calibrate Merton’s model to market observed short rates.</p>
-</section>
-<section id="optional-technical-definition-of-the-solution-to-sde" class="level2">
-<h2 class="anchored" data-anchor-id="optional-technical-definition-of-the-solution-to-sde">Optional: Technical Definition of the Solution to SDE</h2>
+<p><span class="math inline">\frac{\partial y}{\partial t} = \frac{1}{T-t}\left(y_t - \frac{dA/dt}{A\left(t, T\right)} + \frac{dB\left(t,T\right)}{dt} r_t\right)</span></p>
+<p><span class="math inline">\frac{\partial y}{\partial r} = \frac{B\left(t, T\right)}{T-t} = 1</span></p>
+<p><span class="math inline">\frac{\partial^2 y}{\partial r^2} = 0</span></p>
+<p>The resulting dynamic for <span class="math inline">y</span> is a stochastic process that depends on both <span class="math inline">y</span> and <span class="math inline">r</span> in its diffusion term. Let <span class="math inline">\tau = T-t</span> then</p>
+<p><span class="math inline">dy = \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\tau\sigma^2\right] dt + \sigma dW_t</span></p>
+<p>The drift term can be interpreted as the sum of the annualized carry/rolldown <span class="math inline">\left(y_t - r_t\right)/\tau</span> and the convexity adjustment term <span class="math inline">\frac{1}{2}\tau\sigma^2</span>. The diffusion term is the volatility of the short rate <span class="math inline">\sigma</span>, which is the same regardless of <span class="math inline">\tau</span>. This is inconsistent with empirical observation: the short rates are much more volatile than long rates in general. For short-rate models that include mean-reversion, such as the Vasicek model, tend to have the opposite problem where long-rate volatility is too low. As we will see when we introduce the Vasicek model.</p>
+<h2 data-number="5" id="wrapping-up" class="anchored"><span class="header-section-number">5</span> Wrapping Up</h2>
+<p>While simplistic in its assumptions, Merton’s model serves as an excellent starting point for understanding short-rate models in terms of technicality and historical development. It already exhibits some of the key features and limitations of short-rate models. In the <a href="../short-rate-models-2/">next post</a>, we’ll review how to simulate short rates from <span class="math inline">\mu</span> and <span class="math inline">\sigma</span>, as well as how to calibrate Merton’s model to market observed short rates.</p>
+<h2 data-number="6" id="optional-technical-definition-of-the-solution-to-sde" class="anchored"><span class="header-section-number">6</span> Optional: Technical Definition of the Solution to SDE</h2>
 <p>This section is adapted from the <a href="https://users.wpi.edu/~zzhang7/apma2811z/lec4.pdf">lecture notes</a></p>
-<p>Let <span class="math display">\[\mu(t, r_t)\]</span> and <span class="math display">\[\sigma(t, r_t)\]</span> be the drift and diffusion terms of the SDE:</p>
-<p><span class="math display">\[dr_t = \mu(t, r_t) dt + \sigma(t, r_t) dW_t, \quad t \in (0, T],\]</span></p>
-<p>The (strong) solution to the SDE is the process <span class="math display">\[r(t)\]</span> that satisfies the integral equation:</p>
+<p>Let <span class="math inline">\mu(t, r_t)</span> and <span class="math inline">\sigma(t, r_t)</span> be the drift and diffusion terms of the SDE:</p>
+<p><span class="math inline">dr_t = \mu(t, r_t) dt + \sigma(t, r_t) dW_t, \quad t \in (0, T],</span></p>
+<p>The (strong) solution to the SDE is the process <span class="math inline">r(t)</span> that satisfies the integral equation:</p>
 <ul>
-<li><span class="math display">\[\mu(t, r_t) \in \mathrm{L}_{ad}\left(\Omega, L^1\left([0, T\right) \right)\]</span></li>
-<li><span class="math display">\[\sigma(t, r_t) \in \mathrm{L}_{ad}\left(\Omega, L^2\left([0, T\right) \right)\]</span></li>
-<li>and <span class="math display">\[r_t\]</span> satisfies the following integral equation</li>
+<li><span class="math inline">\mu(t, r_t) \in \mathrm{L}_{ad}\left(\Omega, L^1\left([0, T\right) \right)</span></li>
+<li><span class="math inline">\sigma(t, r_t) \in \mathrm{L}_{ad}\left(\Omega, L^2\left([0, T\right) \right)</span></li>
+<li>and <span class="math inline">r_t</span> satisfies the following integral equation</li>
 </ul>
-<p><span class="math display">\[r_t = r_0 + \int_0^t \mu(u, r_u) du + \int_0^t \sigma(u, r_u) dW_u\]</span></p>
-<p>A sufficient condition for the existence and uniqueness of the solution is that the coefficients <span class="math display">\[\mu(t, r_t)\]</span> and <span class="math display">\[\sigma(t, r_t)\]</span> are Lipschitz continuous in <span class="math display">\[r_t\]</span> and grow at most linearly in <span class="math display">\[r_t\]</span>, i.e.</p>
+<p><span class="math inline">r_t = r_0 + \int_0^t \mu(u, r_u) du + \int_0^t \sigma(u, r_u) dW_u</span></p>
+<p>A sufficient condition for the existence and uniqueness of the solution is that the coefficients <span class="math inline">\mu(t, r_t)</span> and <span class="math inline">\sigma(t, r_t)</span> are Lipschitz continuous in <span class="math inline">r_t</span> and grow at most linearly in <span class="math inline">r_t</span>, i.e.</p>
 <ul>
-<li>Lipschitz condition: there exists a constant <span class="math display">\[K\]</span> such that for all <span class="math display">\[t \in [0, T]\]</span> and <span class="math display">\[x, y \in \mathbb{R}\]</span>,</li>
+<li>Lipschitz condition: there exists a constant <span class="math inline">K</span> such that for all <span class="math inline">t \in [0, T]</span> and <span class="math inline">x, y \in \mathbb{R}</span>,</li>
 </ul>
-<p><span class="math display">\[|\mu(t, y) - \mu(t, x)| + |\sigma(t, y) - \sigma(t, x)| \leq K|y - x|\]</span></p>
+<p><span class="math inline">|\mu(t, y) - \mu(t, x)| + |\sigma(t, y) - \sigma(t, x)| \leq K|y - x|</span></p>
 <ul>
-<li>Linear growth condition: there exists a constant <span class="math display">\[K\]</span> such that for all <span class="math display">\[t \in [0, T]\]</span> and <span class="math display">\[x \in \mathbb{R}\]</span>,</li>
+<li>Linear growth condition: there exists a constant <span class="math inline">K</span> such that for all <span class="math inline">t \in [0, T]</span> and <span class="math inline">x \in \mathbb{R}</span>,</li>
 </ul>
-<p><span class="math display">\[|\mu(t, x)| + |\sigma(t, x)| \leq K(1 + |x|)\]</span></p>
-<p>We can view these two conditions as ensuring the boundedness of the coefficients. Intuitively, the Lipschitz condition ensures that the coefficients do not change too rapidly as the state variable <span class="math display">\[x\]</span> changes. Given an initial condition <span class="math display">\[r_0\]</span>, there is a well-defined path for the stochastic process r_t.The linear growth condition ensures that the coefficients do not explode to infinity in fitnite time. It also ensures that small changes in the initial condition will not cause large, unstable changes in the behavior of <span class="math display">\[r_t\]</span>. We will see these conditions again in <a href="../short-rate-models-4/">Post 4</a> when we discuss the strong convergence of the Euler-Maruyama discretization.</p>
+<p><span class="math inline">|\mu(t, x)| + |\sigma(t, x)| \leq K(1 + |x|)</span></p>
+<p>We can view these two conditions as ensuring the boundedness of the coefficients. Intuitively, the Lipschitz condition ensures that the coefficients do not change too rapidly as the state variable <span class="math inline">x</span> changes. Given an initial condition <span class="math inline">r_0</span>, there is a well-defined path for the stochastic process r_t.The linear growth condition ensures that the coefficients do not explode to infinity in fitnite time. It also ensures that small changes in the initial condition will not cause large, unstable changes in the behavior of <span class="math inline">r_t</span>. We will see these conditions again in <a href="../short-rate-models-4/">Post 4</a> when we discuss the strong convergence of the Euler-Maruyama discretization.</p>
 
 
-</section>
-
-</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
-    }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
       }
+      return false;
     }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
       }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
       for (const childEl of codeEl.children) {
         if (isCodeAnnotation(childEl)) {
           childEl.remove();
         }
       }
       return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
     });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/steveya\.github\.io");
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
     }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/steveya\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
-    };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
         }
-        return container.innerHTML
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -646,199 +527,161 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
-</div> <!-- /content -->
-<footer class="footer">
-  <div class="nav-footer">
-    <div class="nav-footer-left">
-      &nbsp;
-    </div>   
-    <div class="nav-footer-center">
-<p>© Steve Yang</p>
-</div>
-    <div class="nav-footer-right">
-      &nbsp;
-    </div>
-  </div>
-</footer>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 
 
 

@@ -2,8 +2,7 @@
 layout: post
 title: "Malaria Detection (Part 2: Model Building and Training)"
 date: 2024-06-13
-categories: [Machine Learning]
-tags: [study-notes, machine-learning, data-science, cnn, deep-learning]
+categories: [Study Notes, Machine Learning, Data Science, Cnn, Deep Learning]
 ---
 
 The notebook for this post can be found [here](https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb).

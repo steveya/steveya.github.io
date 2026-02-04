@@ -2,8 +2,7 @@
 layout: post
 title: Signature Methods (Part 2 - Signature and Augmentation)
 date: 2025-12-21
-categories: [Quantitative Finance]
-tags: [study-notes, signature-method, quantitative-finance, machine-learning, research]
+categories: [Study Notes, Signature Method, Quantitative Finance, Machine Learning, Research]
 math: true
 ---
 
@@ -11,77 +10,77 @@ math: true
 
 ## Definition of Signatures
 
-Fix a time window $$t \in [a,b]$$ and choose $$d$$ input timeseries. Collect them into a single multivariate process
+Fix a time window $t \in [a,b]$ and choose $d$ input timeseries. Collect them into a single multivariate process
 
-$$
+$$ 
 X_t = \big(X_t^1, X_t^2, \dots, X_t^d\big), \qquad t\in[a,b],
-$$
+$$ 
 
-where each component $$X^i$$ is a timeseries such as time, log-price or cumulative return, cumulative volume, spread, an alpha signal, etc.
+where each component $X^i$ is a timeseries such as time, log-price or cumulative return, cumulative volume, spread, an alpha signal, etc.
 
 For any ordered index sequence
 
 $$
 (i_1, i_2, \dots, i_k), \qquad i_j \in {1,\dots,d},
-$$
+$$ 
 
-define the corresponding order-$$k$$ signature coordinate as the iterated integral
+define the corresponding order-$k$ signature coordinate as the iterated integral
 
 $$
 S^{i_1,\dots,i_k}(X)_{a,b}
 \int_{a<t_1<\cdots<t_k<b}
 \mathrm{d}X^{i_1}{t_1}\cdots \mathrm{d}X^{i_k}{t_k}.
-$$
+$$ 
 
-The constraint $$a<t_1<\cdots<t_k<b$$ enforces time ordering. Terms such as $$S^{(i,j)}$$ and $$S^{(j,i)}$$ represent different ordered interactions between components $$i$$ and $$j$$ over the window.
+The constraint $a<t_1<\cdots<t_k<b$ enforces time ordering. Terms such as $S^{(i,j)}$ and $S^{(j,i)}$ represent different ordered interactions between components $i$ and $j$ over the window.
 
-If the window is sampled at $$a=t_0<t_1<\cdots<t_N=b$$ and $$\Delta X^i_n = X^i_{t_n}-X^i_{t_{n-1}}$$, then low-order signature terms can be viewed as time-ordered sums of products of increments. In particular,
+If the window is sampled at $a=t_0<t_1<\cdots<t_N=b$ and $\Delta X^i_n = X^i_{t_n}-X^i_{t_{n-1}}$, then low-order signature terms can be viewed as time-ordered sums of products of increments. In particular,
 
-$$
+$$ 
 S^{(i)}(X)_{a,b} \approx \sum_{n=1}^N \Delta X^i_n = X^i_b - X^i_a,
-$$
+$$ 
 
 and
 
-$$
+$$ 
 S^{(i,j)}(X)_{a,b} \approx \sum_{1\le p<q\le N} \Delta X^i_p,\Delta X^j_q.
-$$
+$$ 
 
-The order-1 term is simply the change from $$a$$ to $$b$$:
-- log return from $$a$$ to $$b$$ if $$X^i$$ is log-price
-- total volume between $$a$$ and $$b$$ if $$X^i$$ is cumulative volume
+The order-1 term is simply the change from $a$ to $b$:
+- log return from $a$ to $b$ if $X^i$ is log-price
+- total volume between $a$ and $b$ if $X^i$ is cumulative volume
 - net change in spread, net change in signal, etc.
 
-The order-2 terms are directional: they aggregate “moves in series $$i$$ occurring earlier” times “moves in series $$j$$ occurring later.” 
-- $$S^{(\text{signal},\text{return})}$$ captures whether signal changes early in the window are followed by returns later (a lead–lag-aware relation)
-- $$S^{(\text{spread},\text{volume})}$$ captures whether widening spreads tend to be followed by volume (or vice versa)
+The order-2 terms are directional: they aggregate “moves in series $i$ occurring earlier” times “moves in series $j$ occurring later.” 
+- $S^{(\text{signal},\text{return})}$ captures whether signal changes early in the window are followed by returns later (a lead–lag-aware relation)
+- $S^{(\text{spread},\text{volume})}$ captures whether widening spreads tend to be followed by volume (or vice versa)
 - for multi-asset paths, cross terms encode ordering in co-moves
 
-A useful way to interpret the order-$$k$$ coordinate $$S^{i_1,\dots,i_k}(X)_{a,b}$$ is as a summary of how a particular ordered pattern of moves occurs across the window. In discrete time it behaves like an aggregate of products $$\Delta X^{i_1}{p_1}\cdots\Delta X^{i_k}_{p_k}$$ over all strictly increasing index tuples $$p_1<\cdots<p_k$$. This time-ordering is what makes signatures fundamentally different from symmetric moment features such as the average or standard deviation: changing the order of the indices generally changes the signature.
+A useful way to interpret the order-$k$ coordinate $S^{i_1,\dots,i_k}(X)_{a,b}$ is as a summary of how a particular ordered pattern of moves occurs across the window. In discrete time it behaves like an aggregate of products $\Delta X^{i_1}{p_1}\cdots\Delta X^{i_k}_{p_k}$ over all strictly increasing index tuples $p_1<\cdots<p_k$. This time-ordering is what makes signatures fundamentally different from symmetric moment features such as the average or standard deviation: changing the order of the indices generally changes the signature.
 
-The signature of $$X$$ on $$[a,b]$$ is the collection of all such coordinates across all orders:
+The signature of $X$ on $[a,b]$ is the collection of all such coordinates across all orders:
 
-$$
-S(X)_{a,b} = \big(1,\ S^{(1)}(X)_{a,b},\ S^{(2)}(X)_{a,b},\ \dots\big)
-$$
+$$ 
+S(X)_{a,b} = \big(1,\ S^{(1)}(X)_{a,b},\ S^{(2)}(X)_{a,b},\ \dots\big) 
+$$ 
 
-where $$S^{(k)}(X)_{a,b}$$ denotes the vector of all order-$$k$$ coordinates (all ordered index sequences of length $$k$$).
+where $S^{(k)}(X)_{a,b}$ denotes the vector of all order-$k$ coordinates (all ordered index sequences of length $k$).
 
-In practice we work with the truncated signature up to depth $$m$$:
+In practice we work with the truncated signature up to depth $m$:
 
-$$
+$$ 
 S^{\le m}(X)_{a,b}
-$$
+$$ 
 
-If the path has dimension $$d$$, the number of coordinates up to depth $$m$$ is
+If the path has dimension $d$, the number of coordinates up to depth $m$ is
 
-$$
+$$ 
 1 + d + d^2 + \cdots + d^m = \frac{d^{m+1}-1}{d-1}
-$$
+$$ 
 
-Since this grows quickly, in practice we typically have to control the number of input series $$d$$ and the truncation depth $$m$$, and consider using log-signatures (introduced in a future post) to reduce redundancy.
+Since this grows quickly, in practice we typically have to control the number of input series $d$ and the truncation depth $m$, and consider using log-signatures (introduced in a future post) to reduce redundancy.
 
-From a modeling perspective, the signature provides a structured hierarchy of features: level 1 captures net changes, level 2 captures ordered pairwise interactions, and higher levels capture longer sequencing effects. Truncating at depth $$m$$ then amounts to assuming that most of the relevant path-dependence can be expressed using interaction templates of length at most $$m$$—an assumption that is often reasonable in practice when paired with regularization.
+From a modeling perspective, the signature provides a structured hierarchy of features: level 1 captures net changes, level 2 captures ordered pairwise interactions, and higher levels capture longer sequencing effects. Truncating at depth $m$ then amounts to assuming that most of the relevant path-dependence can be expressed using interaction templates of length at most $m$—an assumption that is often reasonable in practice when paired with regularization.
 
 If we view the signature as a compression of path information, can we recreate simple time-series features with it? Below are two examples that motivate the need for *augmentation*.
 
@@ -89,108 +88,108 @@ If we view the signature as a compression of path information, can we recreate s
 
 A very simple continuous functional is the endpoint:
 
-$$
+$$ 
 F(X) = X_b
-$$
+$$ 
 
 Recall that the level-1 signature of a 1D path is
 
-$$
+$$ 
 S^{(1)}(X)_{a,b}=\int_a^b dX_t = X_b - X_a
-$$
+$$ 
 
-So if the start level $$X_a$$ were fixed (or known), then
+So if the start level $X_a$ were fixed (or known), then
 
-$$
+$$ 
 F(X) = X_a + S^{(1)}(X)_{a,b}
-$$
+$$ 
 
-However, the signature of a path is built from increments along the window, so the absolute level $$X_a$$ is not automatically available unless we anchor the window. A standard way to do this is basepoint augmentation.
+However, the signature of a path is built from increments along the window, so the absolute level $X_a$ is not automatically available unless we anchor the window. A standard way to do this is basepoint augmentation.
 
-Given a windowed path $$X:[a,b]\to\mathbb{R}^d$$, the basepoint augmented path $$\widetilde X$$ is one that starts at a fixed reference point (typically the origin) followed by the original window. Concretely, one common construction is:
-- introduce a short interval $$[a-\delta,a]$$,
-- set $$\widetilde X_{a-\delta}=0$$,
-- connect $$0$$ to $$X_a$$ by a straight line on $$[a-\delta,a]$$,
-- then set $$\widetilde X_t = X_t$$ for $$t\in[a,b]$$.
+Given a windowed path $X:[a,b]\to\mathbb{R}^d$, the basepoint augmented path $\widetilde X$ is one that starts at a fixed reference point (typically the origin) followed by the original window. Concretely, one common construction is:
+- introduce a short interval $[a-\delta,a]$,
+- set $\widetilde X_{a-\delta}=0$,
+- connect $0$ to $X_a$ by a straight line on $[a-\delta,a]$,
+- then set $\widetilde X_t = X_t$ for $t\in[a,b]$.
 
-In discrete time, this corresponds to prepending a basepoint (typically $$0$$) to the series before applying the signature transform.
+In discrete time, this corresponds to prepending a basepoint (typically $0$) to the series before applying the signature transform.
 
 With this anchoring, the level-1 signature of the augmented path becomes
 
-$$
+$$ 
 S^{(1)}(\widetilde X)_{a-\delta,b} = \widetilde X_b - \widetilde X_{a-\delta} = X_b - 0 = X_b
-$$
+$$ 
 
-so the endpoint functional is exactly a linear functional of level-1 signature coordinates (plus, if we keep the constant level-0 term, an optional intercept). In other words, for endpoints the coefficient vector $$\ell$$ simply “selects” the appropriate level-1 coordinate of the basepoint-augmented signature. Here we see that if we do not augment the path with a basepoint, we cannot exactly recover the end-point functional.
+so the endpoint functional is exactly a linear functional of level-1 signature coordinates (plus, if we keep the constant level-0 term, an optional intercept). In other words, for endpoints the coefficient vector $\ell$ simply “selects” the appropriate level-1 coordinate of the basepoint-augmented signature. Here we see that if we do not augment the path with a basepoint, we cannot exactly recover the end-point functional.
 
 ## Example 2: Moving Average
 
-A slightly richer example is the window average of a level process $$x_t$$:
+A slightly richer example is the window average of a level process $x_t$:
 
-$$
+$$ 
 F(X)=\frac{1}{b-a}\int_a^b x_t dt
-$$
+$$ 
 
 To express this with signatures, it is convenient to use time augmentation. Define the 2D path
 
-$$
+$$ 
 X_t = (t, x_t)\in\mathbb{R}^2,\qquad t\in[a,b]
-$$
+$$ 
 
 Integration by parts gives
 
-$$
+$$ 
 \int_a^b x_t dt
 = \big[t x_t\big]_a^b - \int_a^b t dx_t
 = b x_b - a x_a - \int_a^b t dx_t
-$$
+$$ 
 
-Now consider the depth-2 signature coordinate of the time-augmented path corresponding to the ordered pair $$(t,x)$$:
+Now consider the depth-2 signature coordinate of the time-augmented path corresponding to the ordered pair $(t,x)$:
 
-$$
+$$ 
 S^{(t,x)}(X)_{a,b} = \int_{a<u<v<b} dt_u dx_v
-$$
+$$ 
 
-Because $$dt_u$$ integrates to the elapsed time, we can rewrite it as
+Because $dt_u$ integrates to the elapsed time, we can rewrite it as
 
-$$
+$$ 
 S^{(t,x)}(X)_{a,b}
 = \int_a^b \left(\int_{a}^{v} dt_u\right) dx_v
 = \int_a^b (v-a) dx_v
 = \int_a^b (t-a) dx_t
-$$
+$$ 
 
 Using this identity,
 
-$$
+$$ 
 \int_a^b t dx_t
 = a\int_a^b dx_t + \int_a^b (t-a) dx_t
 = a(x_b-x_a) + S^{(t,x)}(X)_{a,b}
-$$
+$$ 
 
 Substitute back into the integration-by-parts formula:
 
-$$
+$$ 
 \int_a^b x_t dt
 = b x_b - a x_a - \Big(a(x_b-x_a) + S^{(t,x)}(X)_{a,b}\Big)
 = (b-a)x_b - S^{(t,x)}(X)_{a,b}
-$$
+$$ 
 
 Therefore the moving average can be written as
 
-$$
+$$ 
 F(X)
 = \frac{1}{b-a}\int_a^b x_t dt
 = x_b - \frac{1}{b-a}S^{(t,x)}(X)_{a,b}
-$$
+$$ 
 
-This shows that the moving average is an affine function of low-order signature terms of the time-augmented path: it uses the endpoint $$x_b$$ (a level-1 quantity, once you account for basepoint anchoring) and the depth-2 coordinate $$S^{(t,x)}$$.
+This shows that the moving average is an affine function of low-order signature terms of the time-augmented path: it uses the endpoint $x_b$ (a level-1 quantity, once you account for basepoint anchoring) and the depth-2 coordinate $S^{(t,x)}$.
 
-If you want the moving average of levels (not just increments), you typically combine basepoint augmentation (to make $$x_b$$ visible relative to a fixed reference) with time augmentation (to expose the time integral through $$S^{(t,x)}$$).
+If you want the moving average of levels (not just increments), you typically combine basepoint augmentation (to make $x_b$ visible relative to a fixed reference) with time augmentation (to expose the time integral through $S^{(t,x)}$).
 
 ## Augmentation
 
-A practical way to use the “universality” result is to treat it as universality relative to our path representation. Start from the statistic or target $$F$$ we care about and ask: what information must the path encode so that $$F$$ is a stable functional of that path? Level-1 signature terms capture net changes of whatever we include (returns, spreads, signals, time). If our target depends on quadratic variation / volatility or second-order cross-products (e.g., $$\sum r^2$$, rolling covariance, beta, correlation), then we should include an augmentation that promotes these increment-level second moments into level-2 signature coordinates. If our target depends on normalization by time or sample count, include an explicit time / event-count component. 
+A practical way to use the “universality” result is to treat it as universality relative to our path representation. Start from the statistic or target $F$ we care about and ask: what information must the path encode so that $F$ is a stable functional of that path? Level-1 signature terms capture net changes of whatever we include (returns, spreads, signals, time). If our target depends on quadratic variation / volatility or second-order cross-products (e.g., $\sum r^2$, rolling covariance, beta, correlation), then we should include an augmentation that promotes these increment-level second moments into level-2 signature coordinates. If our target depends on normalization by time or sample count, include an explicit time / event-count component. 
 
 In practice, we are not trying to recover these statistics from the signature. Rather, knowing what information must be present in the path in order to recover these statistics helps us construct effective path representations. “Augmentation” means adding extra channels or changing the embedding of the raw series into a path so that the signature captures the aspects of the data we need. 
 
@@ -198,15 +197,15 @@ Below we list some augmentations useful in financial applications.
 	
 - **Basepoint Augmentation**. Include an explicit start point so that the representation distinguishes “the same increments but different starting level” when that matters. Operationally, you embed each window as a path starting at a fixed basepoint (often zero) and then follow the observed trajectory. There is an alternative augmentation called invisibility-reset augmentation that also aims to encode level information.
 
-- **Time / Event-Count Augmentation**. Add a monotonically increasing channel $$t$$ (calendar time) or $$n$$ (event count). This stabilizes the representation under irregular sampling and gives the signature direct access to time-weighted effects and integrals. For example, for the 2D path $$X_t=(t,x_t)$$ one can express window averages using low-order signature terms as we have seen above. Time augmentation is a natural choice when your target depends on “average level,” time-in-window normalization, or when the sampling grid itself is informative.
+- **Time / Event-Count Augmentation**. Add a monotonically increasing channel $t$ (calendar time) or $n$ (event count). This stabilizes the representation under irregular sampling and gives the signature direct access to time-weighted effects and integrals. For example, for the 2D path $X_t=(t,x_t)$ one can express window averages using low-order signature terms as we have seen above. Time augmentation is a natural choice when your target depends on “average level,” time-in-window normalization, or when the sampling grid itself is informative.
 
-- **Lead–lag Augmentation**. Replace a stream by a higher-dimensional path that separates the current value from a lagged copy, producing an L-shaped move at each step. The key consequence is that second-order increment quantities become accessible at low depth. For a 1D log-price $$x$$ with returns $$r_n=x_n-x_{n-1}$$ and lead–lag path $$Z=\mathrm{LL}(x)\in\mathbb{R}^2$$, one obtains a depth-2 identity of the form
-$$S^{(1,2)}(Z){0,N}-S^{(2,1)}(Z){0,N}=\sum_{n=1}^N r_n^2,$$
-(up to a sign convention). In the multivariate case, the same construction promotes cross-products $$\sum r^i r^j$$ into depth-2 coordinates, which is why lead–lag is the default augmentation when the target involves volatility, covariance, beta, correlation, or other second-moment objects. We will see an example of this below.
+- **Lead–lag Augmentation**. Replace a stream by a higher-dimensional path that separates the current value from a lagged copy, producing an L-shaped move at each step. The key consequence is that second-order increment quantities become accessible at low depth. For a 1D log-price $x$ with returns $r_n=x_n-x_{n-1}$ and lead–lag path $Z=\mathrm{LL}(x)\in\mathbb{R}^2$, one obtains a depth-2 identity of the form
+$S^{(1,2)}(Z){0,N}-S^{(2,1)}(Z){0,N}=\sum_{n=1}^N r_n^2,$
+(up to a sign convention). In the multivariate case, the same construction promotes cross-products $\sum r^i r^j$ into depth-2 coordinates, which is why lead–lag is the default augmentation when the target involves volatility, covariance, beta, correlation, or other second-moment objects. We will see an example of this below.
 
-- **Cumulative Augmentation**: In finance, many raw series arrive as increments (returns, changes in yields, flow shocks). Signatures are defined on paths, so you typically embed increments by forming a cumulative level process $$x_n = x_0 + \sum_{k=1}^n r_k$$. The signature features are iterated integrals of $$dx$$, so making explicit what counts as a level and what counts as an increment clarifies what the low-order terms represent (net change, time-weighted change, ordered interactions, etc.).
+- **Cumulative Augmentation**: In finance, many raw series arrive as increments (returns, changes in yields, flow shocks). Signatures are defined on paths, so you typically embed increments by forming a cumulative level process $x_n = x_0 + \sum_{k=1}^n r_k$. The signature features are iterated integrals of $dx$, so making explicit what counts as a level and what counts as an increment clarifies what the low-order terms represent (net change, time-weighted change, ordered interactions, etc.).
 
-- **Multiple Channels**: Adding channels is not just “more predictors.” It sets the interaction vocabulary the signature can express. For example, if we include $$x$$ (log-price), $$v$$ (volume), $$s$$ (spread), and a macro surprise index $$m$$ as channels, then depth-2 signature coordinates correspond to ordered co-movements such as “$$x$$ moves before $$v$$” or “$$m$$ moves before $$x$$,” and depth-3 signature coordinates correspond to three-way sequencing patterns. This is the mechanism by which signatures can replace hand-coded interaction features.
+- **Multiple Channels**: Adding channels is not just “more predictors.” It sets the interaction vocabulary the signature can express. For example, if we include $x$ (log-price), $v$ (volume), $s$ (spread), and a macro surprise index $m$ as channels, then depth-2 signature coordinates correspond to ordered co-movements such as “$x$ moves before $v$” or “$m$ moves before $x$,” and depth-3 signature coordinates correspond to three-way sequencing patterns. This is the mechanism by which signatures can replace hand-coded interaction features.
 
 Once the path representation contains the information the target depends on via appropriate augmentation, linear functionals of truncated signatures can approximate a broad class of continuous path-dependent maps. Many rolling statistics and economically meaningful targets depend on first and second moments, time normalization, and ordered interactions; augmentations such as time and lead–lag make these ingredients appear in low-order signature coordinates.
 
@@ -214,4 +213,3 @@ Once the path representation contains the information the target depends on via 
 In the next post, we will work through a few more examples of the “universality + augmentation” design pattern. A useful point to keep in mind is that many familiar rolling statistics—-such as the sample mean and sample variance—-ignore time ordering, yet they can still be **represented exactly** (after the right augmentation) as **linear functionals of signatures**. This is not because signatures are “just another way to compute the same statistics,” but because those statistics sit inside a much richer feature algebra.
 
 Once we can reproduce the usual symmetric summaries as low-order special cases, the real value becomes clearer: signatures also encode ordered and asymmetric interaction patterns-—the kinds of effects that standard rolling features struggle to express without extensive hand-crafting.
-

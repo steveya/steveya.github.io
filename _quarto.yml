@@ -7,6 +7,8 @@ website:
   site-url: "https://steveya.github.io"
   description: "Updates on quantitative analysis, data science, and ML education."
   navbar:
+    background: "#FDFCF9"
+    foreground: "#2E2E2E"
     left:
       - text: "Home"
         href: index.qmd
@@ -25,10 +27,17 @@ website:
 
 format:
   html:
-    theme: cosmo
+    theme: none
+    css: styles.css
+    mainfont: '"Charter", "Georgia", serif'  # Wrapped in single quotes
+    fontsize: 1.15rem
+    fontcolor: "#292524"
+    linkcolor: "#8B4513"
+    backgroundcolor: "#FDFCF9"
     toc: true
+    number-sections: true
     code-copy: true
-    mathjax: true
+    html-math-method: katex
 
 execute:
   freeze: auto
