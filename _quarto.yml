@@ -1,0 +1,49 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Steve Yang"
+  site-url: "https://steveya.github.io"
+  description: "Updates on quantitative analysis, data science, and ML education."
+  page-navigation: true
+  navbar:
+    background: "#FDFCF9"
+    foreground: "#2E2E2E"
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Series"
+        href: pages/series.qmd
+      - text: "Projects"
+        href: pages/projects.qmd
+      - text: "Categories"
+        href: pages/categories.qmd
+      - text: "About"
+        href: pages/about.qmd
+  page-footer:
+    center: "© Steve Yang"
+
+format:
+  html:
+    theme: none
+    css: styles.css
+    include-before-body: _includes/nav.html
+    mainfont: '"Charter", "Georgia", serif'  # Wrapped in single quotes
+    fontsize: 1.15rem
+    fontcolor: "#292524"
+    linkcolor: "#8B4513"
+    backgroundcolor: "#FDFCF9"
+    toc: true
+    toc-location: right
+    toc-title: "On this page"
+    number-sections: true
+    code-copy: true
+    code-fold: show
+    anchor-sections: true
+    smooth-scroll: true
+    html-math-method: katex
+
+execute:
+  freeze: auto
+  enabled: false

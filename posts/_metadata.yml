@@ -1,0 +1,11 @@
+format:
+  html:
+    toc: true
+    toc-location: right
+    toc-title: "On this page"
+    code-copy: true
+    code-fold: show
+    anchor-sections: true
+    smooth-scroll: true
+
+bibliography: ../../references.bib

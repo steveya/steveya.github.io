@@ -1,0 +1,34 @@
+---
+title: "Steve Yang"
+listing:
+  contents: posts/*/index.qmd
+  sort: "date desc"
+  type: default
+  sort-ui: false
+  filter-ui: false
+  image-height: 0px 
+  feed: true
+  fields: [date, title, description, categories, reading-time]
+  page-size: 10
+page-layout: full
+title-block-banner: false
+sidebar:
+  title: "Series"
+  style: "floating"
+  position: right
+  contents:
+    - text: "All series"
+      href: pages/series.qmd
+    - text: "Volatility Forecasts"
+      href: posts/volatility-forecasts-1/index.qmd
+    - text: "Signature Methods"
+      href: posts/signature-method-1/index.qmd
+    - text: "Short Rate Models"
+      href: posts/short-rate-models-1/index.qmd
+    - text: "Malaria Detection"
+      href: posts/malaria-detection-1/index.qmd
+    - text: "Mean Reversion Strategy"
+      href: posts/mean-reversion-strategy-1/index.qmd
+---
+
+Welcome to my blog. Here you'll find posts on quantitative finance, data science, and machine learning education.

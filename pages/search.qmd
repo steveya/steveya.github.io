@@ -1,0 +1,75 @@
+---
+title: "Search"
+page-layout: full
+title-block-banner: false
+listing:
+  contents: ../posts/*/index.qmd
+  sort: "date desc"
+  type: default
+  sort-ui: false
+  filter-ui: false
+  image-height: 0px
+  fields: [date, title, description, categories, reading-time]
+  page-size: 20
+---
+
+<input id="post-search" class="post-search" type="search" placeholder="Search posts by title, description, or category…" autocomplete="off" />
+
+```{=html}
+<script>
+  window.document.addEventListener("DOMContentLoaded", function () {
+    const input = window.document.getElementById("post-search");
+    if (!input) return;
+
+    const LISTING_ID = "listing-listing";
+    const SEARCH_COLUMNS = [
+      "listing-title",
+      "listing-description",
+      "listing-categories",
+    ];
+
+    const getList = () => {
+      const listings = window["quarto-listings"] || {};
+      return listings[LISTING_ID];
+    };
+
+    const run = () => {
+      const list = getList();
+      if (!list) return;
+
+      const q = input.value || "";
+      list.search(q, SEARCH_COLUMNS);
+    };
+
+    // Quarto initializes listings on DOMContentLoaded as well; ensure we're
+    // attached even if our handler runs first.
+    const waitForListing = (attemptsLeft = 50) => {
+      if (getList()) {
+        run();
+        return;
+      }
+      if (attemptsLeft <= 0) return;
+      window.setTimeout(() => waitForListing(attemptsLeft - 1), 50);
+    };
+
+    input.addEventListener("input", run);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        input.value = "";
+        run();
+        input.blur();
+      }
+    });
+
+    // If the user arrived with a query param (?q=...), prefill.
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q");
+    if (q) {
+      input.value = q;
+      // Defer running until the listing is definitely available.
+    }
+
+    waitForListing();
+  });
+</script>
+```

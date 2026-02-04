@@ -1,0 +1,18 @@
+---
+title: "Graph Regularization (Preview)"
+date: 2026-02-04
+description: "Notes and experiments inspired by Graph Regularized PCA, and how graph regularization might be applied to financial data." 
+categories: [Quantitative Finance, Machine Learning, Time Series]
+jupyter: python3
+---
+
+The Graph Regularized PCA paper (https://arxiv.org/abs/2601.10199) allows the PCA algorithm to be aware of a dependency graph between data. It is not the first time we work with graph regularization: we had attempted to encode a temporal smoothness constraint using graph regularizer in PCA, but the result did not achieve what we want. Reading this paper now rekindled our interest in this topic, particularly in how this can be applied to financial data. 
+
+
+```{python}
+import pandas as pd
+import numpy as np
+
+from alphaforge import *
+```
+

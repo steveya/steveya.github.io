@@ -1,0 +1,13 @@
+{
+    "name": "steveya-github-io",
+    "private": true,
+    "devDependencies": {
+        "@playwright/test": "^1.50.0"
+    },
+    "scripts": {
+        "build": "quarto render",
+        "test": "playwright test",
+        "test:headed": "playwright test --headed",
+        "serve:docs": "python3 -m http.server 8000 --directory docs"
+    }
+}

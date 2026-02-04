@@ -13,7 +13,6 @@ _site
 
 # NPM dependencies
 node_modules
-package-lock.json
 
 # IDE configurations
 .idea
@@ -27,3 +26,7 @@ assets/js/dist
 .DS_Store
 
 assets/.DS_Store
+
+/.quarto/
+
+**/*.quarto_ipynb
