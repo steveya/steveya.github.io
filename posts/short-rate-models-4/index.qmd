@@ -2,15 +2,6 @@
 title: "Short Rate Models (Part 4: Simulating and Calibrating the Vasicek Model)"
 date: 2024-09-16
 categories: [Quantitative Finance]
-description: >-
-  In our previous post, we introduced the Vasicek model that used the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short
-  rates. We then derived solutions for both the OU process and bond prices. We can now focus on the more practical aspects: simulating the
-  Vasicek model and estimating its parameters from market-observed short rates. Given the extensive study of the OU process in finance and
-  physics literature, we will focus on introducing other essential concepts related to simulating and estimating the Vasicek model. When
-  introducing how we simulate the OU process, we also discuss the convergence of the Euler-Maruyama discretization to the exact
-  discretization. The different discretization is also the distinquishment between the likelihood and the quasi-likelihood function, leading
-  us to the section on parameter estimation using the maximum likelihood methods. We will then demonstrate and discuss the limitation of the
-  maximum likelihood estimator on finite samples. To
 ---
 
 ## Recap

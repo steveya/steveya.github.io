@@ -2,14 +2,6 @@
 title: "Short Rate Models (Part 1: Introducing Merton's Model)"
 date: 2024-05-10
 categories: [Quantitative Finance]
-description: >-
-  Welcome to my refresher series on short-rate models, dear reader! These mathematical marvels are not just academic curiosities but crucial
-  tools in finance. They are among the main workhorses of interest rate modelling, used in the ivory towers of academic research and by the
-  fast-paced world of Wall Street desk quants. This refresher series aims to help you understand, formulate, and solve these models by
-  deriving and implementing well-known and newer models of varying complexity and generality. Code snippets included in this post (and more)
-  can be found in the Github repository. The code library will evolve with the series as we build out more types of models and can exploit the
-  benefits of more abstraction. Despite their seeming simplicity, short-rate models are incredibly versatile for modelling interest rates. The
-  short rate is also known as the instantaneous spot interest rate, at which one can borrow money for an infinitesimally
 ---
 
 ## Introduction

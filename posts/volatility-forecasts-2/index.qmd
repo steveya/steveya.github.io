@@ -2,15 +2,6 @@
 title: "Volatility Forecasts (Part 2 - XGBSTES Algorithm 1)"
 date: 2024-07-18
 categories: [Quantitative Finance]
-description: >-
-  In the previous post, we replicated the Smooth Transition Exponential Smoothing (STES) model from (Taylor 2004) and (Liu, Taylor, Choo
-  2020). In a small replication study on SPY returns, STES delivered modest improvements in out-of-sample RMSE relative to simple Exponential
-  Smoothing (ES). Here, we ask a natural follow-up: if we keep the same feature set (lag returns, lag squared returns, and lag absolute
-  returns), can a more flexible gate improve the forecast further? This post is motivated by (Coulombe 2020), which shows how tree-based
-  models can be used to predict time-varying coefficients in otherwise classical econometric settings. Many traditional models accommodate
-  regimes and nonlinearity via Markov switching, time-varying parameters, or thresholds; Coulombe’s key point is that decision trees can often
-  approximate these regime mappings directly. The paper considers a regression of the form: where is the customized random forest that maps
-  the features to the coefficients . The customized tree
 ---
 
 (Code snippets for this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/blob/main/examples/volatility_forecast_2.py).)

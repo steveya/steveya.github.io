@@ -9,7 +9,6 @@ listing:
   image-height: 0px 
   feed: true
   fields: [date, title, description, categories, reading-time]
-  max-description-length: 150
 page-layout: full
 title-block-banner: false
 sidebar:

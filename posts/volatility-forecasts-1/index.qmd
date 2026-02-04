@@ -2,8 +2,6 @@
 title: "Volatility Forecasts (Part 1 - STES Model)"
 date: 2021-09-07
 categories: [Quantitative Finance]
-description: >-
-  20260113: This post is updated with more mathematical analysis (The code for this post can be found in the Github repository.)
 ---
 
 #### Updates

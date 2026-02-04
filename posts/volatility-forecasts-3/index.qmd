@@ -2,14 +2,6 @@
 title: "Volatility Forecasts (Part 3 - XGBSTES Algorithm 2)"
 date: 2026-01-24
 categories: [Quantitative Finance]
-description: >-
-  In the previous post, we extended the Smooth Transition Exponential Smoothing (STES) model from (Taylor 2004) and (Liu, Taylor, Choo 2020)
-  by replacing the linear model in STES with a XGBoost model. We saw that the XGBoost model has lower MAE and MedAE scores, but generally
-  underperform STES in terms of RMSE. We did not however find out the true cause of this. In this post, we drill down into the cause of this,
-  and propose a different fitting algorithm. Recall that the XGBSTES model is formulated as We fit the model by minimizing mean squared error
-  (MSE) between the forecasted variance and realized squared returns. For each time step , the forecasted variance is a weighted combination
-  of the previous period’s squared return and the previous forecast . The weight is produced by an XGBoost model applied to the transition
-  variable and passed through a sigmoid so it lies
 ---
 
 (Code snippets for this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/blob/main/examples/volatility_forecast_2.py).)
