@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2025-12-21">
+<meta name="description" content="Previously I provided some motivations for the use of signatures.">
 
 <title>Signature Methods (Part 2 - Signature and Augmentation) – Steve Yang</title>
 <style>
@@ -33,8 +34,24 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
-  </head><body>true
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -64,10 +81,20 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../../styles.css">
+</head>
 
+<body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
 
-
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Signature Methods (Part 2 - Signature and Augmentation)</h1>
@@ -213,7 +240,6 @@ F(X)
 <h2 data-number="5" id="whats-next" class="anchored"><span class="header-section-number">5</span> What’s Next</h2>
 <p>In the next post, we will work through a few more examples of the “universality + augmentation” design pattern. A useful point to keep in mind is that many familiar rolling statistics—-such as the sample mean and sample variance—-ignore time ordering, yet they can still be <strong>represented exactly</strong> (after the right augmentation) as <strong>linear functionals of signatures</strong>. This is not because signatures are “just another way to compute the same statistics,” but because those statistics sit inside a much richer feature algebra.</p>
 <p>Once we can reproduce the usual symmetric summaries as low-order special cases, the real value becomes clearer: signatures also encode ordered and asymmetric interaction patterns-—the kinds of effects that standard rolling features struggle to express without extensive hand-crafting.</p>
-
 
 
 <script id="quarto-html-after-body" type="application/javascript">
@@ -624,4 +650,5 @@ F(X)
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

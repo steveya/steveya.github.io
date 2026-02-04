@@ -1,5 +1,25 @@
 [
   {
+    "listing": "/pages/search.html",
+    "items": [
+      "/posts/volatility-forecasts-3/index.html",
+      "/posts/signature-method-3/index.html",
+      "/posts/signature-method-2/index.html",
+      "/posts/signature-method-1/index.html",
+      "/posts/short-rate-models-4/index.html",
+      "/posts/malaria-detection-4/index.html",
+      "/posts/short-rate-models-3/index.html",
+      "/posts/volatility-forecasts-2/index.html",
+      "/posts/malaria-detection-3/index.html",
+      "/posts/malaria-detection-2/index.html",
+      "/posts/malaria-detection-1/index.html",
+      "/posts/short-rate-models-2/index.html",
+      "/posts/short-rate-models-1/index.html",
+      "/posts/mean-reversion-strategy-1/index.html",
+      "/posts/volatility-forecasts-1/index.html"
+    ]
+  },
+  {
     "listing": "/index.html",
     "items": [
       "/posts/volatility-forecasts-3/index.html",

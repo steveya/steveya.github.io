@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2024-08-10">
+<meta name="description" content="We continue our refresher series on the short-rate models. In the previous post, I introduced the Merton model and the Euler-Maruyama method to simulate it.">
 
 <title>Short Rate Models (Part 3: Introducing Vasicek Model) – Steve Yang</title>
 <style>
@@ -33,6 +34,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -83,6 +85,16 @@ window.Quarto = {
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Short Rate Models (Part 3: Introducing Vasicek Model)</h1>
@@ -94,46 +106,40 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#table-of-contents" id="toc-table-of-contents"><span class="header-section-number">1</span> Table of Contents</a></li>
-  <li><a href="#vasicek-model" id="toc-vasicek-model"><span class="header-section-number">2</span> Vasicek Model</a>
+  <li><a href="#vasicek-model" id="toc-vasicek-model"><span class="header-section-number">1</span> Vasicek Model</a>
   <ul>
-  <li><a href="#model-specification" id="toc-model-specification"><span class="header-section-number">2.1</span> Model Specification</a></li>
-  <li><a href="#key-concepts" id="toc-key-concepts"><span class="header-section-number">2.2</span> Key Concepts</a></li>
-  <li><a href="#bond-pricing-in-vasiceks-model" id="toc-bond-pricing-in-vasiceks-model"><span class="header-section-number">2.3</span> Bond Pricing in Vasicek’s Model</a></li>
-  <li><a href="#dynamic-of-the-zero-coupon-bond-yield" id="toc-dynamic-of-the-zero-coupon-bond-yield"><span class="header-section-number">2.4</span> Dynamic of the zero-coupon bond yield</a></li>
+  <li><a href="#model-specification" id="toc-model-specification"><span class="header-section-number">1.1</span> Model Specification</a></li>
+  <li><a href="#key-concepts" id="toc-key-concepts"><span class="header-section-number">1.2</span> Key Concepts</a></li>
+  <li><a href="#bond-pricing-in-vasiceks-model" id="toc-bond-pricing-in-vasiceks-model"><span class="header-section-number">1.3</span> Bond Pricing in Vasicek’s Model</a></li>
+  <li><a href="#dynamic-of-the-zero-coupon-bond-yield" id="toc-dynamic-of-the-zero-coupon-bond-yield"><span class="header-section-number">1.4</span> Dynamic of the zero-coupon bond yield</a></li>
   </ul></li>
-  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">3</span> Wrapping Up</a></li>
+  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">2</span> Wrapping Up</a></li>
   </ul>
 </nav>
-<h2 data-number="1" id="table-of-contents" class="anchored"><span class="header-section-number">1</span> Table of Contents</h2>
-<ol type="1">
-<li><a href="#vasicek-model">Vasicek Model</a></li>
-<li><a href="#wrapping-up">Wrapping Up</a></li>
-</ol>
-<h2 data-number="2" id="vasicek-model" class="anchored"><span class="header-section-number">2</span> Vasicek Model</h2>
+<h2 data-number="1" id="vasicek-model" class="anchored"><span class="header-section-number">1</span> Vasicek Model</h2>
 <p>We continue our refresher series on the <strong>short-rate models</strong>. In the <a href="../short-rate-models-2/">previous post</a>, I introduced the Merton model and the Euler-Maruyama method to simulate it. Now we are ready to tackle slightly more complicated models! This post will discuss the Vasicek model, one of the earliest and most influential term structure models. It may seem like a small step from the Merton model, but the Vasicek model forms the backbone of many of the later extensions of the short-rate models.</p>
 <p>Introduced by Oldrich Vasicek in 1977, the Vasicek model relaxes the restriction on the short-rate process by letting it follow a mean-reverting Ornstein-Uhlenbeck process. This assumption ensures that the short rate does not go unbounded as in the Merton model and allows for an attachment of economic ideas such as the long-term equilibrium short rate. Because of this, many of the later extensions of the short-rate models are extensions to the Vasicek model.</p>
-<h3 data-number="2.1" id="model-specification" class="anchored"><span class="header-section-number">2.1</span> Model Specification</h3>
+<h3 data-number="1.1" id="model-specification" class="anchored"><span class="header-section-number">1.1</span> Model Specification</h3>
 <p>The following stochastic differential equation defines the Vasicek model:</p>
 <p><span class="math inline">dr_t = \kappa(\theta - r_t)dt + \sigma dW_t</span></p>
 <p>Where: - <span class="math inline">r_t</span>: short-term interest rate at time <span class="math inline">t</span> - <span class="math inline">\kappa</span>: speed of mean reversion - <span class="math inline">\theta</span>: long-term mean level - <span class="math inline">\sigma</span>: volatility - <span class="math inline">W_t</span>: Wiener process (standard Brownian motion)</p>
-<h3 data-number="2.2" id="key-concepts" class="anchored"><span class="header-section-number">2.2</span> Key Concepts</h3>
-<h4 data-number="2.2.1" id="mean-reversion-to-fixed-long-term-equilibrium" class="anchored"><span class="header-section-number">2.2.1</span> Mean Reversion to Fixed Long-Term Equilibrium</h4>
+<h3 data-number="1.2" id="key-concepts" class="anchored"><span class="header-section-number">1.2</span> Key Concepts</h3>
+<h4 data-number="1.2.1" id="mean-reversion-to-fixed-long-term-equilibrium" class="anchored"><span class="header-section-number">1.2.1</span> Mean Reversion to Fixed Long-Term Equilibrium</h4>
 <p>Mean reversion is the tendency of a process to “pull back” towards its long-term average. In the context of interest rates, this reflects the economic intuition that the short rates tend to fluctuate around a long-term equilibrium level. This level is a constant <span class="math inline">\theta</span> in the Vasicek model. In later posts, when we introduce several extensions of the short-rate models, one of them will relax this assumption and allow the long-term equilibrium level to be a mean-reverting process itself.</p>
 <p>The speed of mean reversion <span class="math inline">\kappa</span> is a critical parameter in the Vasicek model. It controls the speed of mean-reversion and influences the volatility of the short rate on top of the <span class="math inline">\sigma</span> parameter. The higher the <span class="math inline">\kappa</span>, the faster the mean-reversion speed, and the lower the volatility of the short rate, and vice versa.</p>
-<h4 data-number="2.2.2" id="ornstein-uhlenbeck-process" class="anchored"><span class="header-section-number">2.2.2</span> Ornstein-Uhlenbeck Process</h4>
+<h4 data-number="1.2.2" id="ornstein-uhlenbeck-process" class="anchored"><span class="header-section-number">1.2.2</span> Ornstein-Uhlenbeck Process</h4>
 <p>The model assumes that the short rate follows an Ornstein-Uhlenbeck process, a well-established method for representing mean-reverting behaviour. This modelling choice is more consistent with empirical results. Like the Merton model, the short rate can still go negative, and the volatility is still independent of the short rate’s level.</p>
-<h4 data-number="2.2.3" id="equilibrium-short-rate-model" class="anchored"><span class="header-section-number">2.2.3</span> Equilibrium Short-Rate Model</h4>
+<h4 data-number="1.2.3" id="equilibrium-short-rate-model" class="anchored"><span class="header-section-number">1.2.3</span> Equilibrium Short-Rate Model</h4>
 <p>Like the Merton model, the Vasicek model also belongs to a subclass of the short-rate model called the <em>Equilibrium short-rate model</em>. The Arbitrage-Free counterpart to the Vasicek model is the <strong>Hull-White Model</strong>, which allows <span class="math inline">\theta</span> to be deterministically time-varying.</p>
-<h3 data-number="2.3" id="bond-pricing-in-vasiceks-model" class="anchored"><span class="header-section-number">2.3</span> Bond Pricing in Vasicek’s Model</h3>
+<h3 data-number="1.3" id="bond-pricing-in-vasiceks-model" class="anchored"><span class="header-section-number">1.3</span> Bond Pricing in Vasicek’s Model</h3>
 <p>Similar to the Merton model, we can derive the price of a zero-coupon bond in two different ways that closely follow those derivations for the Merton model. We derive the solution using the “direct” method again below. (Warning: tedious algebra ahead!) The “guessed” solution is left as an exercise. However, in a future post, we will go over the “guessed” solution in more generality, where I will use it to solve a multi-factor short-rate model.</p>
-<h4 data-number="2.3.1" id="direct-solution" class="anchored"><span class="header-section-number">2.3.1</span> Direct Solution</h4>
+<h4 data-number="1.3.1" id="direct-solution" class="anchored"><span class="header-section-number">1.3.1</span> Direct Solution</h4>
 <ol type="1">
-<li><p>Start with the general bond pricing equation: <span class="math inline">P(t,T) = \mathbb{E}_t^Q\[\exp\left(-\int_t^T r_s ds\right)\]</span> where <span class="math inline">\mathbb{E}_t^Q</span> denotes the expectation under the risk-neutral measure.</p></li>
+<li><p>Start with the general bond pricing equation: <span class="math inline">P(t,T) = \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right]</span> where <span class="math inline">\mathbb{E}_t^Q</span> denotes the expectation under the risk-neutral measure.</p></li>
 <li><p>Since <span class="math inline">r_t</span> follows a Gaussian process, the <span class="math inline">\int_t^T r_s ds</span> is also normally distributed.</p></li>
 <li><p>For a normally distributed variable <span class="math inline">X</span> with mean <span class="math inline">m</span> and variance <span class="math inline">v</span>, we have:</p></li>
 </ol>
-<p><span class="math inline">\mathbb{E}\[\exp\left(-X\right)\] = \exp\left(-m + \frac{1}{2}v\right)</span></p>
+<p><span class="math inline">\mathbb{E}\left[\exp\left(-X\right)\right] = \exp\left(-m + \frac{1}{2}v\right)</span></p>
 <ol start="4" type="1">
 <li>Calculate the mean and variance of <span class="math inline">\int_t^T r_s ds</span>. Recall that in the derivation of the Merton model, we first derive an expression for <span class="math inline">r_s</span> for $ s t$. To get this expression for the Vasicek model, we first multiply out the drift term:</li>
 </ol>
@@ -144,7 +150,7 @@ window.Quarto = {
 r_s = r_t e^{-\kappa \left(s-t\right)} + \theta \left(1 - e^{-\kappa\left(s-t\right)}\right) + \sigma \int_t^s e^{-\kappa \left(u-t\right)} dW_u
 \end{equation}
 </span></p>
-<p>Now to get <span class="math inline">\mathbb{E}_t^Q\[\int_t^T r_s ds\right]</span> and <span class="math inline">\text{Var}_t^Q\[\int_t^T r_s ds\right]</span>, we need to again integrate <span class="math inline">\int_t^T r_s ds</span>, which turns out to be</p>
+<p>Now to get <span class="math inline">\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]</span> and <span class="math inline">\text{Var}_t^Q\left[\int_t^T r_s ds\right]</span>, we need to again integrate <span class="math inline">\int_t^T r_s ds</span>, which turns out to be</p>
 <p><span class="math display">
 \begin{equation}
 \begin{aligned}
@@ -154,29 +160,29 @@ r_s = r_t e^{-\kappa \left(s-t\right)} + \theta \left(1 - e^{-\kappa\left(s-t\ri
 \end{aligned}
 \end{equation}
 </span></p>
-<p>We can compute the <span class="math inline">\mathbb{E}_t^Q\[\int_t^T r_s ds\right]</span> and <span class="math inline">\text{Var}_t^Q\[\int_t^T r_s ds\right]</span> by taking the expectation of the drift and diffusion terms, respectively:</p>
+<p>We can compute the <span class="math inline">\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]</span> and <span class="math inline">\text{Var}_t^Q\left[\int_t^T r_s ds\right]</span> by taking the expectation of the drift and diffusion terms, respectively:</p>
 <p><span class="math display">
 \begin{equation}
 \begin{aligned}
-\mathbb{E}_t^Q\[\int_t^T r_s ds\] &amp;= r_t \left(\frac{1 - e^{-\kappa\left(T-t\right)}}{\kappa}\right) + \theta \left(\left(T-t\right) - \frac{1 - e^{-\kappa\left(T-t\right)}}{\kappa}\right) \\
-\text{Var}_t^Q\[\int_t^T r_s ds\] &amp;= \text{Var}\[\frac{\sigma}{\kappa}\int_t^T\left(1-e^{-\kappa\left(T-u\right)}\right)dW_u\] \\
-&amp;=\frac{\sigma^2}{\kappa^2}\int_t^T\left(1-e^{-\kappa\left(T-u\right)}\right)^2du \quad \text{(by Itô's Isometry)}\\
+\mathbb{E}_t^Q\left[\int_t^T r_s ds\right] &amp;= r_t \left(\frac{1 - e^{-\kappa\left(T-t\right)}}{\kappa}\right) + \theta \left(\left(T-t\right) - \frac{1 - e^{-\kappa\left(T-t\right)}}{\kappa}\right) \\
+\text{Var}_t^Q\left[\int_t^T r_s ds\right] &amp;= \text{Var}\left[\frac{\sigma}{\kappa}\int_t^T\left(1-e^{-\kappa\left(T-u\right)}\right)dW_u\right] \\
+&amp;=\frac{\sigma^2}{\kappa^2}\int_t^T\left(1-e^{-\kappa\left(T-u\right)}\right)^2du \quad \text{(by Itô's Isometry)} \\
 &amp;= \frac{\sigma^2}{\kappa^2}\int_t^T\left[1 + e^{-2\kappa\left(T-u\right)} - 2e^{-\kappa\left(T-u\right)}\right]du \\
-&amp;= \frac{\sigma^2\left(T-t\right)}{\kappa^2} + \frac{\sigma^2}{2\kappa^3}\[1-e^{-2\kappa\left(T-u\right)}\] - \frac{2\sigma^2}{\kappa^3}\[1 - e^{-\kappa\left(T-u\right)}\] \\
+&amp;= \frac{\sigma^2\left(T-t\right)}{\kappa^2} + \frac{\sigma^2}{2\kappa^3}\left[1-e^{-2\kappa\left(T-u\right)}\right] - \frac{2\sigma^2}{\kappa^3}\left[1 - e^{-\kappa\left(T-u\right)}\right] \\
 &amp;= \frac{\sigma^2}{2\kappa^3}\left(2\kappa\left(T-t\right) - 3 - e^{2\kappa\left(T-t\right)} + 4e^{-2\kappa\left(T-t\right)}\right) \\
 \end{aligned}
 \end{equation}
 </span></p>
 <ol start="5" type="1">
-<li>Substitute the expression for <span class="math inline">\mathbb{E}_t^Q\[\int_t^T r_s ds\right]</span> and <span class="math inline">\text{Var}_t^Q\[\int_t^T r_s ds\right]</span> into the bond price formula, and let <span class="math inline">\tau = T-t</span>, and after some tedious algebra, we get</li>
+<li>Substitute the expression for <span class="math inline">\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]</span> and <span class="math inline">\text{Var}_t^Q\left[\int_t^T r_s ds\right]</span> into the bond price formula, and let <span class="math inline">\tau = T-t</span>, and after some tedious algebra, we get</li>
 </ol>
 <p><span class="math display">
 \begin{equation}
 \begin{aligned}
-P(t,T) &amp;= \mathbb{E}_t^Q\[\exp\left(-\int_t^T r_s ds\right)\] \\
-&amp;= \exp\left[-\mathbb{E}_t^Q\[\int_t^T r_s ds\]+\frac{1}{2}\text{Var}_t^Q\[\int_t^T r_s ds\]\right] \\
-&amp;= \exp\left[-r_t \left(\frac{1 - e^{-\kappa\tau}}{\kappa}\right) - \theta \left(\tau - \frac{1 - e^{-\kappa\tau}}{\kappa}\right)+ \frac{\sigma^2}{4\kappa^3}\left(2\kappa\tau - 3 - e^{2\kappa\tau} + 4e^{-2\kappa\tau}\right)\]\\
-&amp;= \exp\left[-r_t \left(\frac{1 - e^{-\kappa\tau}}{\kappa}\right) + \left(\theta -\frac{\sigma^2}{\kappa^2}\right)\left[\frac{1-e^{-\kappa\tau}}{\kappa}-\tau\] - \frac{\sigma^2}{4\kappa}\left[\frac{1 - e^{-\kappa\tau}}{\kappa}\right]^2\]\\
+P(t,T) &amp;= \mathbb{E}_t^Q\left[\exp\left(-\int_t^T r_s ds\right)\right] \\
+&amp;= \exp\left[-\mathbb{E}_t^Q\left[\int_t^T r_s ds\right]+\frac{1}{2}\text{Var}_t^Q\left[\int_t^T r_s ds\right]\right] \\
+&amp;= \exp\left[-r_t \left(\frac{1 - e^{-\kappa\tau}}{\kappa}\right) - \theta \left(\tau - \frac{1 - e^{-\kappa\tau}}{\kappa}\right)+ \frac{\sigma^2}{4\kappa^3}\left(2\kappa\tau - 3 - e^{2\kappa\tau} + 4e^{-2\kappa\tau}\right)\right]\\
+&amp;= \exp\left[-r_t \left(\frac{1 - e^{-\kappa\tau}}{\kappa}\right) + \left(\theta -\frac{\sigma^2}{\kappa^2}\right)\left[\frac{1-e^{-\kappa\tau}}{\kappa}-\tau\right] - \frac{\sigma^2}{4\kappa}\left[\frac{1 - e^{-\kappa\tau}}{\kappa}\right]^2\right]\\
 \end{aligned}
 \end{equation}
 </span></p>
@@ -184,9 +190,9 @@ P(t,T) &amp;= \mathbb{E}_t^Q\[\exp\left(-\int_t^T r_s ds\right)\] \\
 <p><span class="math display">
 \begin{equation}
 \begin{aligned}
-\mathbb{E}_t^Q\[r_s \vert r_t\] &amp;=r_t e^{-\kappa \left(s-t\right)} + \theta \left(1 - e^{-\kappa\left(s-t\right)}\right) \\
-\text{Var}_t^Q\[r_s \vert r_t\] &amp;= \text{Var}\[\sigma \int_t^s e^{-\kappa \left(u-t\right)} dW_u\] \\
-&amp;= \sigma^2 \int_t^s e^{-2\kappa \left(u-t\right)} du \quad \text{(by Itô's Isometry)}\\
+\mathbb{E}_t^Q\left[r_s \vert r_t\right] &amp;=r_t e^{-\kappa \left(s-t\right)} + \theta \left(1 - e^{-\kappa\left(s-t\right)}\right) \\
+\text{Var}_t^Q\left[r_s \vert r_t\right] &amp;= \text{Var}\left[\sigma \int_t^s e^{-\kappa \left(u-t\right)} dW_u\right] \\
+&amp;= \sigma^2 \int_t^s e^{-2\kappa \left(u-t\right)} du \quad \text{(by Itô's Isometry)} \\
 &amp;= \frac{\sigma^2}{2\kappa}\left(1 - e^{-2\kappa\left(s-t\right)}\right)
 \end{aligned}
 \end{equation}
@@ -197,7 +203,7 @@ P(t,T) &amp;= \mathbb{E}_t^Q\[\exp\left(-\int_t^T r_s ds\right)\] \\
 \begin{equation}
 \begin{aligned}
 P(t,T) &amp;= A(t,T)e^{-B(t,T)r_t} \\
-A(t,T) &amp;= \exp\left[\[\left(\theta -\frac{\sigma^2}{\kappa^2}\right)\left[\frac{1-e^{-\kappa\tau}}{\kappa}-\tau\] - \frac{\sigma^2}{4\kappa}\left[\frac{1 - e^{-\kappa\tau}}{\kappa}\right]^2\]\right] \\
+A(t,T) &amp;= \exp\left[\left(\theta -\frac{\sigma^2}{\kappa^2}\right)\left[\frac{1-e^{-\kappa\tau}}{\kappa}-\tau\right] - \frac{\sigma^2}{4\kappa}\left[\frac{1 - e^{-\kappa\tau}}{\kappa}\right]^2\right] \\
 B(t,T) &amp;= \frac{1-e^{-\kappa\tau}}{\kappa}
 \end{aligned}
 \end{equation}
@@ -207,7 +213,7 @@ B(t,T) &amp;= \frac{1-e^{-\kappa\tau}}{\kappa}
 \frac{dA/dt}{A} - r\frac{dB}{dt} - \mu\left(t, r_t\right) = r - \frac{1}{2} B^2\sigma^2
 </span></p>
 <p>where <span class="math inline">\mu\left(t, r_t\right) = \kappa\left(\theta - r_t\right)</span> is the drift term.</p>
-<h3 data-number="2.4" id="dynamic-of-the-zero-coupon-bond-yield" class="anchored"><span class="header-section-number">2.4</span> Dynamic of the zero-coupon bond yield</h3>
+<h3 data-number="1.4" id="dynamic-of-the-zero-coupon-bond-yield" class="anchored"><span class="header-section-number">1.4</span> Dynamic of the zero-coupon bond yield</h3>
 <p>We can similarly derive the dynamic of the zero-coupon bond yield as we did for the Merton model. However, this time, instead of directly applying Itô’s lemma to the bond yield solution for the Vasicek model, we apply it to the more general solution.</p>
 <p><span class="math display">
 y_t = -\frac{\log\left(A\left(t,T\right)\right) - B\left(t,T\right) r_t}{T-t}
@@ -236,15 +242,15 @@ dg(t, r_t) = \left( \frac{\partial g}{\partial t} + \mu(t, r_t) \frac{\partial g
 \begin{equation}
 \begin{aligned}
 dy_t &amp;= \frac{1}{\tau}\left(y_t - \frac{d A\left(t,T\right) / dt}{A(t, T)} + \frac{d B\left(t, T\right)}{dt} r_t + \mu(t, r_t) B(t,T) \right) dt + \frac{\sigma(t, r_t) B(t,T)}{\tau} \, dW_t \\
-&amp;= \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\frac{B^2}{\tau}\sigma^2\] dt + \frac{B}{\tau} \sigma dW_t \\
+&amp;= \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\frac{B^2}{\tau}\sigma^2\right] dt + \frac{B}{\tau} \sigma dW_t \\
 \end{aligned}
 \end{equation}
 </span></p>
 <p>Let us compare this with the <span class="math inline">d_y</span> from the Merton model.</p>
-<p><span class="math inline">dy = \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\tau\sigma^2\] dt + \sigma dW_t</span></p>
+<p><span class="math inline">dy = \left[\frac{y_t - r_t}{\tau} - \frac{1}{2}\tau\sigma^2\right] dt + \sigma dW_t</span></p>
 <p>While the carry/rolldown term <span class="math inline">\left(y_t - r_t\right)/\tau</span> is the same, the convexity adjustment and the diffusion term are different.</p>
 <p>Recall that in the Vasicek model, <span class="math inline">B\left(t, T\right) = \kappa^{-1}\left(1-\exp\left(-\kappa\tau\right)\right)</span>, and as <span class="math inline">\tau</span> increases, <span class="math inline">B</span> tends to the constant <span class="math inline">1 / \kappa</span>. Therefore both <span class="math inline">B^2/\tau</span> and <span class="math inline">B/\tau</span> tend to 0 as <span class="math inline">\tau</span> increases. Therefore, longer rates have diminishing volatility and convexity adjustment, and as the tenor increases, carry/rolldown become the dominant driver of the expected yield change.</p>
-<h2 data-number="3" id="wrapping-up" class="anchored"><span class="header-section-number">3</span> Wrapping Up</h2>
+<h2 data-number="2" id="wrapping-up" class="anchored"><span class="header-section-number">2</span> Wrapping Up</h2>
 <p>The Vasicek model represents a significant leap forward in short-rate modeling by introducing mean-reversion to the drift term. This addition constrains the range of short-rate movements, offering a more realistic portrayal of interest rate behavior compared to the pure random walk of the Merton model.</p>
 <p>However, this features comes with its own set of challenges. The mean-reversion mechanism, while beneficial in many respects, also suppresses the long-rate volatility. This results in a downward-sloping volatility curve that approaches zero as tenor increases—a stark contrast to the Merton model’s constant volatility. In this aspect, neither model accurately captures the volatility patterns observed in real markets.</p>
 <p>A further limitation of the Vasicek model is its assumption of constant short-rate volatility (<span class="math inline">\sigma</span>), independent of the rate level <span class="math inline">r_t</span>. This simplification diverges from empirical evidence, which suggests a more complex relationship between rates and volatility.</p>
@@ -660,4 +666,5 @@ dy_t &amp;= \frac{1}{\tau}\left(y_t - \frac{d A\left(t,T\right) / dt}{A(t, T)} +
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

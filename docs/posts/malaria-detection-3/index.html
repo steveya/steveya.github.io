@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2024-07-17">
+<meta name="description" content="I was honestly amazed by these results. Even the base model achieved 98% accuracy! However, accuracy isn’t everything. Let’s break down what these numbers really mean.">
 
 <title>Malaria Detection (Part 3: Results and Reflections) – Steve Yang</title>
 <style>
@@ -33,6 +34,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -83,6 +85,16 @@ window.Quarto = {
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Malaria Detection (Part 3: Results and Reflections)</h1>
@@ -94,25 +106,15 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#table-of-contents" id="toc-table-of-contents"><span class="header-section-number">1</span> Table of Contents</a></li>
-  <li><a href="#model-performances" id="toc-model-performances"><span class="header-section-number">2</span> Model Performances</a></li>
-  <li><a href="#understanding-the-metrics" id="toc-understanding-the-metrics"><span class="header-section-number">3</span> Understanding the Metrics</a></li>
-  <li><a href="#key-insights-and-lessons-learned" id="toc-key-insights-and-lessons-learned"><span class="header-section-number">4</span> Key Insights and Lessons Learned</a></li>
-  <li><a href="#whats-next" id="toc-whats-next"><span class="header-section-number">5</span> What’s Next?</a></li>
-  <li><a href="#closing-thoughts" id="toc-closing-thoughts"><span class="header-section-number">6</span> Closing Thoughts</a></li>
+  <li><a href="#model-performances" id="toc-model-performances"><span class="header-section-number">1</span> Model Performances</a></li>
+  <li><a href="#understanding-the-metrics" id="toc-understanding-the-metrics"><span class="header-section-number">2</span> Understanding the Metrics</a></li>
+  <li><a href="#key-insights-and-lessons-learned" id="toc-key-insights-and-lessons-learned"><span class="header-section-number">3</span> Key Insights and Lessons Learned</a></li>
+  <li><a href="#whats-next" id="toc-whats-next"><span class="header-section-number">4</span> What’s Next?</a></li>
+  <li><a href="#closing-thoughts" id="toc-closing-thoughts"><span class="header-section-number">5</span> Closing Thoughts</a></li>
   </ul>
 </nav>
 <p>The notebook for this post can be found <a href="https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb">here</a>.</p>
-<h2 data-number="1" id="table-of-contents" class="anchored"><span class="header-section-number">1</span> Table of Contents</h2>
-<ol type="1">
-<li><a href="#model-performances">Model Performances</a></li>
-<li><a href="#understanding-the-metrics">Understanding the Metrics</a></li>
-<li><a href="#key-insights-and-lessons-learned">Key Insights and Lessons Learned</a></li>
-<li><a href="#whats-next">What’s Next?</a></li>
-<li><a href="#closing-thoughts">Closing Thoughts</a></li>
-</ol>
-<p>Welcome back to our journey in building a malaria detection model. If you’ve been following along, you’veseen how I prepared the data and built various models to detect Malaria from cell images. How well did our models perform on a relative basis?</p>
-<h2 data-number="2" id="model-performances" class="anchored"><span class="header-section-number">2</span> Model Performances</h2>
+<h2 data-number="1" id="model-performances" class="anchored"><span class="header-section-number">1</span> Model Performances</h2>
 <p>Here’s a summary of how the different models performed:</p>
 <table class="caption-top" style="width:100%;">
 <colgroup>
@@ -192,7 +194,7 @@ window.Quarto = {
 </table>
 <p>*P/U: Parasitized / Uninfected</p>
 <p>I was honestly amazed by these results. Even the base model achieved 98% accuracy! However, accuracy isn’t everything. Let’s break down what these numbers really mean.</p>
-<h2 data-number="3" id="understanding-the-metrics" class="anchored"><span class="header-section-number">3</span> Understanding the Metrics</h2>
+<h2 data-number="2" id="understanding-the-metrics" class="anchored"><span class="header-section-number">2</span> Understanding the Metrics</h2>
 <ol type="1">
 <li><p><strong>Accuracy</strong>: This is the proportion of correct predictions (both true positives and true negatives) among the total number of cases examined. Mathematically, it’s:</p>
 <p><span class="math inline">\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}</span></p>
@@ -206,7 +208,7 @@ window.Quarto = {
 <p><span class="math inline">F1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}</span></p>
 <p>It gives us a single score that balances both precision and recall.</p></li>
 </ol>
-<h2 data-number="4" id="key-insights-and-lessons-learned" class="anchored"><span class="header-section-number">4</span> Key Insights and Lessons Learned</h2>
+<h2 data-number="3" id="key-insights-and-lessons-learned" class="anchored"><span class="header-section-number">3</span> Key Insights and Lessons Learned</h2>
 <ol type="1">
 <li><p><strong>Deeper isn’t always better</strong>: My deeper models (Model 2 and 3) didn’t significantly outperform the simpler ones. This taught me that complexity is only sometimes the answer.</p></li>
 <li><p><strong>The importance of regularization</strong>: Techniques like Dropout and Batch Normalization helped prevent overfitting, allowing me to train deeper networks without losing generalization. Our base model performed well on the test sample because it is sufficiently regularized.</p></li>
@@ -214,7 +216,7 @@ window.Quarto = {
 <li><p><strong>Data augmentation can help with data diversity </strong>: Once we determine the type of images likely to be misclassified, we can use data augmentation to create more of this kind of data. Model 3 used augmented data to generate images where the parasite was at the edge of the images and was able to outperform other models.</p></li>
 <li><p><strong>Transfer learning isn’t a silver bullet</strong>: Although the VGG16-based model (Model 4) performed well, it still needs to outperform our baseline model. This taught me the importance of understanding my problem rather than relying on off-the-shelf solutions.</p></li>
 </ol>
-<h2 data-number="5" id="whats-next" class="anchored"><span class="header-section-number">5</span> What’s Next?</h2>
+<h2 data-number="4" id="whats-next" class="anchored"><span class="header-section-number">4</span> What’s Next?</h2>
 <p>This project has been an incredible learning experience, but there’s always room for improvement. Here are some ideas I’m considering for future iterations:</p>
 <ol type="1">
 <li><p><strong>Exploring other architectures</strong>: I’m curious about trying out other model architectures like ResNet or DenseNet.</p></li>
@@ -223,7 +225,7 @@ window.Quarto = {
 <li><p><strong>Explainable AI</strong>: Implementing techniques like Grad-CAM to visualize what the model is “looking at” could provide valuable insights.</p></li>
 <li><p><strong>Real-world testing</strong>: While the results on this dataset are promising, testing on a diverse set of real-world images is crucial for practical application.</p></li>
 </ol>
-<h2 data-number="6" id="closing-thoughts" class="anchored"><span class="header-section-number">6</span> Closing Thoughts</h2>
+<h2 data-number="5" id="closing-thoughts" class="anchored"><span class="header-section-number">5</span> Closing Thoughts</h2>
 <p>This journey into deep learning for malaria detection has been challenging and frustrating but ultimately incredibly rewarding. With some Python code and patience, we can create tools that potentially save lives.</p>
 <p>This series has been informative and inspired you to tackle similar problems. Remember, every expert was once a beginner, and the key is to keep learning and experimenting.</p>
 <p>Thanks for joining me on this adventure! I’d love to hear your thoughts, questions, or ideas for future projects. Let’s continue the conversation in the comments below!</p>
@@ -637,4 +639,5 @@ window.Quarto = {
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2025-12-25">
+<meta name="description" content="Continuing from the previous post, we work through three examples of approximating path functionals using linear functionals of truncated signatures in increasingly less practical way to illustrate…">
 
 <title>Signature Methods (Part 3 - Lead–Lag Augmentation and Practical Limitations to the Signature Method) – Steve Yang</title>
 <style>
@@ -33,8 +34,24 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
-  </head><body>true
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -64,10 +81,20 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../../styles.css">
+</head>
 
+<body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
 
-
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Signature Methods (Part 3 - Lead–Lag Augmentation and Practical Limitations to the Signature Method)</h1>
@@ -82,7 +109,7 @@ window.Quarto = {
   <li><a href="#variance-and-standard-deviation-of-increments" id="toc-variance-and-standard-deviation-of-increments"><span class="header-section-number">1</span> Variance and Standard Deviation of Increments</a></li>
   <li><a href="#leadlag-augmentation" id="toc-leadlag-augmentation"><span class="header-section-number">2</span> Lead–Lag Augmentation</a>
   <ul>
-  <li><a href="#expressing-2-as-level-2-signature" id="toc-expressing-2-as-level-2-signature"><span class="header-section-number">2.1</span> Expressing <span class="math inline">^2</span> as Level-2 Signature</a></li>
+  <li><a href="#expressing-r2-as-level-2-signature" id="toc-expressing-r2-as-level-2-signature"><span class="header-section-number">2.1</span> Expressing <span class="math inline">r^2</span> as Level-2 Signature</a></li>
   <li><a href="#the-mean-term-via-repeated-index-level-2-signatures" id="toc-the-mean-term-via-repeated-index-level-2-signatures"><span class="header-section-number">2.2</span> The Mean Term Via Repeated-Index Level-2 Signatures</a></li>
   </ul></li>
   <li><a href="#example-1-sample-variance" id="toc-example-1-sample-variance"><span class="header-section-number">3</span> Example 1: Sample Variance</a></li>
@@ -141,10 +168,10 @@ S^{(1)}(Z)_{0,N} = x_N-x_0
 S^{(2)}(Z)_{0,N} = x_N-x_0
 </span></p>
 <p>but with this convention the antisymmetric level-2 combination <span class="math inline">S^{(1,2)}-S^{(2,1)}</span> yields a sum of increment squares.</p>
-<h3 data-number="2.1" id="expressing-2-as-level-2-signature" class="anchored"><span class="header-section-number">2.1</span> Expressing <span class="math inline">^2</span> as Level-2 Signature</h3>
+<h3 data-number="2.1" id="expressing-r2-as-level-2-signature" class="anchored"><span class="header-section-number">2.1</span> Expressing <span class="math inline">r^2</span> as Level-2 Signature</h3>
 <p>Fix one step <span class="math inline">n</span> and write <span class="math inline">r=r_n=x_n-x_{n-1}</span>. Since signature coordinates depend only on increments, we can translate the step by subtracting <span class="math inline">(x_{n-1},x_{n-1})</span> from each point. The translated step is</p>
 <p><span class="math display">
-(0,0)\to (r,0)\to (r,r)
+(0,0) \to (r,0) \to (r,r)
 </span></p>
 <p>Parametrize this 2D path <span class="math inline">Z=(Z^1,Z^2)</span> over <span class="math inline">[0,2]</span> as</p>
 <p><span class="math display">
@@ -329,7 +356,6 @@ F(X) = \max_{t\in[a,b]} x_t
 <p>This example illustrates a practical limitation. Some widely used time-series features are structurally compatible with low-order signature coordinates after the right augmentation. Other features, such as max, drawdown, or barrier hits, are continuous but extremal and are typically not efficiently represented by low-order truncated signatures. Therefore, signatures should not be viewed as a universal replacement for hand-crafted features. A more accurate mental model is that signatures provide a principled feature hierarchy for ordered interactions, augmentations determine what information is easily accessible at low depth, and for extremal functionals it can be more effective to include the statistic explicitly as a channel rather than relying on high-depth approximation.</p>
 <h2 data-number="6" id="whats-next" class="anchored"><span class="header-section-number">6</span> What’s Next</h2>
 <p>In Part 4 we will apply the signature method to volatility forecasting. I previously wrote a short series on volatility forecasts starting <a href="../volatility-forecasts-1/">here</a>, where I compared a range of models using relatively simple price and return-only features. We will revisit the same setup and evaluation framework, and then ask a focused question: what changes when we replace hand-crafted lag features with truncated signature features computed from a multichannel return path</p>
-
 
 
 <script id="quarto-html-after-body" type="application/javascript">
@@ -740,4 +766,5 @@ F(X) = \max_{t\in[a,b]} x_t
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

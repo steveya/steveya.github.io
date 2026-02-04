@@ -1,9 +1,9 @@
 ---
 title: "Malaria Detection (Part 1: Introduction and Data Preparation)"
 date: 2024-06-12
-categories: [Machine Learning]
+description: "I recently learned more about convolutional neural networks (CNNs) and how they are used to analyze images."
+categories: [Machine Learning, Computer Vision, Deep Learning, Healthcare AI]
 ---
-
 The notebook for this post can be found [here](https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb).
 
 ## Introduction

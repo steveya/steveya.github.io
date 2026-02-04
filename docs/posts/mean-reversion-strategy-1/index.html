@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2022-09-01">
+<meta name="description" content="A value strategy posits that the worth of an asset tends to oscillate around a more gradual, underlying trend.">
 
 <title>Expected Performance of a Mean-Reversion Trading Strategy - Part 1 – Steve Yang</title>
 <style>
@@ -33,6 +34,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -83,6 +85,16 @@ window.Quarto = {
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Expected Performance of a Mean-Reversion Trading Strategy - Part 1</h1>
@@ -96,7 +108,7 @@ window.Quarto = {
   <ul>
   <li><a href="#model" id="toc-model"><span class="header-section-number">1</span> Model</a>
   <ul>
-  <li><a href="#constant-fair-value-labelseccase1" id="toc-constant-fair-value-labelseccase1"><span class="header-section-number">1.1</span> Constant Fair Value <span class="math inline">\label{sec:case1}</span></a></li>
+  <li><a href="#sec-case1" id="toc-sec-case1"><span class="header-section-number">1.1</span> Constant Fair Value</a></li>
   </ul></li>
   <li><a href="#expected-sharpe-ratio" id="toc-expected-sharpe-ratio"><span class="header-section-number">2</span> Expected Sharpe Ratio</a></li>
   <li><a href="#observations" id="toc-observations"><span class="header-section-number">3</span> Observations</a></li>
@@ -107,94 +119,72 @@ window.Quarto = {
 <h1 data-number="1" id="model"><span class="header-section-number">1</span> Model</h1>
 <p>At the core of this model lies the concept of log prices and fair values. Define <span class="math inline">p_t=\log{P_t}</span> as the log price of an asset at time <span class="math inline">t</span> and <span class="math inline">v_t=\log{V_t}</span> the log fair value of the asset at time <span class="math inline">t</span>. The valuation process is key to understanding this model, denoted as <span class="math inline">X_t = p_t - v_t</span>. This process represents the difference between the market price and the fair value in logarithmic terms. When <span class="math inline">X_t&gt;0</span>, it indicates that the market price <span class="math inline">P_t</span> is above the fair value price <span class="math inline">V_t</span> by <span class="math inline">X_t</span>% and conversely, <span class="math inline">X_t&lt;0</span> indicates that the market price <span class="math inline">P_t</span> is below the fair value. A value <span class="math inline">X_t=0</span> signifies that the asset trades at its fair value.</p>
 <p>The dynamics of <span class="math inline">X_t</span> follow an Ornstein-Uhlenbeck process, a well-established method for representing mean-reverting behaviour. In this process, <span class="math inline">X_t</span> reverts towards zero, representing the fair value in our context, with a certain speed of mean reversion <span class="math inline">\theta</span> and a volatility <span class="math inline">\sigma</span>. The initial condition is <span class="math inline">X_0 = 0</span>, which implies that the asset starts at its fair value. Mathematically, this process is described by the stochastic differential equation:</p>
-<p><span class="math display">
-\begin{equation}\label{eq:ou}
+<p><span id="eq-ou"><span class="math display">
 dX_t = -\theta X_t dt + \sigma dW_t
-\end{equation}
-</span></p>
+\tag{1}</span></span></p>
 <p>This equation captures the essence of mean reversion: <span class="math inline">-\theta X_t dt</span> pulls the value back towards the mean, while <span class="math inline">\sigma dW_t</span> adds a random fluctuation, reflecting the inherent asset return volatility.</p>
 <p>To analyze this process further, we utilize a few useful identities. First, we can express <span class="math inline">X_t</span> as normally distributed with a mean of zero and a time-dependent variance.</p>
-<p><span class="math display">
-\begin{equation}
+<p><span id="eq-normal-x"><span class="math display">
 X_t \sim N\left(0, \frac{\sigma^2}{2\theta}\left(1-e^{-2\theta t}\right)\right)
-\end{equation}
-</span></p>
+\tag{2}</span></span></p>
 <p>This distribution reflects how the variance of <span class="math inline">X_t</span> evolves.</p>
 <p>Lastly, for analytical convenience, we introduce <span class="math inline">s_t^2</span>, a scaling factor for the variance of <span class="math inline">X_t</span>. By defining <span class="math inline">s_t^2 = (2\theta)^{-1}(\sigma^2 (1-e^{-2\theta t}) )</span>, we can standardize <span class="math inline">X_t</span> such that</p>
-<p><span class="math display">
-\begin{equation}\label{eq:xdist}
-    \frac{X_t}{s_t^2} \sim N(0, 1)
-\end{equation}
-</span></p>
+<p><span id="eq-xdist"><span class="math display">
+\frac{X_t}{s_t^2} \sim N(0, 1)
+\tag{3}</span></span></p>
 <p>This standardization simplifies further analysis, allowing us to work with a standard normal distribution and facilitating a more straightforward interpretation and application of statistical methods.</p>
-<h2 data-number="1.1" id="constant-fair-value-labelseccase1" class="anchored"><span class="header-section-number">1.1</span> Constant Fair Value <span class="math inline">\label{sec:case1}</span></h2>
+<h2 data-number="1.1" id="sec-case1" class="anchored"><span class="header-section-number">1.1</span> Constant Fair Value</h2>
 <p>In this section, we delve into the implications of assuming a constant fair value for the asset in this model. This assumption simplifies our understanding of the valuation process, <span class="math inline">X_t</span>, and its relationship to the asset’s log price, <span class="math inline">p_t</span>.</p>
 <p>By considering the fair value, <span class="math inline">v_t</span>, as a constant, we essentially equate the change in <span class="math inline">X_t</span> with the instantaneous log return of the asset, <span class="math inline">dp_t</span>. This equivalence leads to an important insight: the log return of the asset, under this assumption, follows a mean-reverting process devoid of any drift component. It is a crucial simplification that allows us to focus on the mean-reverting nature of the asset’s price without the additional complexity of a drifting trend.</p>
 <p>The strategy is continuously rebalanced and aims to exploit this mean reversion. The strategy operates by trading in opposition to the current valuation; specifically, it sells when the asset is overpriced (i.e., when <span class="math inline">X_t&gt;0</span>). The instantaneous profit and loss <span class="math inline">\pi_t</span> at time <span class="math inline">t</span> can be expressed as:</p>
 <p><span class="math display">
-\begin{equation}
-    \pi_t = -X_t dp_t = -X_t dX_t
-\end{equation}
+\pi_t = -X_t dp_t = -X_t dX_t
 </span></p>
 <p>we then examine the cumulative PnL process</p>
-<p><span class="math display">
-\begin{equation}\label{eq:y}
+<p><span id="eq-y"><span class="math display">
 Y_t = \int_{0}^{t} \pi_u du = \int_{0}^{t}-X_u dX_u
-\end{equation}
-</span></p>
+\tag{4}</span></span></p>
 <p>with initial condition <span class="math inline">Y_0=0</span>, we integrate this expression to obtain:</p>
 <p><span class="math display">
-\begin{equation}
 Y_t = -\frac{X_t^2 - \langle X_t \rangle}{2} = \frac{\sigma^2 t -  X_t^2}{2}
-\end{equation}
 </span></p>
-<p>Equation ef{eq:xdist} implies that <span class="math inline">X_t^2 \sim s_t^2 \chi_1^2</span> where <span class="math inline">\chi_1^2</span> is a Chi-squared distribution with <span class="math inline">1</span> degree of freedom. The expectation of <span class="math inline">X_t</span> is <span class="math inline">s_t^2</span>, leading us to the distribution of <span class="math inline">Y_t</span></p>
-<p><span class="math display">
-\begin{equation}\label{eq:ydist}
+<p>Equation <a href="#eq-xdist" class="quarto-xref">Equation&nbsp;3</a> implies that <span class="math inline">X_t^2 \sim s_t^2 \chi_1^2</span> where <span class="math inline">\chi_1^2</span> is a Chi-squared distribution with <span class="math inline">1</span> degree of freedom. The expectation of <span class="math inline">X_t</span> is <span class="math inline">s_t^2</span>, leading us to the distribution of <span class="math inline">Y_t</span></p>
+<p><span id="eq-ydist"><span class="math display">
 Y_t \sim \frac{1}{2}\left(\sigma^2t - s_t^2 \chi_1^2\right)
-\end{equation}
-</span></p>
+\tag{5}</span></span></p>
 <p>with its expected value being <span class="math inline">\mathbb{E}(Y_t)=\left(\sigma^2 t - s_t^2\right)/2</span>.</p>
 <h1 data-number="2" id="expected-sharpe-ratio"><span class="header-section-number">2</span> Expected Sharpe Ratio</h1>
 <p>We now focus on calculating the expected Sharpe ratio of the mean-reversion strategy, a key metric for assessing the performance of any investment strategy. We must understand the first two moments of the annualized Profit and Loss (PnL) process to do this.</p>
 <p>The first moment, or the expected value of the annualized PnL over a time horizon <span class="math inline">t</span>, is derived as follows:</p>
-<p><span class="math display">
-\begin{equation}
-\begin{aligned}\label{eq:exp}
-    \mathbb{E}\left[\frac{1}{t}\int_0^t \pi_u du\right] &amp;\frac{1}{t}\mathbb{E}\left[\int_0^t X_u dX_u\right] \\
-&amp;\frac{1}{t}\mathbb{E}(Y_t) \\
-&amp; = \frac{1}{2}\left(\sigma^2 - \frac{s_t^2}{t}\right)
+<p><span id="eq-exp"><span class="math display">
+\begin{aligned}
+\mathbb{E}\left[\frac{1}{t}\int_0^t \pi_u du\right] &amp;=\frac{1}{t}\mathbb{E}\left[\int_0^t X_u dX_u\right] \\
+&amp;=\frac{1}{t}\mathbb{E}(Y_t) \\
+&amp;= \frac{1}{2}\left(\sigma^2 - \frac{s_t^2}{t}\right)
 \end{aligned}
-\end{equation}
-</span></p>
-<p>This equation represents the average return of the strategy over the period <span class="math inline">t</span>. It balances the constant volatility term <span class="math inline">\\sigma^2</span> with the decreasing impact of <span class="math inline">s_t^2</span> as <span class="math inline">t</span> increases.</p>
+\tag{6}</span></span></p>
+<p>This equation represents the average return of the strategy over the period <span class="math inline">t</span>. It balances the constant volatility term <span class="math inline">\sigma^2</span> with the decreasing impact of <span class="math inline">s_t^2</span> as <span class="math inline">t</span> increases.</p>
 <p>The second non-central moment, or the variance of the annualized PnL, is</p>
-<p><span class="math display">
-\begin{equation}
-\begin{aligned}\label{eq:vol}
-    \mathbb{E}\left[\frac{1}{t}\int_0^t \pi_u^2 du\right]
-&amp; = \frac{1}{t}\mathbb{E}\left[\int_0^t\left(X_u dX_u\right)^2\right] \\
-&amp; = \frac{1}{t}\mathbb{E}\left[\int_0^t\sigma^2X_u^2du\right] \\
-&amp; = \frac{1}{t}\int_0^t \sigma^2\mathbb{E}(X_u^2)du \\
-&amp; = \frac{1}{t}\int_0^t \sigma^2s_u^2 du \\
-&amp; = \frac{1}{t}\frac{\sigma^4}{2\theta}\left(t + \frac{e^{-2\theta t}}{2\theta} - \frac{1}{2 \theta}\right) \\
-&amp; = \frac{\sigma^2}{2\theta}\left(\sigma^2 - \frac{s_t^2}{t}\right)
+<p><span id="eq-vol"><span class="math display">
+\begin{aligned}
+\mathbb{E}\left[\frac{1}{t}\int_0^t \pi_u^2 du\right]
+&amp;= \frac{1}{t}\mathbb{E}\left[\int_0^t\left(X_u dX_u\right)^2\right] \\
+&amp;= \frac{1}{t}\mathbb{E}\left[\int_0^t\sigma^2X_u^2du\right] \\
+&amp;= \frac{1}{t}\int_0^t \sigma^2\mathbb{E}(X_u^2)du \\
+&amp;= \frac{1}{t}\int_0^t \sigma^2s_u^2 du \\
+&amp;= \frac{1}{t}\frac{\sigma^4}{2\theta}\left(t + \frac{e^{-2\theta t}}{2\theta} - \frac{1}{2 \theta}\right) \\
+&amp;= \frac{\sigma^2}{2\theta}\left(\sigma^2 - \frac{s_t^2}{t}\right)
 \end{aligned}
-\end{equation}
-</span></p>
+\tag{7}</span></span></p>
 <p>The Sharpe ratio at horizon <span class="math inline">t</span> is calculated as the ratio between the mean and the standard deviation of the pnl:</p>
-<p><span class="math display">
-\begin{equation}\label{eq:sr}
-    \mathrm{SR}_t = \sqrt{\frac{\theta\left(\sigma^2 - \frac{s_t^2}{t}\right)}{2\sigma^2}}
-\end{equation}
-</span></p>
+<p><span id="eq-sr"><span class="math display">
+\mathrm{SR}_t = \sqrt{\frac{\theta\left(\sigma^2 - \frac{s_t^2}{t}\right)}{2\sigma^2}}
+\tag{8}</span></span></p>
 <p>Taking <span class="math inline">t</span> to infinity yields the asymptotic annualized Sharpe ratio.</p>
-<p><span class="math display">
-\begin{equation}\label{eq:asr}
-    \mathrm{SR} = \lim_{t\rightarrow \infty} \mathrm{SR}_t = \sqrt{\frac{\theta}{2}}
-\end{equation}
-</span></p>
-<p>Figure 1 shows the asymptotic expected Sharpe ratio as a function of the mean reversion speed <span class="math inline">\\theta</span>. We produce the simulation results (shown in orange) by generating 1000 PnL paths of the strategy with <span class="math inline">t=100</span> and <span class="math inline">\\sigma=0.1</span>. Each path is discretized into 252 trading days in a year. Different <span class="math inline">\\sigma</span> values are also tried and yield the same result.</p>
+<p><span id="eq-asr"><span class="math display">
+\mathrm{SR} = \lim_{t\rightarrow \infty} \mathrm{SR}_t = \sqrt{\frac{\theta}{2}}
+\tag{9}</span></span></p>
+<p>Figure 1 shows the asymptotic expected Sharpe ratio as a function of the mean reversion speed <span class="math inline">\theta</span>. We produce the simulation results (shown in orange) by generating 1000 PnL paths of the strategy with <span class="math inline">t=100</span> and <span class="math inline">\sigma=0.1</span>. Each path is discretized into 252 trading days in a year. Different <span class="math inline">\sigma</span> values are also tried and yield the same result.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img src="../../assets/img/post_assets/mean-reversion-strategy/rv_sharp_ratio.png" class="img-fluid"></p>
@@ -202,9 +192,9 @@ Y_t \sim \frac{1}{2}\left(\sigma^2t - s_t^2 \chi_1^2\right)
 </figure>
 </div>
 <h1 data-number="3" id="observations"><span class="header-section-number">3</span> Observations</h1>
-<p>The primary contributor to the expected annualized PnL is the term <span class="math inline">\\sigma^2</span>. This term originates from the quadratic variation <span class="math inline">\\langle X_t \rangle</span>, a critical component in our model that reflects the strategy’s profit from trading effectively in fluctuating markets–buying when prices are lower and selling when they are higher. This aspect of the strategy, encapsulated by the quadratic variation, operates independently of the fair value estimations.</p>
-<p>However, the expected returns are offset by the variance of the valuation gap <span class="math inline">\\mathbb{E}(X_t^2)</span>. This variance plays a dual role: it increases with the asset’s volatility and decreases as the speed of mean-reversion, <span class="math inline">\\theta</span>, increases. This relationship implies that when the volatility is high relative to the speed of mean reversion, the valuation gaps may persist for extended periods, thereby increasing the holding costs of our positions.</p>
-<p>Similarly, the asymptotic Sharpe ratio, a measure of risk-adjusted return, is shown to be directly proportional to the mean reversion speed <span class="math inline">\\theta</span> while remaining unaffected by <span class="math inline">\\sigma</span>. Equation ef{eq:sr} shows that <span class="math inline">\\theta</span> influences the volatility of the strategy’s PnLs. Meanwhile, an increase in mean reversion speed leads to reduced volatility of average PnLs, subsequently enhancing the Sharpe ratio.</p>
+<p>The primary contributor to the expected annualized PnL is the term <span class="math inline">\sigma^2</span>. This term originates from the quadratic variation <span class="math inline">\langle X_t \rangle</span>, a critical component in our model that reflects the strategy’s profit from trading effectively in fluctuating markets–buying when prices are lower and selling when they are higher. This aspect of the strategy, encapsulated by the quadratic variation, operates independently of the fair value estimations.</p>
+<p>However, the expected returns are offset by the variance of the valuation gap <span class="math inline">\mathbb{E}(X_t^2)</span>. This variance plays a dual role: it increases with the asset’s volatility and decreases as the speed of mean-reversion, <span class="math inline">\theta</span>, increases. This relationship implies that when the volatility is high relative to the speed of mean reversion, the valuation gaps may persist for extended periods, thereby increasing the holding costs of our positions.</p>
+<p>Similarly, the asymptotic Sharpe ratio, a measure of risk-adjusted return, is shown to be directly proportional to the mean reversion speed <span class="math inline">\theta</span> while remaining unaffected by <span class="math inline">\sigma</span>. Equation <a href="#eq-sr" class="quarto-xref">Equation&nbsp;8</a> shows that <span class="math inline">\theta</span> influences the volatility of the strategy’s PnLs. Meanwhile, an increase in mean reversion speed leads to reduced volatility of average PnLs, subsequently enhancing the Sharpe ratio.</p>
 <h1 data-number="4" id="further-exploration"><span class="header-section-number">4</span> Further exploration</h1>
 <p>A few more extensions of the model reveal further complexities when we introduce variations. If the unconditional mean is estimated with a constant bias, an intriguing phenomenon emerges: the expected PnL remains stable, but there is a noticeable increase in its variance. This increase is directly influenced by the asset’s volatility and the magnitude of the bias, leading to a consequential decrease in the expected IR of the strategy. Moreover, the model indicates that when the unconditional mean is estimated without bias but possesses a positive (or negative) correlation with the log price, the expected PnL is impacted adversely (or favourably).</p>
 <p>A particularly notable finding from our analysis is the impact of correlation on the trailing estimates of fair value. We demonstrate that a positive correlation can occur with any trailing estimate, presenting a nuanced insight into the behaviour between the fair value and the log price. This aspect of the model underscores the complexity inherent in mean-reversion strategies and highlights the critical importance of accurate parameter estimation in maximizing the efficacy of such investment approaches.</p>
@@ -618,4 +608,5 @@ Y_t \sim \frac{1}{2}\left(\sigma^2t - s_t^2 \chi_1^2\right)
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2024-08-20">
+<meta name="description" content="In the previous post, we built a finetuned VGG16-based model (Model 4) to detect malaria from cell images.">
 
 <title>Malaria Detection (Part 4: Finetuning VGG16 with LoRA) – Steve Yang</title>
 <style>
@@ -68,6 +69,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -118,6 +120,16 @@ window.Quarto = {
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Malaria Detection (Part 4: Finetuning VGG16 with LoRA)</h1>
@@ -162,8 +174,8 @@ W' = W + A B
 \begin{equation}
 \begin{aligned}
 Y &amp;= X \ast (W + \Delta W) + b  \\
-  &amp;= X \ast (W + A \ast B) + b  \\
-  &amp;= X \ast W + X \ast A \ast B + b  \\
+&amp;= X \ast (W + A \ast B) + b  \\
+&amp;= X \ast W + X \ast A \ast B + b  \\
 \end{aligned}
 \end{equation}
 </span></p>
@@ -788,4 +800,5 @@ Y &amp;= X \ast (W + \Delta W) + b  \\
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

@@ -1,0 +1,8 @@
+# Stealth drafts (never publish)
+drafts/
+posts/**/draft.ipynb
+posts/**/_draft.ipynb
+posts/**/.ipynb_checkpoints/
+
+# Local-only artifacts
+.DS_Store

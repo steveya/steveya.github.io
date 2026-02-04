@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2024-07-18">
+<meta name="description" content="In the previous post, we replicated the Smooth Transition Exponential Smoothing (STES) model from (Taylor 2004) and (Liu, Taylor, Choo 2020).">
 
 <title>Volatility Forecasts (Part 2 - XGBSTES Algorithm 1) – Steve Yang</title>
 <style>
@@ -68,6 +69,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -118,6 +120,16 @@ window.Quarto = {
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Volatility Forecasts (Part 2 - XGBSTES Algorithm 1)</h1>
@@ -213,9 +225,9 @@ L=\sum_{t=1}^T\left(y_t-\widehat{\sigma}_t^2\right)^2,\qquad y_t=r_t^2
 L \approx \sum_{t=1}^T \ell_t(y_t,f_{t-1})
 </span></p>
 <p>so each row <span class="math inline">t</span> contributes a gradient and Hessian that depends on <span class="math inline">f_{t-1}</span> locally.</p>
-<p>In <code>STES</code>, the prediction at time <span class="math inline">t-1</span> depends on the entire history of gates:</p>
+<p>In <code>STES</code>, the prediction at time <span class="math inline">t</span>-1$ depends on the entire history of gates:</p>
 <p><span class="math display">
-\widehat{\sigma}_t^2 = g(\alpha_{t-1},\dots,\alpha_1),
+\widehat{\sigma}t^2 = g(\alpha{t-1},\dots,\alpha_1),
 \qquad \alpha_s=\mathrm{expit}(f_s)
 </span></p>
 <p>So the true loss is not row-separable:</p>
@@ -337,11 +349,13 @@ y_t = r_t^2
 </span> with labels <span class="math inline">y_t=r_t^2</span> and per-time loss <span class="math inline">\ell_t=(y_t-\widehat{\sigma}_t^2)^2</span>.</p>
 <ol type="1">
 <li><p><strong>Inputs (for one objective call).</strong> A contiguous training block <span class="math inline">t=1,\dots,T</span> with feature rows <span class="math inline">X_t</span> (inside the <code>DMatrix</code>), labels <span class="math inline">y_t</span> (from <code>dtrain.get_label()</code>), and an aligned array <span class="math inline">r_{t-1}^2</span>. The objective receives the current raw predictions <span class="math inline">s_t</span> from XGBoost.</p></li>
-<li><p><strong>Initialization (variance state).</strong> Choose an initial variance level <span class="math inline">\widehat{\sigma}_0^2</span>. In our implementation we use a fixed warm-start such as</p>
+<li><p><strong>Initialization (variance state).</strong> Choose an initial variance level <span class="math inline">\widehat{\sigma}_0^2</span>. In our implementation we use a fixed warm-start such as</p></li>
+</ol>
 <p><span class="math display">
-\widehat{\sigma}_0^2 = \frac{1}{M}\sum_{i=0}^{M-1} r_i^2
+    \widehat{\sigma}_0^2 = \frac{1}{M}\sum_{i=0}^{M-1} r_i^2
 </span></p>
-<p>for some window length <span class="math inline">M</span> (e.g.&nbsp;<span class="math inline">M=500</span>).</p></li>
+<pre><code>for some window length $M$ (e.g. $M=500$).</code></pre>
+<ol start="3" type="1">
 <li><p><strong>Forward pass (compute gate and variance forecast).</strong> For <span class="math inline">t=1,\dots,T</span>:</p>
 <p>3.1. Compute the gate output for this row: <span class="math display">
 \alpha_t = \mathrm{sigmoid}(s_t).
@@ -352,24 +366,26 @@ y_t = r_t^2
 <p>3.3. Define the “innovation” entering the recursion: <span class="math display">
 \Delta_{t-1} := r_{t-1}^2 - \widehat{\sigma}_{t-1}^2.
 </span></p></li>
-<li><p><strong>Local derivatives (per-row gradient/Hessian returned to XGBoost).</strong> The gate derivative is</p>
+<li><p><strong>Local derivatives (per-row gradient/Hessian returned to XGBoost).</strong> The gate derivative is</p></li>
+</ol>
 <p><span class="math display">
-\frac{\partial \alpha_{t-1}}{\partial s_{t-1}} = \alpha_{t-1}(1-\alpha_{t-1})
+   \frac{\partial \alpha_{t-1}}{\partial s_{t-1}} = \alpha_{t-1}(1-\alpha_{t-1})
 </span></p>
 <p>Since <span class="math inline">\widehat{\sigma}_t^2</span> depends on <span class="math inline">s_{t-1}</span> only through <span class="math inline">\alpha_{t-1}</span>,</p>
 <p><span class="math display">
-\frac{\partial \widehat{\sigma}_t^2}{\partial s_{t-1}} = \Delta_{t-1}\,\alpha_{t-1}(1-\alpha_{t-1})
+   \frac{\partial \widehat{\sigma}_t^2}{\partial s_{t-1}} = \Delta_{t-1}\,\alpha_{t-1}(1-\alpha_{t-1})
 </span></p>
 <p>Therefore, using <span class="math inline">\ell_t=(y_t-\widehat{\sigma}_t^2)^2</span>, we return the per-row quantities (aligned so that <span class="math inline">g_{t-1}</span> and <span class="math inline">h_{t-1}</span> correspond to row <span class="math inline">t-1</span>):</p>
 <p><span class="math display">
-g_{t-1} = \frac{\partial \ell_t}{\partial s_{t-1}}
-= 2(\widehat{\sigma}_t^2-y_t)\,\Delta_{t-1}\,\alpha_{t-1}(1-\alpha_{t-1})
+   g_{t-1} = \frac{\partial \ell_t}{\partial s_{t-1}}
+   = 2(\widehat{\sigma}_t^2-y_t)\,\Delta_{t-1}\,\alpha_{t-1}(1-\alpha_{t-1})
 </span></p>
 <p><span class="math display">
-h_{t-1} \approx 2\Big(\Delta_{t-1}\,\alpha_{t-1}(1-\alpha_{t-1})\Big)^2
+   h_{t-1} \approx 2\Big(\Delta_{t-1}\,\alpha_{t-1}(1-\alpha_{t-1})\Big)^2
 </span></p>
-<p>(The Hessian uses a Gauss–Newton-style approximation)</p></li>
-<li><p><strong>Termination (outer boosting loop).</strong> XGBoost repeatedly calls this objective across boosting rounds until reaching <code>num_boost_round</code> or an early-stopping criterion (if enabled). Each call performs Steps 2–4 on the current raw prediction vector <span class="math inline">\{s_t\}</span>.</p></li>
+<p>(The Hessian uses a Gauss–Newton-style approximation)</p>
+<ol start="5" type="1">
+<li><strong>Termination (outer boosting loop).</strong> XGBoost repeatedly calls this objective across boosting rounds until reaching <code>num_boost_round</code> or an early-stopping criterion (if enabled). Each call performs Steps 2–4 on the current raw prediction vector <span class="math inline">\{s_t\}</span>.</li>
 </ol>
 <p>We fit the model on the same data as in my (now updated) <a href="https://steveya.github.io/posts/volatility-forecast-1/">last post</a>. The results are presented in the next section.</p>
 <h2 data-number="4" id="results" class="anchored"><span class="header-section-number">4</span> Results</h2>
@@ -1374,4 +1390,5 @@ u_t = r_t^2 - \hat v_t^{STES}.
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

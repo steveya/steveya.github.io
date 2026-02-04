@@ -1,8 +1,0 @@
----
-title: "Archives"
----
-
-```{listing}
-contents: ../posts/*/index.qmd
-sort: "date desc"
-```

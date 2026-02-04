@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2024-06-12">
+<meta name="description" content="I recently learned more about convolutional neural networks (CNNs) and how they are used to analyze images.">
 
 <title>Malaria Detection (Part 1: Introduction and Data Preparation) – Steve Yang</title>
 <style>
@@ -68,6 +69,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -75,6 +77,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Malaria Detection (Part 1: Introduction and Data Preparation)</h1>
@@ -86,22 +98,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#table-of-contents" id="toc-table-of-contents"><span class="header-section-number">1</span> Table of Contents</a></li>
-  <li><a href="#introduction" id="toc-introduction"><span class="header-section-number">2</span> Introduction</a></li>
-  <li><a href="#data-exploration-and-visualization" id="toc-data-exploration-and-visualization"><span class="header-section-number">3</span> Data Exploration and Visualization</a></li>
-  <li><a href="#data-preprocessing" id="toc-data-preprocessing"><span class="header-section-number">4</span> Data Preprocessing</a></li>
-  <li><a href="#next-step" id="toc-next-step"><span class="header-section-number">5</span> Next Step</a></li>
+  <li><a href="#introduction" id="toc-introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#data-exploration-and-visualization" id="toc-data-exploration-and-visualization"><span class="header-section-number">2</span> Data Exploration and Visualization</a></li>
+  <li><a href="#data-preprocessing" id="toc-data-preprocessing"><span class="header-section-number">3</span> Data Preprocessing</a></li>
+  <li><a href="#next-step" id="toc-next-step"><span class="header-section-number">4</span> Next Step</a></li>
   </ul>
 </nav>
 <p>The notebook for this post can be found <a href="https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb">here</a>.</p>
-<h2 data-number="1" id="table-of-contents" class="anchored"><span class="header-section-number">1</span> Table of Contents</h2>
-<ol type="1">
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#data-exploration-and-visualization">Data Exploration and Visualization</a></li>
-<li><a href="#data-preprocessing">Data Preprocessing</a></li>
-<li><a href="#next-step">Next Step</a></li>
-</ol>
-<h2 data-number="2" id="introduction" class="anchored"><span class="header-section-number">2</span> Introduction</h2>
+<h2 data-number="1" id="introduction" class="anchored"><span class="header-section-number">1</span> Introduction</h2>
 <p>I recently learned more about convolutional neural networks (CNNs) and how they are used to analyze images. Now that I understand the basics, I’ve decided to apply this knowledge to a real-world healthcare problem, an area I am passionate about. I found the Malaria dataset on Kaggle and decided to analyze it.</p>
 <p>Malaria is a life-threatening disease caused by parasites entering the bloodstream and damaging red blood cells (RBCs). Early detection and treatment are crucial to prevent complications, death, and the spread of the disease within communities. Traditional medical examinations for Malaria detection are time-consuming and require trained professionals whose accuracy depends heavily on their training and experience.</p>
 <p>In a series of upcoming blog posts, I will explore how to develop an automated system to detect Malaria from images of a patient’s RBCs using deep learning techniques. The goal is to create a highly accurate and efficient system to distinguish between parasitized and uninfected RBCs in microscopic images.</p>
@@ -111,7 +115,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Parasitized: Cells containing the Plasmodium parasite, the cause of Malaria</li>
 <li>Uninfected: Cells free of the Plasmodium parasites</li>
 </ul>
-<h2 data-number="3" id="data-exploration-and-visualization" class="anchored"><span class="header-section-number">3</span> Data Exploration and Visualization</h2>
+<h2 data-number="2" id="data-exploration-and-visualization" class="anchored"><span class="header-section-number">2</span> Data Exploration and Visualization</h2>
 <p>The following function reads the images, resizes them to 64x64 pixels, and assigns labels (1 for parasitized, 0 for uninfected).</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_data(data_path):</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  X, y <span class="op">=</span> [], []</span>
@@ -142,7 +146,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Figure 2. Histogram of RGB channels in Parasitized and Uninfected RBC Images</figcaption>
 </figure>
 </div>
-<h2 data-number="4" id="data-preprocessing" class="anchored"><span class="header-section-number">4</span> Data Preprocessing</h2>
+<h2 data-number="3" id="data-preprocessing" class="anchored"><span class="header-section-number">3</span> Data Preprocessing</h2>
 <p>With our prior knowledge that the presence of purple color can be an important feature in detecting Malaria, we consult image segmentation literature for clues. <a href="https://link.springer.com/chapter/10.1007/978-3-642-04697-1_57">Burdescu et al.</a> shows that the image segmentation task is easier for images in the HSV (Hue, Saturation, Value) colour space. We, therefore, transform each image into HSV space and normalize each channel again.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X_train_hsv <span class="op">=</span> []</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> image <span class="kw">in</span> X_train_rgb_normalized:</span>
@@ -168,7 +172,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>X_train_blur_normalized <span class="op">=</span> gaussian_blur(X_train_hsv)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>These preprocessing steps together can potentially enhance the features that distinguish parasitized from uninfected cells and reduce image noise.</p>
-<h2 data-number="5" id="next-step" class="anchored"><span class="header-section-number">5</span> Next Step</h2>
+<h2 data-number="4" id="next-step" class="anchored"><span class="header-section-number">4</span> Next Step</h2>
 <p>In the <a href="../malaria-detection-2/">next post</a> of this series, we will dive into building and training our deep-learning models for Malaria detection. Stay tuned!</p>
 
 
@@ -580,4 +584,5 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

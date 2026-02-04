@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2026-01-24">
+<meta name="description" content="We extend STES by replacing its linear component with XGBoost, then dig into why RMSE can underperform and propose a more stable end-to-end fitting algorithm.">
 
 <title>Volatility Forecasts (Part 3 - XGBSTES Algorithm 2) – Steve Yang</title>
 <style>
@@ -56,7 +57,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
@@ -68,6 +89,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -118,6 +140,16 @@ window.Quarto = {
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Volatility Forecasts (Part 3 - XGBSTES Algorithm 2)</h1>
@@ -141,7 +173,7 @@ window.Quarto = {
 </nav>
 <p>(Code snippets for this post can be found in the <a href="https://github.com/steveya/volatility-forecast/blob/main/examples/volatility_forecast_2.py">Github repository</a>.) Update: added discussion and a new fitting algorithm</p>
 <h2 data-number="1" id="recap" class="anchored"><span class="header-section-number">1</span> Recap</h2>
-<p>In the <a href="../volatility-forecasts-2/">previous post</a>, we extended the Smooth Transition Exponential Smoothing (<code>STES</code>) model from <a href="https://doi.org/10.1016/j.ijforecast.2003.09.010">(Taylor 2004)</a> and <a href="https://doi.org/10.1016/j.econmod.2020.02.021">(Liu, Taylor, Choo 2020)</a> by replacing the linear model in <code>STES</code> with a <code>XGBoost</code> model.</p>
+<p>In the <a href="../volatility-forecasts-2/">previous post</a>, we extended the Smooth Transition Exponential Smoothing (<code>STES</code>) model from <span class="citation" data-cites="taylor2004">Taylor (2004)</span> and <span class="citation" data-cites="liu2020">Liu, Taylor, and Choo (2020)</span> by replacing the linear model in <code>STES</code> with a <code>XGBoost</code> model.</p>
 <p>We saw that the XGBoost model has lower <code>MAE</code> and <code>MedAE</code> scores, but generally underperform STES in terms of <code>RMSE</code>. We did not however find out the true cause of this. In this post, we drill down into the cause of this, and propose a different fitting algorithm.</p>
 <p>Recall that the <code>XGBSTES</code> model is formulated as</p>
 <p><span class="math display">
@@ -199,6 +231,8 @@ w_j^* = -\frac{G_j}{H_j + \lambda}, \quad \text{Score}_j = -\frac{1}{2} \frac{G_
 <p><span class="math display">
 h_t = \frac{\partial^2 L}{\partial z_t^2}
 </span></p>
+</blockquote>
+<blockquote>
 <p>and the “Hessian” becomes a <span class="math inline">N</span>-dimensional vector. This independence assumption is why the method is an approximation. However, because we update the model iteratively (boosting), errors from this approximation are corrected in subsequent rounds, allowing <code>XGBoost</code> to converge even with this simplified curvature information.</p>
 </blockquote>
 <h3 data-number="2.1" id="previous-implementation" class="anchored"><span class="header-section-number">2.1</span> Previous Implementation</h3>
@@ -267,10 +301,10 @@ h_{GN} \approx (f'(z))^2
 <p><span class="math display">
 \text{Score} = -\frac{1}{2} \frac{G^2}{H + \lambda}
 </span></p>
-<p>wheer <span class="math inline">G \approx 10^{-8}</span> and <span class="math inline">H \approx 10^{-16}</span>, and the default regularization parameter <span class="math inline">\lambda = 1</span>, the denominator is dominated by <span class="math inline">\lambda</span>. The resulting score is roughly <span class="math inline">10^{-16}</span>, which is numerically indistinguishable from zero. Furthermore, we initially ran with the default <code>min_child_weight</code> parameter, which requires the sum of Hessians in a leaf to exceed 1. Our Hessians at <span class="math inline">10^{-16}</span> is just on a different scale.</p>
+<p>where <span class="math inline">G \approx 10^{-8}</span> and <span class="math inline">H \approx 10^{-16}</span>, and the default regularization parameter <span class="math inline">\lambda = 1</span>, the denominator is dominated by <span class="math inline">\lambda</span>. The resulting score is roughly <span class="math inline">10^{-16}</span>, which is numerically indistinguishable from zero. Furthermore, we initially ran with the default <code>min_child_weight</code> parameter, which requires the sum of Hessians in a leaf to exceed 1. Our Hessians at <span class="math inline">10^{-16}</span> is just on a different scale.</p>
 <p>This is analogous to the scaling issues found in Lasso or Ridge regression, where unstandardized features can lead to disproportionate penalization. Here, the “feature” is the gradient signal itself. To fix this, we multiply returns by 100 before squaring them. This scales the variance targets by <span class="math inline">10,000</span>. The gradient, which is quadratic in the scale of returns, increases by a factor of <span class="math inline">10^8</span>, bringing it to order <span class="math inline">O(1)</span>. With this adjustment, the standard <code>XGBoost</code> hyperparameters function as intended.</p>
 <blockquote>
-<p>The <code>min_child_weight</code> relates to the Hessian and measures the quantity of the curvature or the number of samples in a leaf. A split is only allowed if <span class="math inline">H_\mathrm{left} \ge \text{min_child_weight}</span> and <span class="math inline">H_\mathrm{right} \ge \text{min_child_weight}</span>. In second order optimization, the curvature measures the steepness of the surface. When curvature is high, a small change in prediction changes the error massively. The model has a strong motivation to split here. On the other hand, when the curvature is small, the loss function is a flat plain. The optimizaer can change the prediction wildly and the error barely changes. The model would have no strong incentive to split here.</p>
+<p>The <code>min_child_weight</code> relates to the Hessian and measures the quantity of the curvature or the number of samples in a leaf. A split is only allowed if <span class="math inline">H_L \ge \text{min\_child\_weight}</span> and <span class="math inline">H_R \ge \text{min\_child\_weight}</span>. In second order optimization, the curvature measures the steepness of the surface. When curvature is high, a small change in prediction changes the error massively. The model has a strong motivation to split here. On the other hand, when the curvature is small, the loss function is a flat plain. The optimizaer can change the prediction wildly and the error barely changes. The model would have no strong incentive to split here.</p>
 <p>To see how the quantity of curvature relates to the number of sample, we only need to look at the mean squared error objective function.</p>
 <p><span class="math display">
 \ell = \frac{1}{2} \left(\hat{y} - y\right)^2 \rightarrow \frac{\partial^2 \ell}{\partial \hat{y}^2} = 1
@@ -348,6 +382,14 @@ h_i = p_i (1 - p_i)
 </div>
 <p>That’s it for this post. We will diagnose the XGBSTES model further in future posts. See you then.</p>
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-liu2020" class="csl-entry" role="listitem">
+Liu, Min, James W. Taylor, and Wei-Chong Choo. 2020. <span>“Further Empirical Evidence on the Forecasting of Volatility with Smooth Transition Exponential Smoothing.”</span> <em>Economic Modelling</em> 93 (December): 651–59. <a href="https://doi.org/10.1016/j.econmod.2020.02.021">https://doi.org/10.1016/j.econmod.2020.02.021</a>.
+</div>
+<div id="ref-taylor2004" class="csl-entry" role="listitem">
+Taylor, James W. 2004. <span>“Volatility Forecasting with Smooth Transition Exponential Smoothing.”</span> <em>International Journal of Forecasting</em> 20 (2): 273–86. <a href="https://doi.org/10.1016/j.ijforecast.2003.09.010">https://doi.org/10.1016/j.ijforecast.2003.09.010</a>.
+</div>
+</div>
 
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -757,4 +799,5 @@ h_i = p_i (1 - p_i)
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

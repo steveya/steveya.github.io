@@ -1,0 +1,32 @@
+---
+title: "Series"
+page-layout: full
+title-block-banner: false
+---
+
+A curated index of multi-part series.
+
+## Short Rate Models
+- [Part 1: Merton Model](../posts/short-rate-models-1/)
+- [Part 2: Bond Pricing](../posts/short-rate-models-2/)
+- [Part 3: Vasicek Model](../posts/short-rate-models-3/)
+- [Part 4: Simulating and Calibrating Vasicek](../posts/short-rate-models-4/)
+
+## Volatility Forecasts
+- [Part 1: STES Model](../posts/volatility-forecasts-1/)
+- [Part 2: Replication + Baselines](../posts/volatility-forecasts-2/)
+- [Part 3: Extensions](../posts/volatility-forecasts-3/)
+
+## Signature Methods
+- [Part 1: Motivation](../posts/signature-method-1/)
+- [Part 2: Key Concepts](../posts/signature-method-2/)
+- [Part 3: Examples + Approximation](../posts/signature-method-3/)
+
+## Malaria Detection
+- [Part 1: Problem + Dataset](../posts/malaria-detection-1/)
+- [Part 2: Preprocessing + Setup](../posts/malaria-detection-2/)
+- [Part 3: Modeling Results](../posts/malaria-detection-3/)
+- [Part 4: Fine-tuning + Improvements](../posts/malaria-detection-4/)
+
+## Mean Reversion Strategies
+- [Part 1: Foundations](../posts/mean-reversion-strategy-1/)

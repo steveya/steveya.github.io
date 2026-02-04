@@ -2,8 +2,101 @@
 title: "Categories"
 ---
 
+## Quantitative Finance
+
 ```{listing}
 contents: ../posts/*/index.qmd
 sort: "date desc"
-categories: true
+filter:
+	categories: ["Quantitative Finance"]
+```
+
+## Interest Rate Models
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Interest Rate Models"]
+```
+
+## Volatility Modeling
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Volatility Modeling"]
+```
+
+## Time Series
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Time Series"]
+```
+
+## Stochastic Processes
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Stochastic Processes"]
+```
+
+## Signature Methods
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Signature Methods"]
+```
+
+## Trading Strategies
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Trading Strategies"]
+```
+
+## Machine Learning
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Machine Learning"]
+```
+
+## Computer Vision
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Computer Vision"]
+```
+
+## Deep Learning
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Deep Learning"]
+```
+
+## Healthcare AI
+
+```{listing}
+contents: ../posts/*/index.qmd
+sort: "date desc"
+filter:
+	categories: ["Healthcare AI"]
 ```

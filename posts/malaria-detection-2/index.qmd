@@ -1,9 +1,9 @@
 ---
 title: "Malaria Detection (Part 2: Model Building and Training)"
 date: 2024-06-13
-categories: [Machine Learning]
+description: "In the previous post of this series, we introduced the problem of Malaria detection and prepared and preprocessed our dataset."
+categories: [Machine Learning, Computer Vision, Deep Learning, Healthcare AI]
 ---
-
 The notebook for this post can be found [here](https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb).
 
 ## Recap

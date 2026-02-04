@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2025-12-14">
+<meta name="description" content="I am starting a series on the signature method now that I have some free time on my hands over the 2025 holiday season.">
 
 <title>Signature Methods (Part 1 - Motivation) – Steve Yang</title>
 <style>
@@ -33,8 +34,24 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
-  </head><body>true
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -64,10 +81,20 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../../styles.css">
+</head>
 
+<body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
 
-
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Signature Methods (Part 1 - Motivation)</h1>
@@ -106,17 +133,16 @@ F(X_{[a,b]}) \approx \langle \ell,\ S^{\le m}(X_{[a,b]})\rangle
 <p>Let <span class="math inline">\mathcal{P}</span> be a set of <span class="math inline">d</span>-dimensional paths on <span class="math inline">[a,b]</span> (for example, continuous paths of bounded variation), and let <span class="math inline">S(X_{[a,b]})</span> denote the (full) signature of a path <span class="math inline">X</span> on <span class="math inline">[a,b]</span>. Fix a compact subset <span class="math inline">K\subset\mathcal{P}</span> (compact in a topology where the signature map is continuous).</p>
 <p>For any continuous functional <span class="math inline">F:K\to\mathbb{R}</span> and any <span class="math inline">\varepsilon&gt;0</span>, there exist: - a truncation depth <span class="math inline">m</span>, and - a coefficient vector <span class="math inline">\ell</span> supported on signature coordinates up to level <span class="math inline">m</span>,</p>
 <p>such that</p>
-<p><span class="math inline">\sup_{X\in K}\left|F(X)-\langle \ell,\ S^{\le m}(X)\rangle\right|&lt;\varepsilon</span></p>
+<p><span class="math display">\sup_{X\in K}\left|F(X)-\langle \ell,\ S^{\le m}(X)\rangle\right|&lt;\varepsilon</span></p>
 </blockquote>
 <p>Here <span class="math inline">\ell</span> is simply a vector in the same space as the truncated signature up to level <span class="math inline">m</span>, and <span class="math inline">\langle \ell, S^{\le m}(X)\rangle</span> means an ordinary dot product: it is a finite linear combination of signature coordinates,</p>
-<p><span class="math inline">\langle \ell, S^{\le m}(X)\rangle= \ell_{\varnothing}\cdot 1+ \sum_{i} \ell_{(i)}\, S^{(i)}(X)+ \sum_{i,j} \ell_{(i,j)}\, S^{(i,j)}(X)+ \cdots+ \sum_{i_1,\dots,i_m} \ell_{(i_1,\dots,i_m)}\, S^{(i_1,\dots,i_m)}(X)</span></p>
+<p><span class="math display">\langle \ell, S^{\le m}(X)\rangle= \ell_{\varnothing}\cdot 1+ \sum_{i} \ell_{(i)}\, S^{(i)}(X)+ \sum_{i,j} \ell_{(i,j)}\, S^{(i,j)}(X) + \cdots + \sum_{i_1,\dots,i_m} \ell_{(i_1,\dots,i_m)}\, S^{(i_1,\dots,i_m)}(X)</span></p>
 <p>At first glance, signatures can sound like a silver bullet that eliminates the need to hand-craft time-series-based trading signals: if many path-dependent targets can be approximated by linear functionals of signatures, why not dump our panel data into a signature transformer, take the outputs, and run a linear regression? In practice, there are still important design choices to make in order to use signature features effectively:</p>
 <ol type="1">
 <li><strong>Path Construction</strong>: Signatures operate on a path representation of the inputs. To leverage the universality property, the path must contain the information that the target depends on. This is usually achieved through augmentations such as time augmentation, lead–lag augmentation, and the inclusion of additional channels (macro variables, microstructure variables, signals, etc.). This is where we decide which invariances we want and which statistics we want to make easy to learn.</li>
 <li><strong>Truncation and Rgularization</strong>: The full signature is an infinite collection of features. In practice we truncate at depth <span class="math inline">m</span> and rely on regularization and model selection to control complexity.</li>
 </ol>
 <p>In the next post we will define signatures explicitly and provide a few examples.</p>
-
 
 
 <script id="quarto-html-after-body" type="application/javascript">
@@ -527,4 +553,5 @@ F(X_{[a,b]}) \approx \langle \ell,\ S^{\le m}(X_{[a,b]})\rangle
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

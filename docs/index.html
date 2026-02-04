@@ -45,8 +45,9 @@ ul.task-list li input[type="checkbox"] {
 
     const options = {
       valueNames: ['listing-date','listing-title','listing-description','listing-categories','listing-reading-time',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
+      page: 10,
+    pagination: { item: "<li class='page-item'><a class='page page-link' href='#'></a></li>" },
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -63,6 +64,7 @@ ul.task-list li input[type="checkbox"] {
     }
   })
   </script>
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -113,6 +115,16 @@ window.Quarto = {
 
 <body>
 
+<nav class="site-nav">
+  <a href="./">Home</a>
+  <a href="./pages/series.html">Series</a>
+  <a href="./pages/projects.html">Projects</a>
+  <a href="./pages/categories.html">Categories</a>
+  <a href="./pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="./pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Steve Yang</h1>
@@ -532,9 +544,10 @@ window.Quarto = {
 
 
 
+<script src="site_libs/quarto-html/zenscroll-min.js"></script>
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1ZvbGF0aWxpdHklMjBGb3JlY2FzdCUyQ01hY2hpbmUlMjBMZWFybmluZyUyQ1Jlc2VhcmNo" data-listing-date-sort="1769230800000" data-listing-file-modified-sort="1770156141227" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2892">
+<div class="quarto-post image-right" data-index="0" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1ZvbGF0aWxpdHklMjBNb2RlbGluZyUyQ1RpbWUlMjBTZXJpZXM=" data-listing-date-sort="1769230800000" data-listing-file-modified-sort="1770219052284" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2888">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/volatility-forecasts-3/index.html" class="no-external">Volatility Forecasts (Part 3 - XGBSTES Algorithm 2)</a>
@@ -543,15 +556,13 @@ window.Quarto = {
 
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('Vm9sYXRpbGl0eSUyMEZvcmVjYXN0'); return false;">Volatility Forecast</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Vm9sYXRpbGl0eSUyME1vZGVsaW5n'); return false;">Volatility Modeling</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('UmVzZWFyY2g='); return false;">Research</div>
+<div class="listing-category" onclick="window.quartoListingCategory('VGltZSUyMFNlcmllcw=='); return false;">Time Series</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/volatility-forecasts-3/index.html" class="no-external">
-
+<p>We extend STES by replacing its linear component with XGBoost, then dig into why RMSE can underperform and propose a more stable end-to-end fitting algorithm.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -563,26 +574,22 @@ Jan 24, 2026
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="U3R1ZHklMjBOb3RlcyUyQ1NpZ25hdHVyZSUyME1ldGhvZCUyQ1F1YW50aXRhdGl2ZSUyMEZpbmFuY2UlMkNNYWNoaW5lJTIwTGVhcm5pbmclMkNSZXNlYXJjaA==" data-listing-date-sort="1766638800000" data-listing-file-modified-sort="1770173758665" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1914">
+<div class="quarto-post image-right" data-index="1" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1NpZ25hdHVyZSUyME1ldGhvZHMlMkNUaW1lJTIwU2VyaWVz" data-listing-date-sort="1766638800000" data-listing-file-modified-sort="1770214624825" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1916">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/signature-method-3/index.html" class="no-external">Signature Methods (Part 3 - Lead–Lag Augmentation and Practical Limitations to the Signature Method)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('U2lnbmF0dXJlJTIwTWV0aG9k'); return false;">Signature Method</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
+<div class="listing-category" onclick="window.quartoListingCategory('U2lnbmF0dXJlJTIwTWV0aG9kcw=='); return false;">Signature Methods</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('UmVzZWFyY2g='); return false;">Research</div>
+<div class="listing-category" onclick="window.quartoListingCategory('VGltZSUyMFNlcmllcw=='); return false;">Time Series</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/signature-method-3/index.html" class="no-external">
-
+<p>Continuing from the previous post, we work through three examples of approximating path functionals using linear functionals of truncated signatures in increasingly less practical way to illustrate…</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -594,26 +601,22 @@ Dec 25, 2025
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="U3R1ZHklMjBOb3RlcyUyQ1NpZ25hdHVyZSUyME1ldGhvZCUyQ1F1YW50aXRhdGl2ZSUyMEZpbmFuY2UlMkNNYWNoaW5lJTIwTGVhcm5pbmclMkNSZXNlYXJjaA==" data-listing-date-sort="1766293200000" data-listing-file-modified-sort="1770173758668" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1823">
+<div class="quarto-post image-right" data-index="2" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1NpZ25hdHVyZSUyME1ldGhvZHMlMkNUaW1lJTIwU2VyaWVz" data-listing-date-sort="1766293200000" data-listing-file-modified-sort="1770214624824" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1784">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/signature-method-2/index.html" class="no-external">Signature Methods (Part 2 - Signature and Augmentation)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('U2lnbmF0dXJlJTIwTWV0aG9k'); return false;">Signature Method</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
+<div class="listing-category" onclick="window.quartoListingCategory('U2lnbmF0dXJlJTIwTWV0aG9kcw=='); return false;">Signature Methods</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('UmVzZWFyY2g='); return false;">Research</div>
+<div class="listing-category" onclick="window.quartoListingCategory('VGltZSUyMFNlcmllcw=='); return false;">Time Series</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/signature-method-2/index.html" class="no-external">
-
+<p>Previously I provided some motivations for the use of signatures.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -621,30 +624,26 @@ Dec 25, 2025
 <div class="listing-date">
 Dec 21, 2025
 </div>
-<div class="listing-reading-time">10 min</div>
+<div class="listing-reading-time">9 min</div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="U3R1ZHklMjBOb3RlcyUyQ1NpZ25hdHVyZSUyME1ldGhvZCUyQ1F1YW50aXRhdGl2ZSUyMEZpbmFuY2UlMkNNYWNoaW5lJTIwTGVhcm5pbmclMkNSZXNlYXJjaA==" data-listing-date-sort="1765688400000" data-listing-file-modified-sort="1770173758661" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="795">
+<div class="quarto-post image-right" data-index="3" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1NpZ25hdHVyZSUyME1ldGhvZHMlMkNUaW1lJTIwU2VyaWVz" data-listing-date-sort="1765688400000" data-listing-file-modified-sort="1770214624824" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="792">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/signature-method-1/index.html" class="no-external">Signature Methods (Part 1 - Motivation)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('U2lnbmF0dXJlJTIwTWV0aG9k'); return false;">Signature Method</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
+<div class="listing-category" onclick="window.quartoListingCategory('U2lnbmF0dXJlJTIwTWV0aG9kcw=='); return false;">Signature Methods</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('UmVzZWFyY2g='); return false;">Research</div>
+<div class="listing-category" onclick="window.quartoListingCategory('VGltZSUyMFNlcmllcw=='); return false;">Time Series</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/signature-method-1/index.html" class="no-external">
-
+<p>I am starting a series on the signature method now that I have some free time on my hands over the 2025 holiday season.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -656,22 +655,22 @@ Dec 14, 2025
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="U3R1ZHklMjBOb3RlcyUyQ1F1YW50aXRhdGl2ZSUyMEZpbmFuY2UlMkNTaG9ydCUyMFJhdGUlMjBNb2RlbHM=" data-listing-date-sort="1726459200000" data-listing-file-modified-sort="1770173758667" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="32" data-listing-word-count-sort="6342">
+<div class="quarto-post image-right" data-index="4" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ0ludGVyZXN0JTIwUmF0ZSUyME1vZGVscyUyQ1N0b2NoYXN0aWMlMjBQcm9jZXNzZXM=" data-listing-date-sort="1726459200000" data-listing-file-modified-sort="1770218301530" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="32" data-listing-word-count-sort="6279">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/short-rate-models-4/index.html" class="no-external">Short Rate Models (Part 4: Simulating and Calibrating the Vasicek Model)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('U2hvcnQlMjBSYXRlJTIwTW9kZWxz'); return false;">Short Rate Models</div>
+<div class="listing-category" onclick="window.quartoListingCategory('SW50ZXJlc3QlMjBSYXRlJTIwTW9kZWxz'); return false;">Interest Rate Models</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('U3RvY2hhc3RpYyUyMFByb2Nlc3Nlcw=='); return false;">Stochastic Processes</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/short-rate-models-4/index.html" class="no-external">
-
+<p>In our previous post, we introduced the Vasicek model that used the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short rates.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -683,28 +682,24 @@ Sep 16, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="U3R1ZHklMjBOb3RlcyUyQ01hY2hpbmUlMjBMZWFybmluZyUyQ0RhdGElMjBTY2llbmNlJTJDQ25uJTJDRGVlcCUyMExlYXJuaW5nJTJDTG9yYQ==" data-listing-date-sort="1724126400000" data-listing-file-modified-sort="1770173758662" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1953">
+<div class="quarto-post image-right" data-index="5" data-categories="TWFjaGluZSUyMExlYXJuaW5nJTJDQ29tcHV0ZXIlMjBWaXNpb24lMkNEZWVwJTIwTGVhcm5pbmclMkNIZWFsdGhjYXJlJTIwQUk=" data-listing-date-sort="1724126400000" data-listing-file-modified-sort="1770214624821" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1944">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/malaria-detection-4/index.html" class="no-external">Malaria Detection (Part 4: Finetuning VGG16 with LoRA)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('RGF0YSUyMFNjaWVuY2U='); return false;">Data Science</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Q25u'); return false;">Cnn</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Q29tcHV0ZXIlMjBWaXNpb24='); return false;">Computer Vision</div>
 
 <div class="listing-category" onclick="window.quartoListingCategory('RGVlcCUyMExlYXJuaW5n'); return false;">Deep Learning</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('TG9yYQ=='); return false;">Lora</div>
+<div class="listing-category" onclick="window.quartoListingCategory('SGVhbHRoY2FyZSUyMEFJ'); return false;">Healthcare AI</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/malaria-detection-4/index.html" class="no-external">
-
+<p>In the previous post, we built a finetuned VGG16-based model (Model 4) to detect malaria from cell images.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -716,22 +711,22 @@ Aug 20, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-categories="U3R1ZHklMjBOb3RlcyUyQ1F1YW50aXRhdGl2ZSUyMEZpbmFuY2UlMkNTaG9ydCUyMFJhdGUlMjBNb2RlbHM=" data-listing-date-sort="1723262400000" data-listing-file-modified-sort="1770173758666" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1783">
+<div class="quarto-post image-right" data-index="6" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ0ludGVyZXN0JTIwUmF0ZSUyME1vZGVscyUyQ1N0b2NoYXN0aWMlMjBQcm9jZXNzZXM=" data-listing-date-sort="1723262400000" data-listing-file-modified-sort="1770214624823" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1755">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/short-rate-models-3/index.html" class="no-external">Short Rate Models (Part 3: Introducing Vasicek Model)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('U2hvcnQlMjBSYXRlJTIwTW9kZWxz'); return false;">Short Rate Models</div>
+<div class="listing-category" onclick="window.quartoListingCategory('SW50ZXJlc3QlMjBSYXRlJTIwTW9kZWxz'); return false;">Interest Rate Models</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('U3RvY2hhc3RpYyUyMFByb2Nlc3Nlcw=='); return false;">Stochastic Processes</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/short-rate-models-3/index.html" class="no-external">
-
+<p>We continue our refresher series on the short-rate models. In the previous post, I introduced the Merton model and the Euler-Maruyama method to simulate it.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -743,7 +738,7 @@ Aug 10, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="7" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1ZvbGF0aWxpdHklMjBGb3JlY2FzdCUyQ01hY2hpbmUlMjBMZWFybmluZyUyQ1Jlc2VhcmNo" data-listing-date-sort="1721275200000" data-listing-file-modified-sort="1770173758667" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="22" data-listing-word-count-sort="4228">
+<div class="quarto-post image-right" data-index="7" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1ZvbGF0aWxpdHklMjBNb2RlbGluZyUyQ1RpbWUlMjBTZXJpZXM=" data-listing-date-sort="1721275200000" data-listing-file-modified-sort="1770214752123" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21" data-listing-word-count-sort="4178">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/volatility-forecasts-2/index.html" class="no-external">Volatility Forecasts (Part 2 - XGBSTES Algorithm 1)</a>
@@ -752,15 +747,13 @@ Aug 10, 2024
 
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('Vm9sYXRpbGl0eSUyMEZvcmVjYXN0'); return false;">Volatility Forecast</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Vm9sYXRpbGl0eSUyME1vZGVsaW5n'); return false;">Volatility Modeling</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('UmVzZWFyY2g='); return false;">Research</div>
+<div class="listing-category" onclick="window.quartoListingCategory('VGltZSUyMFNlcmllcw=='); return false;">Time Series</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/volatility-forecasts-2/index.html" class="no-external">
-
+<p>In the previous post, we replicated the Smooth Transition Exponential Smoothing (STES) model from (Taylor 2004) and (Liu, Taylor, Choo 2020).</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -768,30 +761,28 @@ Aug 10, 2024
 <div class="listing-date">
 Jul 18, 2024
 </div>
-<div class="listing-reading-time">22 min</div>
+<div class="listing-reading-time">21 min</div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="8" data-categories="U3R1ZHklMjBOb3RlcyUyQ01hY2hpbmUlMjBMZWFybmluZyUyQ0RhdGElMjBTY2llbmNlJTJDQ25uJTJDRGVlcCUyMExlYXJuaW5n" data-listing-date-sort="1721188800000" data-listing-file-modified-sort="1770173758661" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="799">
+<div class="quarto-post image-right" data-index="8" data-categories="TWFjaGluZSUyMExlYXJuaW5nJTJDQ29tcHV0ZXIlMjBWaXNpb24lMkNEZWVwJTIwTGVhcm5pbmclMkNIZWFsdGhjYXJlJTIwQUk=" data-listing-date-sort="1721188800000" data-listing-file-modified-sort="1770214752121" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="742">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/malaria-detection-3/index.html" class="no-external">Malaria Detection (Part 3: Results and Reflections)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('RGF0YSUyMFNjaWVuY2U='); return false;">Data Science</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Q25u'); return false;">Cnn</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Q29tcHV0ZXIlMjBWaXNpb24='); return false;">Computer Vision</div>
 
 <div class="listing-category" onclick="window.quartoListingCategory('RGVlcCUyMExlYXJuaW5n'); return false;">Deep Learning</div>
 
+<div class="listing-category" onclick="window.quartoListingCategory('SGVhbHRoY2FyZSUyMEFJ'); return false;">Healthcare AI</div>
+
 </div>
 <div class="delink listing-description"><a href="./posts/malaria-detection-3/index.html" class="no-external">
-
+<p>I was honestly amazed by these results. Even the base model achieved 98% accuracy! However, accuracy isn’t everything. Let’s break down what these numbers really mean.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -803,26 +794,24 @@ Jul 17, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="9" data-categories="U3R1ZHklMjBOb3RlcyUyQ01hY2hpbmUlMjBMZWFybmluZyUyQ0RhdGElMjBTY2llbmNlJTJDQ25uJTJDRGVlcCUyMExlYXJuaW5n" data-listing-date-sort="1718251200000" data-listing-file-modified-sort="1770173758660" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2165">
+<div class="quarto-post image-right" data-index="9" data-categories="TWFjaGluZSUyMExlYXJuaW5nJTJDQ29tcHV0ZXIlMjBWaXNpb24lMkNEZWVwJTIwTGVhcm5pbmclMkNIZWFsdGhjYXJlJTIwQUk=" data-listing-date-sort="1718251200000" data-listing-file-modified-sort="1770214704594" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2133">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/malaria-detection-2/index.html" class="no-external">Malaria Detection (Part 2: Model Building and Training)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('RGF0YSUyMFNjaWVuY2U='); return false;">Data Science</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Q25u'); return false;">Cnn</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Q29tcHV0ZXIlMjBWaXNpb24='); return false;">Computer Vision</div>
 
 <div class="listing-category" onclick="window.quartoListingCategory('RGVlcCUyMExlYXJuaW5n'); return false;">Deep Learning</div>
 
+<div class="listing-category" onclick="window.quartoListingCategory('SGVhbHRoY2FyZSUyMEFJ'); return false;">Healthcare AI</div>
+
 </div>
 <div class="delink listing-description"><a href="./posts/malaria-detection-2/index.html" class="no-external">
-
+<p>In the previous post of this series, we introduced the problem of Malaria detection and prepared and preprocessed our dataset.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -834,26 +823,24 @@ Jun 13, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="10" data-categories="U3R1ZHklMjBOb3RlcyUyQ01hY2hpbmUlMjBMZWFybmluZyUyQ0RhdGElMjBTY2llbmNlJTJDQ25uJTJDRGVlcCUyMExlYXJuaW5n" data-listing-date-sort="1718164800000" data-listing-file-modified-sort="1770173758665" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="791">
+<div class="quarto-post image-right" data-index="10" data-categories="TWFjaGluZSUyMExlYXJuaW5nJTJDQ29tcHV0ZXIlMjBWaXNpb24lMkNEZWVwJTIwTGVhcm5pbmclMkNIZWFsdGhjYXJlJTIwQUk=" data-listing-date-sort="1718164800000" data-listing-file-modified-sort="1770214704594" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="781">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/malaria-detection-1/index.html" class="no-external">Malaria Detection (Part 1: Introduction and Data Preparation)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('RGF0YSUyMFNjaWVuY2U='); return false;">Data Science</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('Q25u'); return false;">Cnn</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Q29tcHV0ZXIlMjBWaXNpb24='); return false;">Computer Vision</div>
 
 <div class="listing-category" onclick="window.quartoListingCategory('RGVlcCUyMExlYXJuaW5n'); return false;">Deep Learning</div>
 
+<div class="listing-category" onclick="window.quartoListingCategory('SGVhbHRoY2FyZSUyMEFJ'); return false;">Healthcare AI</div>
+
 </div>
 <div class="delink listing-description"><a href="./posts/malaria-detection-1/index.html" class="no-external">
-
+<p>I recently learned more about convolutional neural networks (CNNs) and how they are used to analyze images.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -865,22 +852,22 @@ Jun 12, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="11" data-categories="U3R1ZHklMjBOb3RlcyUyQ1F1YW50aXRhdGl2ZSUyMEZpbmFuY2UlMkNTaG9ydCUyMFJhdGUlMjBNb2RlbHM=" data-listing-date-sort="1716091200000" data-listing-file-modified-sort="1770173758668" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2139">
+<div class="quarto-post image-right" data-index="11" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ0ludGVyZXN0JTIwUmF0ZSUyME1vZGVscyUyQ1N0b2NoYXN0aWMlMjBQcm9jZXNzZXM=" data-listing-date-sort="1716091200000" data-listing-file-modified-sort="1770214624823" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2079">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/short-rate-models-2/index.html" class="no-external">Short Rate Models (Part 2: Simulating and Calibrating the Merton Model)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('U2hvcnQlMjBSYXRlJTIwTW9kZWxz'); return false;">Short Rate Models</div>
+<div class="listing-category" onclick="window.quartoListingCategory('SW50ZXJlc3QlMjBSYXRlJTIwTW9kZWxz'); return false;">Interest Rate Models</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('U3RvY2hhc3RpYyUyMFByb2Nlc3Nlcw=='); return false;">Stochastic Processes</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/short-rate-models-2/index.html" class="no-external">
-
+<p>Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the previous post.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -892,22 +879,22 @@ May 19, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="12" data-categories="U3R1ZHklMjBOb3RlcyUyQ1F1YW50aXRhdGl2ZSUyMEZpbmFuY2UlMkNTaG9ydCUyMFJhdGUlMjBNb2RlbHM=" data-listing-date-sort="1715313600000" data-listing-file-modified-sort="1770173758662" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2223">
+<div class="quarto-post image-right" data-index="12" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ0ludGVyZXN0JTIwUmF0ZSUyME1vZGVscyUyQ1N0b2NoYXN0aWMlMjBQcm9jZXNzZXM=" data-listing-date-sort="1715313600000" data-listing-file-modified-sort="1770218313804" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2164">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/short-rate-models-1/index.html" class="no-external">Short Rate Models (Part 1: Introducing Merton’s Model)</a>
 </h3>
 <div class="listing-categories">
 
-<div class="listing-category" onclick="window.quartoListingCategory('U3R1ZHklMjBOb3Rlcw=='); return false;">Study Notes</div>
-
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('U2hvcnQlMjBSYXRlJTIwTW9kZWxz'); return false;">Short Rate Models</div>
+<div class="listing-category" onclick="window.quartoListingCategory('SW50ZXJlc3QlMjBSYXRlJTIwTW9kZWxz'); return false;">Interest Rate Models</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('U3RvY2hhc3RpYyUyMFByb2Nlc3Nlcw=='); return false;">Stochastic Processes</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/short-rate-models-1/index.html" class="no-external">
-
+<p>Welcome to my refresher series on short-rate models, dear reader! These mathematical marvels are not just academic curiosities but crucial tools in finance.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -915,11 +902,11 @@ May 19, 2024
 <div class="listing-date">
 May 10, 2024
 </div>
-<div class="listing-reading-time">12 min</div>
+<div class="listing-reading-time">11 min</div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="13" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ==" data-listing-date-sort="1662004800000" data-listing-file-modified-sort="1770173758664" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1334">
+<div class="quarto-post image-right" data-index="13" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1RyYWRpbmclMjBTdHJhdGVnaWVzJTJDU3RvY2hhc3RpYyUyMFByb2Nlc3Nlcw==" data-listing-date-sort="1662004800000" data-listing-file-modified-sort="1770214624822" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1279">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/mean-reversion-strategy-1/index.html" class="no-external">Expected Performance of a Mean-Reversion Trading Strategy - Part 1</a>
@@ -928,9 +915,13 @@ May 10, 2024
 
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
+<div class="listing-category" onclick="window.quartoListingCategory('VHJhZGluZyUyMFN0cmF0ZWdpZXM='); return false;">Trading Strategies</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('U3RvY2hhc3RpYyUyMFByb2Nlc3Nlcw=='); return false;">Stochastic Processes</div>
+
 </div>
 <div class="delink listing-description"><a href="./posts/mean-reversion-strategy-1/index.html" class="no-external">
-
+<p>A value strategy posits that the worth of an asset tends to oscillate around a more gradual, underlying trend.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -942,7 +933,7 @@ Sep 1, 2022
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="14" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1ZvbGF0aWxpdHklMjBGb3JlY2FzdCUyQ01hY2hpbmUlMjBMZWFybmluZyUyQ1Jlc2VhcmNo" data-listing-date-sort="1630987200000" data-listing-file-modified-sort="1770173758663" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3749">
+<div class="quarto-post image-right" data-index="14" data-categories="UXVhbnRpdGF0aXZlJTIwRmluYW5jZSUyQ1ZvbGF0aWxpdHklMjBNb2RlbGluZyUyQ1RpbWUlMjBTZXJpZXM=" data-listing-date-sort="1630987200000" data-listing-file-modified-sort="1770218313804" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3734">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./posts/volatility-forecasts-1/index.html" class="no-external">Volatility Forecasts (Part 1 - STES Model)</a>
@@ -951,15 +942,13 @@ Sep 1, 2022
 
 <div class="listing-category" onclick="window.quartoListingCategory('UXVhbnRpdGF0aXZlJTIwRmluYW5jZQ=='); return false;">Quantitative Finance</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('Vm9sYXRpbGl0eSUyMEZvcmVjYXN0'); return false;">Volatility Forecast</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Vm9sYXRpbGl0eSUyME1vZGVsaW5n'); return false;">Volatility Modeling</div>
 
-<div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
-
-<div class="listing-category" onclick="window.quartoListingCategory('UmVzZWFyY2g='); return false;">Research</div>
+<div class="listing-category" onclick="window.quartoListingCategory('VGltZSUyMFNlcmllcw=='); return false;">Time Series</div>
 
 </div>
 <div class="delink listing-description"><a href="./posts/volatility-forecasts-1/index.html" class="no-external">
-
+<p>Exponential smoothing (ES) is a simple yet widely used approach to volatility forecasting in finance and economics.</p>
 </a></div>
 </div>
 <div class="metadata">
@@ -973,4 +962,7 @@ Sep 7, 2021
 </div>
 </div>
 <div class="listing-no-matching d-none">No matching items</div>
+<nav id="listing-pagination" class="listing-pagination" aria-label="Page Navigation">
+  <ul class="pagination"></ul>
+</nav>
 </div></body></html>

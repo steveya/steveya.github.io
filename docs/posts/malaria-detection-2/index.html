@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2024-06-13">
+<meta name="description" content="In the previous post of this series, we introduced the problem of Malaria detection and prepared and preprocessed our dataset.">
 
 <title>Malaria Detection (Part 2: Model Building and Training) – Steve Yang</title>
 <style>
@@ -68,6 +69,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -75,6 +77,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Malaria Detection (Part 2: Model Building and Training)</h1>
@@ -86,30 +98,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#table-of-contents" id="toc-table-of-contents"><span class="header-section-number">1</span> Table of Contents</a></li>
-  <li><a href="#recap" id="toc-recap"><span class="header-section-number">2</span> Recap</a></li>
-  <li><a href="#base-model" id="toc-base-model"><span class="header-section-number">3</span> Base Model</a></li>
-  <li><a href="#model-1-going-deeper" id="toc-model-1-going-deeper"><span class="header-section-number">4</span> Model 1: Going Deeper</a></li>
-  <li><a href="#model-2-changing-the-activation-function" id="toc-model-2-changing-the-activation-function"><span class="header-section-number">5</span> Model 2: Changing the Activation Function</a></li>
-  <li><a href="#model-3-tackling-data-scarcity-and-misclassified-data" id="toc-model-3-tackling-data-scarcity-and-misclassified-data"><span class="header-section-number">6</span> Model 3: Tackling Data Scarcity and Misclassified Data</a></li>
-  <li><a href="#model-4-standing-on-the-shoulders-of-giants" id="toc-model-4-standing-on-the-shoulders-of-giants"><span class="header-section-number">7</span> Model 4: Standing on the Shoulders of Giants</a></li>
-  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">8</span> Wrapping Up</a></li>
+  <li><a href="#recap" id="toc-recap"><span class="header-section-number">1</span> Recap</a></li>
+  <li><a href="#base-model" id="toc-base-model"><span class="header-section-number">2</span> Base Model</a></li>
+  <li><a href="#model-1-going-deeper" id="toc-model-1-going-deeper"><span class="header-section-number">3</span> Model 1: Going Deeper</a></li>
+  <li><a href="#model-2-changing-the-activation-function" id="toc-model-2-changing-the-activation-function"><span class="header-section-number">4</span> Model 2: Changing the Activation Function</a></li>
+  <li><a href="#model-3-tackling-data-scarcity-and-misclassified-data" id="toc-model-3-tackling-data-scarcity-and-misclassified-data"><span class="header-section-number">5</span> Model 3: Tackling Data Scarcity and Misclassified Data</a></li>
+  <li><a href="#model-4-standing-on-the-shoulders-of-giants" id="toc-model-4-standing-on-the-shoulders-of-giants"><span class="header-section-number">6</span> Model 4: Standing on the Shoulders of Giants</a></li>
+  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">7</span> Wrapping Up</a></li>
   </ul>
 </nav>
 <p>The notebook for this post can be found <a href="https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb">here</a>.</p>
-<h2 data-number="1" id="table-of-contents" class="anchored"><span class="header-section-number">1</span> Table of Contents</h2>
-<ol type="1">
-<li><a href="#recap">Recap</a></li>
-<li><a href="#base-model">Base Model</a></li>
-<li><a href="#model-1-going-deeper">Model 1: Going Deeper</a></li>
-<li><a href="#model-2-changing-the-activation-function">Model 2: Changing the Activation Function</a></li>
-<li><a href="#model-3-tackling-data-scarcity-and-misclassified-data">Model 3: Tackling Data Scarcity and Misclassified Data</a></li>
-<li><a href="#model-4-standing-on-the-shoulders-of-giants">Model 4: Standing on the Shoulders of Giants</a></li>
-<li><a href="#wrapping-up">Wrapping Up</a></li>
-</ol>
-<h2 data-number="2" id="recap" class="anchored"><span class="header-section-number">2</span> Recap</h2>
+<h2 data-number="1" id="recap" class="anchored"><span class="header-section-number">1</span> Recap</h2>
 <p>In the <a href="../malaria-detection-1/">previous post</a> of this series, we introduced the problem of Malaria detection and prepared and preprocessed our dataset. Now, let’s build and train a few deep-learning models to see if we can detect Malaria with good accuracy and recall.</p>
-<h2 data-number="3" id="base-model" class="anchored"><span class="header-section-number">3</span> Base Model</h2>
+<h2 data-number="2" id="base-model" class="anchored"><span class="header-section-number">2</span> Base Model</h2>
 <p>We’ll start with a CNN model as our baseline:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_base_model():</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a> set_seed()</span>
@@ -211,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Figure 2. The Training and Validation Curve of the Base Model</figcaption>
 </figure>
 </div>
-<h2 data-number="4" id="model-1-going-deeper" class="anchored"><span class="header-section-number">4</span> Model 1: Going Deeper</h2>
+<h2 data-number="3" id="model-1-going-deeper" class="anchored"><span class="header-section-number">3</span> Model 1: Going Deeper</h2>
 <p>My first improvement was to add more layers to the network. The motivation here is that more layers mean more parameters and the capacity to learn complex features. I added 2 extra convolutional layers and another dense layer. The hope is that the additional convolutional layer would allow the model to detect more intricate patterns while the extra dense layer would give it more flexibility in combining these patterns for classification:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_model_1():</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a> set_seed()</span>
@@ -298,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <p>Despite being a deeper model, <code>model_1</code>’s performance is similar to the <code>base_model</code>’s. For <code>model_1</code>, one misclassified image has a purple shape at the boundary, which the model cannot capture well. Figure 4 shows the outputs of the first CNN layer, where many learned features are flat images. This may be caused by the ReLU activation function. We can use a different activation function to see if that improves the feature extraction and model performance. Furthermore, we can improve the training speed by stabilizing the variance of the inputs to each layer. In the next model, we employ the LeakyRelu activation and BatchNormalization:</p>
-<h2 data-number="5" id="model-2-changing-the-activation-function" class="anchored"><span class="header-section-number">5</span> Model 2: Changing the Activation Function</h2>
+<h2 data-number="4" id="model-2-changing-the-activation-function" class="anchored"><span class="header-section-number">4</span> Model 2: Changing the Activation Function</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_model_2():</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a> set_seed()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a> model <span class="op">=</span> Sequential()</span>
@@ -403,7 +404,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Figure 6. Visualizing the Output of the First Layer in Model 2.</figcaption>
 </figure>
 </div>
-<h2 data-number="6" id="model-3-tackling-data-scarcity-and-misclassified-data" class="anchored"><span class="header-section-number">6</span> Model 3: Tackling Data Scarcity and Misclassified Data</h2>
+<h2 data-number="5" id="model-3-tackling-data-scarcity-and-misclassified-data" class="anchored"><span class="header-section-number">5</span> Model 3: Tackling Data Scarcity and Misclassified Data</h2>
 <p>Despite these improvements, our model might be limited by the training data available. In medical imaging, gathering large datasets can be challenging due to privacy concerns and the cost of expert annotation. This led me to explore data augmentation techniques.</p>
 <p>Data augmentation involves creating new training examples by applying transformations to our existing images. The motivation here is to expose our model to a wider variety of cell appearances, making it more robust to variations it might encounter in real-world scenarios.</p>
 <p>All previous models have difficulty correctly labelling an image like the one in Figure 7, where the purple stain is at the boundary of the image. However, this type of image is supposedly in the minority, making it challenging for our model to identify them. I want the model to pay more attention to this type of image.</p>
@@ -479,7 +480,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Figure 8. The Confusion Matrix of Model 2 on Augmented Data (aka Model 3)</figcaption>
 </figure>
 </div>
-<h2 data-number="7" id="model-4-standing-on-the-shoulders-of-giants" class="anchored"><span class="header-section-number">7</span> Model 4: Standing on the Shoulders of Giants</h2>
+<h2 data-number="6" id="model-4-standing-on-the-shoulders-of-giants" class="anchored"><span class="header-section-number">6</span> Model 4: Standing on the Shoulders of Giants</h2>
 <p>For my final experiment, I wanted to see if we could benefit from transfer learning. I wanted to leverage the power of models that have been trained on massive datasets like ImageNet. Even though these models were not trained on cell images, the low-level features they learn (like edge detection) could be valuable for our task.</p>
 <p>I chose to use <code>VGG16</code> as our base model:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> keras.applications.vgg16 <span class="im">import</span> VGG16, preprocess_input</span>
@@ -565,7 +566,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Figure 9. The Confusion Matrix of Model 4 on Original Data</figcaption>
 </figure>
 </div>
-<h2 data-number="8" id="wrapping-up" class="anchored"><span class="header-section-number">8</span> Wrapping Up</h2>
+<h2 data-number="7" id="wrapping-up" class="anchored"><span class="header-section-number">7</span> Wrapping Up</h2>
 <p>In the <a href="../malaria-detection-3/">next post</a> of this series, we’ll discuss the results, draw insights, and explore potential improvements to our malaria detection system. Stay tuned!</p>
 
 
@@ -977,4 +978,5 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

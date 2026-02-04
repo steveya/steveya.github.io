@@ -1,44 +1,44 @@
 ---
 title: "Malaria Detection (Part 4: Finetuning VGG16 with LoRA)"
 date: 2024-08-20
-categories: [Machine Learning]
+description: "In the previous post, we built a finetuned VGG16-based model (Model 4) to detect malaria from cell images."
+categories: [Machine Learning, Computer Vision, Deep Learning, Healthcare AI]
 ---
-
 In the [previous post](../malaria-detection-2/), we built a finetuned VGG16-based model (Model 4) to detect malaria from cell images. We finetuned the VGG16 model by taking part of the trained VGG16 model, and append 2 more CNN layers followed by 2 ANN layers and retrain the 4 layers on our malaria dataset. In this post, I am trying a different approach to finetuning the VGG16 model using Low Rank Adaptation (LoRA). I will be using the LoRA method to adapt the weights of the trained VGG16 model to the malaria dataset.
 
 Low-rank adaptation (LoRA) is a technique for adapting pre-trained neural networks to new tasks, particularly when finetuning the entire model is computationally expensive or when data is scarce. LoRA leverages the concept of low-rank approximation to efficiently adapt a large model to new data by learning a smaller number of parameters. 
 
 The main idea of LoRA is to keep the pre-trained model parameters frozen and introduce only a small number of trainable parameters capable of capturing task-specific information. Therefore, instead of modifying the full weight matrix of a layer as we did previously to finetune VGG16, LoRA introduces a low-rank weight matrix that is mixed with the pre-trained weights from VGG16.
 
-Suppose we have a pre-trained model with a weight matrix $$ W \in \mathbb{R}^{d \times k} $$ for a specific layer, where $$ d $$ is the input dimension, and $$ k $$ is the output dimension. The goal is to adapt $$ W $$ to a new task with minimal changes. In the traditional finetuning approach, we would retrain $$ W $$ directly. Equivalently, we can view this as holding $$ W $$ fixed, add add a perturbation matrix $$ \Delta W $$ to $$ W $$:
+Suppose we have a pre-trained model with a weight matrix $ W \in \mathbb{R}^{d \times k} $ for a specific layer, where $ d $ is the input dimension, and $ k $ is the output dimension. The goal is to adapt $ W $ to a new task with minimal changes. In the traditional finetuning approach, we would retrain $ W $ directly. Equivalently, we can view this as holding $ W $ fixed, add add a perturbation matrix $ \Delta W $ to $ W $:
 
 $$
 W' = W + \Delta W
 $$
 
-The traditional finetuning process would train the $$ \Delta W $$.
+The traditional finetuning process would train the $ \Delta W $.
 
 #### Low-Rank Adaptation
 
-LoRA assumes that a low-rank decomposition can approximate the change $$ \Delta W $$. Specifically, we decompose $$ \Delta W $$ into two much smaller matrices $$ A \in \mathbb{R}^{d \times r} $$ and $$ B \in \mathbb{R}^{r \times k} $$, where $$ r \ll \min(d, k) $$:
+LoRA assumes that a low-rank decomposition can approximate the change $ \Delta W $. Specifically, we decompose $ \Delta W $ into two much smaller matrices $ A \in \mathbb{R}^{d \times r} $ and $ B \in \mathbb{R}^{r \times k} $, where $ r \ll \min(d, k) $:
 
 $$
 \Delta W = A B
 $$
 
-Therefore, the adapted weight matrix $$ W' $$ becomes:
+Therefore, the adapted weight matrix $ W' $ becomes:
 
 $$
 W' = W + A B
 $$
 
-Here, $$ A $$ and $$ B $$ are the trainable parameters, while the original $$ W $$ remains fixed.
+Here, $ A $ and $ B $ are the trainable parameters, while the original $ W $ remains fixed.
 
-The low-rank adaptation significantly reduces the number of trainable parameters. For example, instead of learning $$ d \times k $$ parameters for $$ \Delta W $$, we only need to learn $$ r \times (d + k) $$ parameters for $$ A $$ and $$ B $$, which can be orders of magnitude fewer than $$ d \times k $$ when $$ r $$ is small. This time reduction is especially beneficial for large models, where finetuning all parameters would be computationally expensive and prone to overfitting.
+The low-rank adaptation significantly reduces the number of trainable parameters. For example, instead of learning $ d \times k $ parameters for $ \Delta W $, we only need to learn $ r \times (d + k) $ parameters for $ A $ and $ B $, which can be orders of magnitude fewer than $ d \times k $ when $ r $ is small. This time reduction is especially beneficial for large models, where finetuning all parameters would be computationally expensive and prone to overfitting.
 
 ## Implementation of LoRA for Conv2D Layers
 
-In convolutional layers, $$ W $$ is a tensor instead of a matrix. Therefore, we must change the matrix multiplication operation $$ A' B $$ to a tensor operation since $$ A \ast B $$ to produce multi-dimensional tensors with the same shape as $$ W $$. The original convolution done in a Conv2D layer is $$ Y = X \ast W + b $$, and with LoRA, we have
+In convolutional layers, $ W $ is a tensor instead of a matrix. Therefore, we must change the matrix multiplication operation $ A' B $ to a tensor operation since $ A \ast B $ to produce multi-dimensional tensors with the same shape as $ W $. The original convolution done in a Conv2D layer is $ Y = X \ast W + b $, and with LoRA, we have
 
 $$
 \begin{equation}
@@ -52,11 +52,11 @@ $$
 
 The final output is the sum of the original convolution output and the output of the low-rank adaptation, computed in two steps:
 
-1. **Convolution with $$ A $$**:
-   - The input feature map $$ X $$ is convolved with the low-rank tensor $$ A $$ with dimensions $$(h, w, c_{\text{in}}, r)$$. This operation reduces the number of output channels to $$ r $$.
+1. **Convolution with $ A $**:
+   - The input feature map $ X $ is convolved with the low-rank tensor $ A $ with dimensions $(h, w, c_{\text{in}}, r)$. This operation reduces the number of output channels to $ r $.
 
-2. **Convolution with $$ B $$**:
-   - The result from step 1 is convolved with $$ B $$ with dimensions $$(1, 1, r, c_{\text{out}})$$. This convolution projects the previous reduced-rank output of step 1 back to the desired number of output channels $$ c_{\text{out}} $$.
+2. **Convolution with $ B $**:
+   - The result from step 1 is convolved with $ B $ with dimensions $(1, 1, r, c_{\text{out}})$. This convolution projects the previous reduced-rank output of step 1 back to the desired number of output channels $ c_{\text{out}} $.
 
 We implemented a `LoRAConv2D` layer using TensorFlow Keras as follows.
 

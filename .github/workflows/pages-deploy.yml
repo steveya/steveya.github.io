@@ -35,8 +35,31 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Render site
-        run: quarto render
+      - name: Render site (fail on WARN)
+        shell: bash
+        run: |
+          set -euo pipefail
+          quarto render 2>&1 | tee render.log
+          if grep -q '^WARN:' render.log; then
+            echo 'Quarto warnings found:'
+            grep '^WARN:' -n render.log || true
+            exit 1
+          fi
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Node dependencies
+        run: npm install --no-fund --no-audit
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E smoke tests
+        run: npm test
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3

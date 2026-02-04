@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2024-05-19">
+<meta name="description" content="Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the previous post.">
 
 <title>Short Rate Models (Part 2: Simulating and Calibrating the Merton Model) – Steve Yang</title>
 <style>
@@ -68,6 +69,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -118,6 +120,16 @@ window.Quarto = {
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Short Rate Models (Part 2: Simulating and Calibrating the Merton Model)</h1>
@@ -129,32 +141,24 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#table-of-contents" id="toc-table-of-contents"><span class="header-section-number">1</span> Table of Contents</a></li>
-  <li><a href="#introduction" id="toc-introduction"><span class="header-section-number">2</span> Introduction</a></li>
-  <li><a href="#simulating-mertons-model" id="toc-simulating-mertons-model"><span class="header-section-number">3</span> Simulating Merton’s Model</a>
+  <li><a href="#introduction" id="toc-introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#simulating-mertons-model" id="toc-simulating-mertons-model"><span class="header-section-number">2</span> Simulating Merton’s Model</a>
   <ul>
-  <li><a href="#simulating-short-rates-bond-yields-and-term-structure-from-the-merton-model" id="toc-simulating-short-rates-bond-yields-and-term-structure-from-the-merton-model"><span class="header-section-number">3.1</span> Simulating Short Rates, Bond Yields and Term Structure from the Merton Model</a></li>
+  <li><a href="#simulating-short-rates-bond-yields-and-term-structure-from-the-merton-model" id="toc-simulating-short-rates-bond-yields-and-term-structure-from-the-merton-model"><span class="header-section-number">2.1</span> Simulating Short Rates, Bond Yields and Term Structure from the Merton Model</a></li>
   </ul></li>
-  <li><a href="#model-estimation" id="toc-model-estimation"><span class="header-section-number">4</span> Model Estimation</a>
+  <li><a href="#model-estimation" id="toc-model-estimation"><span class="header-section-number">3</span> Model Estimation</a>
   <ul>
-  <li><a href="#brief-review-of-the-maximum-likelihood-estimation" id="toc-brief-review-of-the-maximum-likelihood-estimation"><span class="header-section-number">4.1</span> Brief Review of the Maximum Likelihood Estimation</a></li>
-  <li><a href="#deriving-the-likelihood-for-the-merton-model" id="toc-deriving-the-likelihood-for-the-merton-model"><span class="header-section-number">4.2</span> Deriving the Likelihood for the Merton Model</a></li>
-  <li><a href="#maximizing-the-log-likelihood" id="toc-maximizing-the-log-likelihood"><span class="header-section-number">4.3</span> Maximizing the Log-Likelihood</a></li>
-  <li><a href="#implementing-mle-for-the-merton-model" id="toc-implementing-mle-for-the-merton-model"><span class="header-section-number">4.4</span> Implementing MLE for the Merton Model</a></li>
+  <li><a href="#brief-review-of-the-maximum-likelihood-estimation" id="toc-brief-review-of-the-maximum-likelihood-estimation"><span class="header-section-number">3.1</span> Brief Review of the Maximum Likelihood Estimation</a></li>
+  <li><a href="#deriving-the-likelihood-for-the-merton-model" id="toc-deriving-the-likelihood-for-the-merton-model"><span class="header-section-number">3.2</span> Deriving the Likelihood for the Merton Model</a></li>
+  <li><a href="#maximizing-the-log-likelihood" id="toc-maximizing-the-log-likelihood"><span class="header-section-number">3.3</span> Maximizing the Log-Likelihood</a></li>
+  <li><a href="#implementing-mle-for-the-merton-model" id="toc-implementing-mle-for-the-merton-model"><span class="header-section-number">3.4</span> Implementing MLE for the Merton Model</a></li>
   </ul></li>
-  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">5</span> Wrapping Up</a></li>
+  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">4</span> Wrapping Up</a></li>
   </ul>
 </nav>
-<h2 data-number="1" id="table-of-contents" class="anchored"><span class="header-section-number">1</span> Table of Contents</h2>
-<ol type="1">
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#simulating-mertons-model">Simulating Merton Model</a></li>
-<li><a href="#model-estimation">Model Estimation</a></li>
-<li><a href="#wrapping-up">Wrapping Up</a></li>
-</ol>
-<h2 data-number="2" id="introduction" class="anchored"><span class="header-section-number">2</span> Introduction</h2>
+<h2 data-number="1" id="introduction" class="anchored"><span class="header-section-number">1</span> Introduction</h2>
 <p>Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the <a href="../short-rate-models-1/">previous post</a>. In this post, we will show how to simulate short rates from the Merton model and how to calibrate its parameters to market-observed short rates. Whereas the previous post deals with the mathematical aspects, this post deals with the computational ones.</p>
-<h2 data-number="3" id="simulating-mertons-model" class="anchored"><span class="header-section-number">3</span> Simulating Merton’s Model</h2>
+<h2 data-number="2" id="simulating-mertons-model" class="anchored"><span class="header-section-number">2</span> Simulating Merton’s Model</h2>
 <p>We now show how to simulate short rates using the Merton model with the Euler-Maruyama discretization, a simple and intuitive way to discretize a continuous-time stochastic process by a sequence of small time steps. It is a first-order numerical method for approximating stochastic differential equations (SDEs). As a refresher, consider a general <span class="math inline">d</span>-dimensional SDE of the form:</p>
 <p><span class="math display">
 dX_t = a(X_t, t) dt + b(X_t, t) dW_t
@@ -175,7 +179,7 @@ X_{t + \Delta t} = X_t + a(X_t, t) \Delta t + b(X_t, t) \sqrt{\Delta t} \cdot Z_
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Simulates the Merton short rates model using the </span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Euler-Maruyama discretization. As the drift does </span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">    not depend on the short rate, each increment can </span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    be simulated independently. </span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    be simulated independently.</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">    r0 (float): Initial (current) short rate.</span></span>
@@ -225,7 +229,7 @@ X_{t+\Delta t} = X_t + \int_t^{t+\Delta t} \mu(X_s, s)ds + \int_t^{t+\Delta t} \
 <figcaption>Figure 1. A Simulated Path of the Merton Short Rate Process</figcaption>
 </figure>
 </div>
-<h3 data-number="3.1" id="simulating-short-rates-bond-yields-and-term-structure-from-the-merton-model" class="anchored"><span class="header-section-number">3.1</span> Simulating Short Rates, Bond Yields and Term Structure from the Merton Model</h3>
+<h3 data-number="2.1" id="simulating-short-rates-bond-yields-and-term-structure-from-the-merton-model" class="anchored"><span class="header-section-number">2.1</span> Simulating Short Rates, Bond Yields and Term Structure from the Merton Model</h3>
 <p>In the <a href="../short-rate-models-1/">previous post</a>, we derived the price of a ZCB from the short-rate model in two different ways: 1. directly solve the SDE, and 2. guess the form of the solution as <span class="math inline">A(t, T) \exp (-B(t, T) r_t)</span> and solve for <span class="math inline">A</span> and <span class="math inline">B</span>. As it turns out, most common short-rate models have bond price solutions in the form of <span class="math inline">A(t, T) \exp (-B(t, T) r_t)</span>, so we will use this fact when we implement our short-rate models. Below is a simple Python implementation of the ZCB price and yields.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> B(t, T):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> T <span class="op">-</span> t</span>
@@ -256,9 +260,9 @@ X_{t+\Delta t} = X_t + \int_t^{t+\Delta t} \mu(X_s, s)ds + \int_t^{t+\Delta t} \
 </div>
 <p>When <span class="math inline">\sigma</span> is small relative to <span class="math inline">\mu</span>, the constant drift term dominates the term structure and is upward-sloping, almost in a straight line. When <span class="math inline">\sigma</span> is large, the long end of the term structure is dominated by the volatility term and is downward sloping due to the convexity effects.</p>
 <p>Now that we can simulate the short rates from the Merton model, we can learn about the reverse process, that is, the process of inferring the model parameters from the simulated short rates or market-observed short rates. This process is known as calibration. Note that we are yet not talking about calibrating the model to the cross-sectional yield curve. For a short-rate model, only the short-rates are assumed to be observed under the physical measure, and all longer-tenor yields are observed under the risk-neutral measure. The parameters we calibrated from the market-observed short rates are those under the physical measure and cannot be used directly to price longer-term bonds. Said differently, the parameters calibrated from the yield curves are those under the risk-neutral measure and cannot be used to forecast the short rates.</p>
-<h2 data-number="4" id="model-estimation" class="anchored"><span class="header-section-number">4</span> Model Estimation</h2>
+<h2 data-number="3" id="model-estimation" class="anchored"><span class="header-section-number">3</span> Model Estimation</h2>
 <p>There are at least two ways to calibrate Merton’s model to market-observed short rates: <code>maximum likelihood estimation (MLE)</code> and the <code>general method of moments (GMM)</code>. We will cover only MLE method in this post. As MLE is taught in most introductory statistics and econometrics courses, we will only provide a brief review of the method then move on to its application to the Merton model.</p>
-<h3 data-number="4.1" id="brief-review-of-the-maximum-likelihood-estimation" class="anchored"><span class="header-section-number">4.1</span> Brief Review of the Maximum Likelihood Estimation</h3>
+<h3 data-number="3.1" id="brief-review-of-the-maximum-likelihood-estimation" class="anchored"><span class="header-section-number">3.1</span> Brief Review of the Maximum Likelihood Estimation</h3>
 <p>Maximum Likelihood Estimation (MLE) is a method for estimating the parameters of a statistical model given observations. The idea is to find the model parameters that make the observed data most probable.</p>
 <p>The MLE can be calculated in the following steps:</p>
 <ol type="1">
@@ -266,11 +270,11 @@ X_{t+\Delta t} = X_t + \int_t^{t+\Delta t} \mu(X_s, s)ds + \int_t^{t+\Delta t} \
 <li>Take the logarithm of the likelihood function to obtain the log-likelihood, this turns the product of many small probabilities into a sum of logarithms of these probabilities, which is easier to compute.</li>
 <li>Find the parameter values that maximize the log-likelihood function.</li>
 </ol>
-<p>The likelihood function is often denoted as <span class="math inline">L  heta | x)</span>, where $ heta$ represents the model parameters and <span class="math inline">x</span> represents the observed data.</p>
-<h3 data-number="4.2" id="deriving-the-likelihood-for-the-merton-model" class="anchored"><span class="header-section-number">4.2</span> Deriving the Likelihood for the Merton Model</h3>
+<p>The likelihood function is often denoted as <span class="math inline">L\left(\theta \vert x\right)</span>, where <span class="math inline">\theta</span> represents the model parameters and <span class="math inline">x</span> represents the observed data.</p>
+<h3 data-number="3.2" id="deriving-the-likelihood-for-the-merton-model" class="anchored"><span class="header-section-number">3.2</span> Deriving the Likelihood for the Merton Model</h3>
 <p>To derive the likelihood function for the Merton model, we need to consider the probability distribution of the changes in the short rate. As we derived above, under the Merton model, these changes are independent and identically normal distributed:</p>
 <p><span class="math display">
-\delta r_t = r_{\left(t+\Delta t\right)} - r_t \sim N\left(\mu\delta t, \sigma^2\delta t\right)
+\delta r_t = r_\left(t+Δt\right) - r_t \sim N\left(\mu\delta t, \sigma^2\delta t\right)
 </span></p>
 <p>Given a series of observed short rates <span class="math inline">\left\{r_0, r_1, ..., r_n\right\}</span> at times <span class="math inline">\left\{t_0, t_1, ..., t_n\right\}</span>, we can write the likelihood function as:</p>
 <p><span class="math display">
@@ -284,7 +288,7 @@ f\left(r_i \vert r_{i-1}, \mu, \sigma\right) = \frac{1}{\sigma\sqrt{2\pi\delta t
 <p><span class="math display">
 ln(L(\mu, \sigma \vert r_0, ..., r_n)) = \sum_{i=1}^n \left[-ln(\sigma) - 0.5ln\left(2\pi\delta t_i\right) - \left(r_i - r_{i-1} - \mu\delta t_i\right)^2 / (2\sigma^2\delta t_i)\right]
 </span></p>
-<h3 data-number="4.3" id="maximizing-the-log-likelihood" class="anchored"><span class="header-section-number">4.3</span> Maximizing the Log-Likelihood</h3>
+<h3 data-number="3.3" id="maximizing-the-log-likelihood" class="anchored"><span class="header-section-number">3.3</span> Maximizing the Log-Likelihood</h3>
 <p>To find the maximum likelihood estimates, we can find the values of <span class="math inline">\mu</span> and <span class="math inline">\sigma</span> that maximize this log-likelihood function. We take the partial derivatives of the log-likelihood with respect to <span class="math inline">\mu</span> and <span class="math inline">\sigma</span>, setting them to zero, and solving the resulting equations to get an analytical solution.</p>
 <p>For the Merton model, we can derive closed-form solutions for the maximum likelihood estimators:</p>
 <p><span class="math display">
@@ -297,7 +301,7 @@ ln(L(\mu, \sigma \vert r_0, ..., r_n)) = \sum_{i=1}^n \left[-ln(\sigma) - 0.5ln\
 </span></p>
 <p>where <span class="math inline">T</span> is the number of periods.</p>
 <p>Numerical optimization techniques are often used to maximize the log-likelihood function, especially for more complex models where closed-form solutions are unavailable.</p>
-<h3 data-number="4.4" id="implementing-mle-for-the-merton-model" class="anchored"><span class="header-section-number">4.4</span> Implementing MLE for the Merton Model</h3>
+<h3 data-number="3.4" id="implementing-mle-for-the-merton-model" class="anchored"><span class="header-section-number">3.4</span> Implementing MLE for the Merton Model</h3>
 <p>With the above, we can now implement the MLE for the Merton model:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> merton_log_likelihood(params, rates, dt):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    mu, sigma <span class="op">=</span> params</span>
@@ -318,7 +322,7 @@ ln(L(\mu, \sigma \vert r_0, ..., r_n)) = \sum_{i=1}^n \left[-ln(\sigma) - 0.5ln\
 </figure>
 </div>
 <p>We can see immediately that the MLE estimates of <span class="math inline">\mu</span>, while unbiased, have a high variance. This is consistent with the observation that the mean of a distribution is a lot harder to estimate precisely than the variance. This problem is even more pronounced for the more complicated processes, such as the Vasicek model. We will discuss this in length in the <a href="../short-rate-models-4/">post 4</a> on calibrating the Vasicek model.</p>
-<h2 data-number="5" id="wrapping-up" class="anchored"><span class="header-section-number">5</span> Wrapping Up</h2>
+<h2 data-number="4" id="wrapping-up" class="anchored"><span class="header-section-number">4</span> Wrapping Up</h2>
 <p>We now know the Merton model, a simple one-factor short-rate equilibrium model that is also an affine term-structure model. In the <a href="../short-rate-models-1/">previous post</a>, we derived the price of a ZCB from the short-rate model and wrote a simple Python implementation of the ZCB price and yields.</p>
 <p>In this post, We also learn how to simulate short rates with this model and how to calibrate its parameters from market-observed short rates.</p>
 <p>We learn that the ZCB prices and yields are computed under the risk-neutral measure and calibrated to market-observed short rates yield parameters under the physical measure. However, the relationship of the parameters under these two measures still needs to be clarified, which prevents us from calibrating the model to market-observed yield curves. We will cover these topics much later, after introducing another popular short-rate model, the Vasicek model, in the <a href="../short-rate-models-3/">next post</a>.</p>
@@ -732,4 +736,5 @@ ln(L(\mu, \sigma \vert r_0, ..., r_n)) = \sum_{i=1}^n \left[-ln(\sigma) - 0.5ln\
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

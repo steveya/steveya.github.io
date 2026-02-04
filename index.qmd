@@ -1,7 +1,7 @@
 ---
 title: "Steve Yang"
 listing:
-  contents: posts
+  contents: posts/*/index.qmd
   sort: "date desc"
   type: default
   sort-ui: false
@@ -9,6 +9,7 @@ listing:
   image-height: 0px 
   feed: true
   fields: [date, title, description, categories, reading-time]
+  page-size: 10
 page-layout: full
 title-block-banner: false
 sidebar:
@@ -16,6 +17,8 @@ sidebar:
   style: "floating"
   position: right
   contents:
+    - text: "All series"
+      href: pages/series.qmd
     - text: "Volatility Forecasts"
       href: posts/volatility-forecasts-1/index.qmd
     - text: "Signature Methods"

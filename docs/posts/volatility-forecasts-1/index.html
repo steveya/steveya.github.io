@@ -7,6 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2021-09-07">
+<meta name="description" content="Exponential smoothing (ES) is a simple yet widely used approach to volatility forecasting in finance and economics.">
 
 <title>Volatility Forecasts (Part 1 - STES Model) – Steve Yang</title>
 <style>
@@ -33,6 +34,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -83,6 +85,16 @@ window.Quarto = {
 
 <body>
 
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
 
 <header id="title-block-header">
 <h1 class="title">Volatility Forecasts (Part 1 - STES Model)</h1>
@@ -94,34 +106,25 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#table-of-contents" id="toc-table-of-contents"><span class="header-section-number">1</span> Table of Contents</a></li>
-  <li><a href="#introduction" id="toc-introduction"><span class="header-section-number">2</span> Introduction</a></li>
-  <li><a href="#smooth-transition-exponential-smoothing" id="toc-smooth-transition-exponential-smoothing"><span class="header-section-number">3</span> Smooth Transition Exponential Smoothing</a></li>
-  <li><a href="#roadmap-for-this-series" id="toc-roadmap-for-this-series"><span class="header-section-number">4</span> Roadmap for this series</a></li>
-  <li><a href="#results" id="toc-results"><span class="header-section-number">5</span> Results</a>
+  <li><a href="#introduction" id="toc-introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#smooth-transition-exponential-smoothing" id="toc-smooth-transition-exponential-smoothing"><span class="header-section-number">2</span> Smooth Transition Exponential Smoothing</a></li>
+  <li><a href="#roadmap-for-this-series" id="toc-roadmap-for-this-series"><span class="header-section-number">3</span> Roadmap for this series</a></li>
+  <li><a href="#results" id="toc-results"><span class="header-section-number">4</span> Results</a>
   <ul>
-  <li><a href="#preprocessing" id="toc-preprocessing"><span class="header-section-number">5.1</span> Preprocessing</a></li>
-  <li><a href="#stes-vs-es-on-simulated-returns" id="toc-stes-vs-es-on-simulated-returns"><span class="header-section-number">5.2</span> <code>STES</code> vs <code>ES</code> on simulated returns</a></li>
-  <li><a href="#stes-vs-es-on-spy-returns" id="toc-stes-vs-es-on-spy-returns"><span class="header-section-number">5.3</span> <code>STES</code> vs <code>ES</code> on <code>SPY</code> returns</a></li>
-  <li><a href="#when-does-stes-beat-es-oos-mechanism-diagnostics" id="toc-when-does-stes-beat-es-oos-mechanism-diagnostics"><span class="header-section-number">5.4</span> When does STES beat ES? (OOS mechanism diagnostics)</a></li>
-  <li><a href="#event-study-around-win-vs-lose-dates" id="toc-event-study-around-win-vs-lose-dates"><span class="header-section-number">5.5</span> Event study around <code>WIN</code> vs <code>LOSE</code> dates</a></li>
-  <li><a href="#which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates" id="toc-which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates"><span class="header-section-number">5.6</span> Which transition variables drive the gate differently on <code>WIN</code> vs <code>LOSE</code> dates?</a></li>
+  <li><a href="#preprocessing" id="toc-preprocessing"><span class="header-section-number">4.1</span> Preprocessing</a></li>
+  <li><a href="#stes-vs-es-on-simulated-returns" id="toc-stes-vs-es-on-simulated-returns"><span class="header-section-number">4.2</span> <code>STES</code> vs <code>ES</code> on simulated returns</a></li>
+  <li><a href="#stes-vs-es-on-spy-returns" id="toc-stes-vs-es-on-spy-returns"><span class="header-section-number">4.3</span> <code>STES</code> vs <code>ES</code> on <code>SPY</code> returns</a></li>
+  <li><a href="#when-does-stes-beat-es-oos-mechanism-diagnostics" id="toc-when-does-stes-beat-es-oos-mechanism-diagnostics"><span class="header-section-number">4.4</span> When does STES beat ES? (OOS mechanism diagnostics)</a></li>
+  <li><a href="#event-study-around-win-vs-lose-dates" id="toc-event-study-around-win-vs-lose-dates"><span class="header-section-number">4.5</span> Event study around <code>WIN</code> vs <code>LOSE</code> dates</a></li>
+  <li><a href="#which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates" id="toc-which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates"><span class="header-section-number">4.6</span> Which transition variables drive the gate differently on <code>WIN</code> vs <code>LOSE</code> dates?</a></li>
   </ul></li>
-  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">6</span> Wrapping Up</a></li>
+  <li><a href="#wrapping-up" id="toc-wrapping-up"><span class="header-section-number">5</span> Wrapping Up</a></li>
   </ul>
 </nav>
 <h4 data-number="0.0.1" id="updates" class="anchored"><span class="header-section-number">0.0.1</span> Updates</h4>
 <p>20260113: This post is updated with more mathematical analysis</p>
 <p>(The code for this post can be found in the <a href="https://github.com/steveya/volatility-forecast/examples/volatility_forecast_1.py">Github repository</a>.)</p>
-<h2 data-number="1" id="table-of-contents" class="anchored"><span class="header-section-number">1</span> Table of Contents</h2>
-<ol type="1">
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#smooth-transition-exponential-smoothing">Smooth Transition Exponential Smoothing</a></li>
-<li><a href="#roadmap-for-this-series">Roadmap for this series</a></li>
-<li><a href="#results">Results</a></li>
-<li><a href="#wrapping-up">Wrapping Up</a></li>
-</ol>
-<h2 data-number="2" id="introduction" class="anchored"><span class="header-section-number">2</span> Introduction</h2>
+<h2 data-number="1" id="introduction" class="anchored"><span class="header-section-number">1</span> Introduction</h2>
 <p>Exponential smoothing (<code>ES</code>) is a simple yet widely used approach to volatility forecasting in finance and economics. It is formulated as</p>
 <p><span class="math display">
 \begin{equation}\label{eq:expsmooth}
@@ -168,7 +171,7 @@ e_t = y_t - \widehat{y}_{t \mid t-1}
 \qquad \alpha = 1+\theta
 </span></p>
 <p>This is exactly the exponential smoothing recursion where the next forecast is a convex combination of the latest observation and the previous forecast. For the usual invertibility condition of <code>MA(1)</code> (which requires <span class="math inline">\lvert \theta \rvert&lt;1</span>), we have <span class="math inline">\alpha \in (0,2)</span>; in many practical applications (including classical exponential smoothing), one restricts to <span class="math inline">\alpha\in(0,1)</span>, which corresponds to <span class="math inline">\theta\in(-1,0)</span>. <code>ARIMA(0,1,1)</code> implies an <code>EWMA</code> forecasting rule, and under correct specification, that rule is one-step-ahead optimal because it is the conditional expectation under the data-generating model.</p>
-<h2 data-number="3" id="smooth-transition-exponential-smoothing" class="anchored"><span class="header-section-number">3</span> Smooth Transition Exponential Smoothing</h2>
+<h2 data-number="2" id="smooth-transition-exponential-smoothing" class="anchored"><span class="header-section-number">2</span> Smooth Transition Exponential Smoothing</h2>
 <p><code>Taylor (2004)</code> introduces the Smooth Transition Exponential Smoothing (<code>STES</code>). It is motivated by an empirical regularity: past return shocks can have an asymmetric relationship with future realized volatility. A natural implication is that the effective update rate in an <code>EWMA</code> filter should vary with the characteristics of recent shocks rather than remain constant.</p>
 <p><code>STES</code> modifies <code>ES</code> by allowing the smoothing parameter to respond to a set of <strong>transition variables</strong>. Specifically, it is formulated as</p>
 <p><span class="math display">
@@ -186,12 +189,12 @@ e_t = y_t - \widehat{y}_{t \mid t-1}
 <p><a href="https://doi.org/10.1016/j.ijforecast.2003.09.010"><code>Taylor (2004)</code></a> reports that <code>STES</code> performs competitively against <code>ES</code> and benchmark <code>GARCH</code>-type models in terms of one-step-ahead forecasting accuracy for major equity indices. A later study, <a href="ttps://doi.org/10.1016/j.econmod.2020.02.021"><code>Liu, Taylor, and Choo (2020)</code></a>, extends the framework to investigate whether trading volume adds incremental predictive value for realized volatility and to assess the robustness of <code>STES</code> to outliers.</p>
 <p>A time-varying update rate can be beneficial in theory and in practice. If the volatility process behaves as if it has different effective persistence in different regions of the state space—e.g., calm periods with slow-moving variance and crisis periods with sharp variance re-pricing—then any constant-<span class="math inline">\alpha</span> filter is forced to compromise. It will either react too slowly in stressed regimes or too quickly in calm regimes. <code>STES</code> addresses this mismatch in the most conservative way possible: it retains the stable <code>EWMA</code> recursion but lets the learning rate <span class="math inline">\alpha_t</span> be a smooth function of observable state variables. In that sense, <code>STES</code> can be interpreted as a low-dimensional, regime-adaptive approximation to richer conditional variance dynamics.</p>
 <p>From a modeling perspective, <code>STES</code> remains deliberately restrictive. Rather than forecasting volatility level directly with a rich parametric dynamics, it focuses on estimating the time-varying smoothing parameter <span class="math inline">\alpha_t</span> that governs how quickly the volatility estimate incorporates new information.</p>
-<h2 data-number="4" id="roadmap-for-this-series" class="anchored"><span class="header-section-number">4</span> Roadmap for this series</h2>
+<h2 data-number="3" id="roadmap-for-this-series" class="anchored"><span class="header-section-number">3</span> Roadmap for this series</h2>
 <p>In this Volatility Forecasts series, we will explore extensions of the <code>STES</code> idea. In <a href="../volatility-forecasts-2/">Part 2</a> and <a href="../volatility-forecasts-3/">Part 3</a>, we replace the linear transition function in <code>STES</code> with a tree-ensemble model.</p>
-<h2 data-number="5" id="results" class="anchored"><span class="header-section-number">5</span> Results</h2>
-<h3 data-number="5.1" id="preprocessing" class="anchored"><span class="header-section-number">5.1</span> Preprocessing</h3>
+<h2 data-number="4" id="results" class="anchored"><span class="header-section-number">4</span> Results</h2>
+<h3 data-number="4.1" id="preprocessing" class="anchored"><span class="header-section-number">4.1</span> Preprocessing</h3>
 <p>All results use standardized inputs: features (excluding the constant term) are normalized using <code>StandardScaler</code> fit on the training split, then applied identically to both training and test splits.</p>
-<h3 data-number="5.2" id="stes-vs-es-on-simulated-returns" class="anchored"><span class="header-section-number">5.2</span> <code>STES</code> vs <code>ES</code> on simulated returns</h3>
+<h3 data-number="4.2" id="stes-vs-es-on-simulated-returns" class="anchored"><span class="header-section-number">4.2</span> <code>STES</code> vs <code>ES</code> on simulated returns</h3>
 <p>We begin by replicating a subset of results from <code>Liu et al. (2020)</code> using data and simulation procedures available to us. The authors compare (among other models) <code>ES</code> and several <code>STES</code> variants by estimating parameters on a training window and evaluating out-of-sample metrics such as <code>RMSE</code>, <code>MAE</code>, and <code>MedAE</code> (median absolute error). They first conduct a controlled experiment on simulated <code>GARCH</code> returns contaminated by extreme outliers, and report that <code>STES</code> can outperform <code>ES</code> in terms of <code>MAE</code> and <code>MedAE</code>, and handle outliers more effectively. As we will see below, <code>STES</code> perform only similarly to <code>ES</code> in terms of <code>RMSE</code>.</p>
 <p>Table 1 reports our <code>RMSE</code> results alongside those from <code>Liu et al. (2020)</code>. Although we do not reproduce their numbers exactly, the overall pattern is similar: the models are close, and the <code>STES</code> variants differ only marginally from <code>ES</code>. We follow the naming convention used by the authors: <code>STES-AE</code> uses absolute return (<code>AE</code>) as the transition variable; <code>STES-E&amp;AE&amp;SE</code> uses returns (<code>E</code>), absolute returns (<code>AE</code>), and squared returns (<code>SE</code>) jointly.</p>
 <table class="caption-top">
@@ -321,7 +324,7 @@ r_t^2 - \sigma_t^2 = \sigma_t^2(z_t^2 - 1)
 </span></p>
 <p>With heavy-tailed innovations (as in the Student-<span class="math inline">t</span> setting), <span class="math inline">\mathrm{Var}(z_t^2)</span> can be large, and this irreducible component dominates the <code>RMSE</code>. As a result, even meaningful improvements in forecasting <span class="math inline">\sigma_t^2</span> may translate into small changes in <code>RMSE</code> measured against <span class="math inline">r_t^2</span>.</p>
 <p>On our simulated <code>GARCH</code> paths, it is not surprising that <code>STES</code> fails to materially beat <code>ES</code> in <code>RMSE</code>. Under that DGP, the optimal one-step forecast is the <code>GARCH</code> conditional variance itself; <code>ES</code> already approximates it well when persistence is high; and the additional flexibility of a time-varying gate has no stable signal to exploit and can only fit noise.</p>
-<h3 data-number="5.3" id="stes-vs-es-on-spy-returns" class="anchored"><span class="header-section-number">5.3</span> <code>STES</code> vs <code>ES</code> on <code>SPY</code> returns</h3>
+<h3 data-number="4.3" id="stes-vs-es-on-spy-returns" class="anchored"><span class="header-section-number">4.3</span> <code>STES</code> vs <code>ES</code> on <code>SPY</code> returns</h3>
 <p>On real equity-index data, <code>STES</code> has more opportunity to add value because the transition variables can capture state dependence that a constant <span class="math inline">\alpha</span> cannot. Table 2 reports out-of-sample <code>RMSE</code> for <code>ES</code> and several <code>STES</code> variants when forecasting <code>SPY</code> realized variance. Across specifications, <code>STES</code> improvements over <code>ES</code> in terms of <code>RMSE</code> are more significant, with the best-performing variant in this run being <code>STES-E&amp;AE&amp;SE</code>.</p>
 <table class="caption-top">
 <thead>
@@ -444,7 +447,7 @@ r_t^2 - \sigma_t^2 = \sigma_t^2(z_t^2 - 1)
 <p>[Table 3: Fitted logistic gate coefficients <span class="math inline">\beta</span> for <code>ES</code> and <code>STES</code> variants on <code>SPY</code> (standardized inputs).]</p>
 <p>Each coefficient <span class="math inline">\beta_j</span> controls the direction and strength <span class="math inline">x_{j,t}</span> pushes the score and <span class="math inline">\alpha_t</span>. Increasing <span class="math inline">x_{j,t}</span> shifts the score by <span class="math inline">\Delta s_t = \beta_j\Delta x_{j,t}</span>, which increases <span class="math inline">\alpha_t</span> if <span class="math inline">\beta_j\Delta x_{j,t} &gt; 0</span> and decreases <span class="math inline">\alpha_t</span> if it is negative. Therefore, a negative <span class="math inline">\beta</span> coefficient above implies a negative relationship between the variable and <span class="math inline">\alpha</span>, all else equal. Since <span class="math inline">\alpha_t</span> is logistic, its responsiveness depends on the level of the score: <span class="math inline">\partial\alpha_t/\partial s_t = \alpha_t(1-\alpha_t)</span>, which is largest near <span class="math inline">\alpha_t\approx 0.5</span> and small when <span class="math inline">\alpha_t</span> is near 0 or 1.</p>
 <p>Since the three variables are not independent, centeris paribus interpretation is a little difficult. However, we can see consistently that a negative SPY return shock increase the weights on recent observation, but its magnitude, as captured by <code>sqlogret</code> and <code>abslogret</code>, can dampen its effect, so large negative return does not increase <span class="math inline">\alpha</span> as much as a medium-sized one.</p>
-<h3 data-number="5.4" id="when-does-stes-beat-es-oos-mechanism-diagnostics" class="anchored"><span class="header-section-number">5.4</span> When does STES beat ES? (OOS mechanism diagnostics)</h3>
+<h3 data-number="4.4" id="when-does-stes-beat-es-oos-mechanism-diagnostics" class="anchored"><span class="header-section-number">4.4</span> When does STES beat ES? (OOS mechanism diagnostics)</h3>
 <p>Define the per-date squared loss differential:</p>
 <p><span class="math display">
 D_t = (y_t - \hat y^{ES}_t)^2 - (y_t - \hat y^{STES}_t)^2
@@ -455,7 +458,7 @@ D_t = (y_t - \hat y^{ES}_t)^2 - (y_t - \hat y^{STES}_t)^2
 <li><strong><code>LOSE</code> events</strong> = dates in the <strong>bottom 10%</strong> of <span class="math inline">D_t</span> in the OOS sample.</li>
 </ul>
 <p>Note this is a <em>quantile definition</em>: “<code>WIN</code>” does not mathematically guarantee <span class="math inline">D_t&gt;0</span> (though in practice the top tail is typically positive), and similarly “<code>LOSE</code>” does not guarantee <span class="math inline">D_t&lt;0</span>. It is simply “best vs worst relative days for <code>STES</code>.”</p>
-<h4 data-number="5.4.1" id="forecasts-and-loss-differential-over-time" class="anchored"><span class="header-section-number">5.4.1</span> Forecasts and loss differential over time</h4>
+<h4 data-number="4.4.1" id="forecasts-and-loss-differential-over-time" class="anchored"><span class="header-section-number">4.4.1</span> Forecasts and loss differential over time</h4>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_forecasts_and_D.png" class="img-fluid"></p>
@@ -464,14 +467,14 @@ D_t = (y_t - \hat y^{ES}_t)^2 - (y_t - \hat y^{STES}_t)^2
 </div>
 <p>Figure 1 shows the target <span class="math inline">y_t</span> and the two one-step forecasts in the <code>OOS</code> period, together with <span class="math inline">D_t</span>. Most of the time the curves overlap. <code>ES</code> and <code>STES</code> often make nearly identical forecasts. <code>RMSE</code> differences are driven by a few episodes. Large spikes in <span class="math inline">D_t</span> concentrate in rare periods where volatility moves sharply (notably around the 2020 shock). This is common with squared-error objectives: the overall <code>RMSE</code> can be dominated by a small set of high-variance days.</p>
 <hr>
-<h3 data-number="5.5" id="event-study-around-win-vs-lose-dates" class="anchored"><span class="header-section-number">5.5</span> Event study around <code>WIN</code> vs <code>LOSE</code> dates</h3>
+<h3 data-number="4.5" id="event-study-around-win-vs-lose-dates" class="anchored"><span class="header-section-number">4.5</span> Event study around <code>WIN</code> vs <code>LOSE</code> dates</h3>
 <p>What is different in the days around dates where STES is relatively much better vs relatively much worse? To answer this, we perform an “event study” centered at each OOS date <span class="math inline">t</span> that is a <code>WIN</code> (or <code>LOSE</code>) event. Let event time be <span class="math inline">k \in [-10,10]</span> where <span class="math inline">k=0</span> corresponds to the <code>WIN</code>/<code>LOSE</code> date <span class="math inline">t</span> (the date whose <span class="math inline">D_t</span> places it in the tail). For a series <span class="math inline">z_t</span> we plot the cross-event mean:</p>
 <p><span class="math display">
 \mathbb{E}\left[z_{t+k}\mid t \in \texttt{WIN}\right]
 \quad\text{and}\quad
 \mathbb{E}\left[z_{t+k}\mid t \in \texttt{``LOSE``}\right].
 </span></p>
-<h4 data-number="5.5.1" id="a-realized-absolute-return-around-events" class="anchored"><span class="header-section-number">5.5.1</span> (A) Realized absolute return around events</h4>
+<h4 data-number="4.5.1" id="a-realized-absolute-return-around-events" class="anchored"><span class="header-section-number">4.5.1</span> (A) Realized absolute return around events</h4>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_event_absr.png" class="img-fluid"></p>
@@ -479,7 +482,7 @@ D_t = (y_t - \hat y^{ES}_t)^2 - (y_t - \hat y^{STES}_t)^2
 </figure>
 </div>
 <p>The y-axis is <strong>mean <span class="math inline">\lvert r_{t+k} \rvert</span></strong> across <code>WIN</code> events (blue) and <code>LOSE</code> events (orange). We observe that <code>WIN</code> events tend to be associated with <strong>larger moves</strong> (especially immediately after the event date), consistent with the idea that “big shocks” are exactly where a state-dependent update rate can matter. <code>LOSE</code> events look like cases where volatility does not persist in the same way after the event date. Being more reactive is helpful when volatility persists, but harmful when volatility mean-reverts quickly.</p>
-<h4 data-number="5.5.2" id="b-gate-level-used-for-the-forecast-at-date-t" class="anchored"><span class="header-section-number">5.5.2</span> (B) Gate level used for the forecast at date t</h4>
+<h4 data-number="4.5.2" id="b-gate-level-used-for-the-forecast-at-date-t" class="anchored"><span class="header-section-number">4.5.2</span> (B) Gate level used for the forecast at date t</h4>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_event_alpha.png" class="img-fluid"></p>
@@ -489,7 +492,7 @@ D_t = (y_t - \hat y^{ES}_t)^2 - (y_t - \hat y^{STES}_t)^2
 <p>The y-axis is <strong>mean <span class="math inline">\alpha_{t+k-1}</span></strong>, i.e.&nbsp;the gate value <em>used in the forecast for date <span class="math inline">t+k</span></em> (since <code>STES</code> updates <span class="math inline">\hat\sigma^2_{t}</span> using <span class="math inline">\alpha_{t-1}</span>). The green line is the constant <code>ES</code> <span class="math inline">\alpha</span>.</p>
 <p>We see that <code>STES</code> has a <strong>higher effective update rate</strong> than <code>ES</code> on average in this run (blue/orange both above the green baseline). Around the most “<code>WIN</code>” dates, the gate is often elevated and shows a distinct hump shortly after the event date, consistent with “shock → faster updating.” However, <code>LOSE</code> events also show elevated gate levels. <strong>High <span class="math inline">\alpha</span> is not automatically good.</strong> The same reactivity that helps in persistent volatility regimes can hurt when the shock is followed by fast normalization.</p>
 <p><code>STES</code> adds value when it increases <span class="math inline">\alpha</span> in <em>the right episodes</em>—i.e., when a shock is followed by persistent high variance.</p>
-<h4 data-number="5.5.3" id="c-innovation-proxy-around-events" class="anchored"><span class="header-section-number">5.5.3</span> (C) Innovation proxy around events</h4>
+<h4 data-number="4.5.3" id="c-innovation-proxy-around-events" class="anchored"><span class="header-section-number">4.5.3</span> (C) Innovation proxy around events</h4>
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img src="../../assets/img/post_assets/volatility-forecasts-1/spy_event_u.png" class="img-fluid"></p>
@@ -501,7 +504,7 @@ D_t = (y_t - \hat y^{ES}_t)^2 - (y_t - \hat y^{STES}_t)^2
 u_{t-1} = r_{t-1}^2 - \hat v^{ES}_{t-1}
 </span></p>
 <p>where <span class="math inline">\hat v^{ES}_{t-1}</span> is the <code>ES</code> variance forecast at <span class="math inline">t-1</span> (so <span class="math inline">u_{t-1}</span> measures whether the realized squared return was above or below what <code>ES</code> expected). <code>WIN</code> events tend to align with patterns where the <code>ES</code> innovation is followed by persistence (so increasing reactivity helps).<code>LOSE</code> events often look like cases where the innovation is more transient (so increasing reactivity can lead to overshooting and larger error). We observe again that the gate is attempting to react to a surprise, but surprises come in at least two flavors—persistent vs transitory. <code>STES-E&amp;AE&amp;SE</code> outperforms <code>ES</code> in our test sample perhaps due to the presence of persistent high vol regime.</p>
-<h3 data-number="5.6" id="which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates" class="anchored"><span class="header-section-number">5.6</span> Which transition variables drive the gate differently on <code>WIN</code> vs <code>LOSE</code> dates?</h3>
+<h3 data-number="4.6" id="which-transition-variables-drive-the-gate-differently-on-win-vs-lose-dates" class="anchored"><span class="header-section-number">4.6</span> Which transition variables drive the gate differently on <code>WIN</code> vs <code>LOSE</code> dates?</h3>
 <p>To interpret the fitted gate, we decompose the logit score into per-feature contributions:</p>
 <p><span class="math display">
 c_{j,t} = x_{j,t}\beta_j
@@ -540,7 +543,7 @@ c_{j,t} = x_{j,t}\beta_j
 <li><strong>Reactivity is not always beneficial:</strong> both the <code>WIN</code> and <code>LOSE</code> sets contain highly reactive gate states. The key is not merely raising <span class="math inline">\alpha</span>, but raising it when volatility is about to persist and avoiding overreaction when volatility mean-reverts.</li>
 </ol>
 <p>On <code>SPY</code> the <code>STES-E&amp;AE&amp;SE</code> mechanism behaves like a state-dependent <code>EWMA</code>: it becomes more reactive after large moves, and that reactivity is precisely where its incremental forecasting value is concentrated.</p>
-<h2 data-number="6" id="wrapping-up" class="anchored"><span class="header-section-number">6</span> Wrapping Up</h2>
+<h2 data-number="5" id="wrapping-up" class="anchored"><span class="header-section-number">5</span> Wrapping Up</h2>
 <p><code>Taylor (2004)</code> notes that <code>STES</code> is not a statistical model in the classical parametric sense, which limits the use of conventional significance tests for parameters. Both <code>Taylor (2004)</code> and <code>Liu et al. (2020)</code> nevertheless provide informative interpretation of fitted transition functions. In particular, the estimated transition function implies that volatility updating speed can depend on both the sign and the magnitude of recent shocks (among other variables such as volume), and the mechanism can downweight certain observations depending on how the features combine in the logit score—supporting the empirical claim of improved robustness to outliers.</p>
 <p>In the <a href="../volatility-forecasts-2/">next post</a>, we discuss an extension of STES that replaces the linear transition function with tree-ensemble models.</p>
 
@@ -953,4 +956,5 @@ c_{j,t} = x_{j,t}\beta_j
 
 
 
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>
