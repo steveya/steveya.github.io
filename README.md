@@ -10,8 +10,8 @@ quarto preview
 
 ## Migration
 
-Legacy Jekyll sources are preserved in `_jekyll_legacy/`. To regenerate the Quarto
-content from the legacy posts:
+Legacy Jekyll sources have been removed now that the site is fully on Quarto. To
+regenerate the Quarto content from any restored legacy posts:
 
 ```bash
 ./scripts/migrate_posts.py --clean

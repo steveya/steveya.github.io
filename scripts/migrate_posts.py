@@ -180,13 +180,13 @@ def main() -> None:
         "--source",
         type=Path,
         default=Path("_jekyll_legacy/_posts"),
-        help="Path to the legacy Jekyll _posts directory",
+        help="Path to the legacy Jekyll _posts directory (if restored)",
     )
     parser.add_argument(
         "--tabs-source",
         type=Path,
         default=Path("_jekyll_legacy/_tabs"),
-        help="Path to the legacy Jekyll _tabs directory",
+        help="Path to the legacy Jekyll _tabs directory (if restored)",
     )
     parser.add_argument(
         "--dest",
