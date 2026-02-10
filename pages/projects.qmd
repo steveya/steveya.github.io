@@ -15,7 +15,7 @@ My study notes on the signature method
   - [Signature Methods (Part 1 - Motivation)](../posts/signature-method-1/)
   - [Signature Methods (Part 2 - Signature and Augmentation)](../posts/signature-method-2/)
   - [Signature Methods (Part 3 - Lead–Lag Augmentation and Practical Limitations to the Signature Method)](../posts/signature-method-3/)
-  - Signature Methods in Volatility Forecasts
+  - [Signature Methods (Part 4 - Rolling Signatures in Volatility Forecasts)](../posts/signature-method-4)
 
 ## Volatility Forecasting
 My work on volatility forecasting. How far can we go by extending simple exponential smoothing filter?
@@ -24,7 +24,7 @@ My work on volatility forecasting. How far can we go by extending simple exponen
   - [Volatility Forecasts (Part 1 - ES vs STES Model)](../posts/volatility-forecasts-1/)
   - [Volatility Forecasts (Part 2 - XGBoost-STES Algorithm 1)](../posts/volatility-forecasts-2/)
   - [Volatility Forecasts (Part 3 - XGBoost-STES Algorithm 2)](../posts/volatility-forecasts-3/)
-  - Signature Methods in Volatility Forecasts
+  - [Related: Signature Methods (Part 4 - Rolling Signatures in Volatility Forecasts)](../posts/signature-method-4)
 - Research Code: [volatility-forecast](https://github.com/steveya/volatility-forecast/blob/main/examples)
 - Research Library: [volatility-forecast](https://github.com/steveya/volatility-forecast)
 
