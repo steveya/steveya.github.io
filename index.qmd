@@ -1,7 +1,9 @@
 ---
 title: "Steve Yang"
 listing:
-  contents: posts/*/index.qmd
+  contents:
+    - posts/*/index.qmd
+    - posts/*/index.ipynb
   sort: "date desc"
   type: default
   sort-ui: false
