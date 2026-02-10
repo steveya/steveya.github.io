@@ -1,0 +1,153 @@
+---
+title: "Intercept Invariance to Added Standardized Features"
+description: "When centering (or standardizing) features leaves the intercept unchanged, and when it does not."
+author: "Steve Yang"
+date: "2026-02-10"
+categories: [Linear Models, Optimization, Statistics]
+draft: false
+---
+
+# Intercept Invariance to Added Standardized Features
+
+While I was working on [Signature Method 4](../signature-method-4/), I realized how little attention I had paid to the behavior of the intercept (or bias) when new standardized features are added. Standardizing (removing the mean and scaling to unit variance) is a common preprocessing step recommended for numerical stability, interpretability, and regularization. A common intuition—true in ordinary least squares—is that adding additional centered regressors should not affect the intercept. However, once we move beyond quadratic losses, that intuition stops being a reliable guide.
+
+This note examines the intercept across a broad class of estimators. We show that intercept invariance to adding centered features is a special property of quadratic objectives with an unpenalized intercept. Outside that family, there is no invariance guarantee, and the intercept generically changes when features are added.
+
+---
+
+## A general setup
+
+Consider a supervised model with a linear predictor
+$$
+\eta_i = b + x_i^\top w,
+$$
+where $b$ is the intercept and $w$ are the slope coefficients. Many estimators—maximum likelihood for generalized linear models, large-margin classifiers, robust regression, and regularized variants—can be written as
+$$
+\min_{b,w} \; \sum_{i=1}^n \ell\left(y_i,\eta_i\right) + \Omega(w).
+$$
+Here $\ell(y,\eta)$ is a per-observation loss (often a negative log-likelihood), and $\Omega(w)$ is a penalty acting on $w$. We assume throughout that the intercept is *not* penalized; penalizing $b$ creates additional coupling and can move the intercept even in settings where it would otherwise be invariant.
+
+We say the intercept is **invariant to adding centered features** if, after augmenting the design matrix with additional columns $z$ satisfying
+$$
+\frac{1}{n}\sum_{i=1}^n z_i = 0
+$$
+the fitted intercept $\hat b$ remains unchanged. When fitting is weighted—e.g., in weighted least squares—the natural notion of “centered” is *weighted* centering, $\sum_i \alpha_i z_i = 0$ for weights $\alpha_i$ used by the objective.
+
+We ask whether the intercept equation decouples from the fitted slopes once features are centered.
+
+## The intercept equation and the quadratic decoupling mechanism
+
+The intercept is determined by the first-order optimality condition with respect to $b$. Define the loss derivative with respect to the linear predictor,
+$$
+\psi_i(\eta_i; y_i) = \frac{\partial}{\partial \eta} \ell(y_i,\eta)\Big|_{\eta=\eta_i}
+$$
+Differentiating the objective with respect to $b$ yields the intercept condition
+$$
+\frac{\partial}{\partial b}\sum_{i=1}^n \ell(y_i, b+x_i^\top w)
+= \sum_{i=1}^n \psi_i\left(b+x_i^\top w; y_i\right) = 0
+$$
+since $\Omega(w)$ does not involve $b$. The intercept is therefore the value of $b$ that solves a scalar equation whose form depends on the entire set of fitted linear predictors $\{b+x_i^\top w\}$.
+
+The invariance in ordinary least squares is a consequence of an exceptional simplification with squared loss:
+$$
+\ell(y,\eta)=\tfrac12(y-\eta)^2,
+\qquad
+\psi(\eta;y)=\eta-y
+$$
+the intercept condition becomes
+$$
+\sum_{i=1}^n (b + x_i^\top w - y_i)=0
+\quad\Longrightarrow\quad
+b = \bar y - \bar x^\top w,
+$$
+where $\bar y = \frac1n\sum_i y_i$ and $\bar x=\frac1n\sum_i x_i$. If the regressors are centered ($\bar x=0$), then
+$$
+\hat b = \bar y,
+$$
+independent of $w$. This is the decoupling mechanism: once centered, the intercept is pinned to the sample mean of $y$, and any change in $w$—including changes induced by adding additional centered regressors—cannot move $\hat b$.
+
+Notably, this logic survives the addition of any penalty $\Omega(w)$ (ridge, lasso, elastic net, group penalties, and so on), as long as the intercept remains unpenalized. The penalty can change $\hat w$, but with centered regressors it still cannot affect $\hat b$.
+
+## Logistic regression and why centering does not protect the intercept
+
+Logistic regression is convex, but its intercept does not enjoy the quadratic decoupling described above. For binary $y_i\in\{0,1\}$, the negative log-likelihood is
+$$
+\ell(y,\eta)=\log(1+e^\eta)-y\eta
+$$
+and its derivative is
+$$
+\psi(\eta;y)=\sigma(\eta)-y,
+\qquad
+\sigma(\eta)=\frac{1}{1+e^{-\eta}}
+$$
+The intercept condition is therefore
+$$
+\sum_{i=1}^n \big(\sigma(b+x_i^\top w)-y_i\big)=0
+\quad\Longleftrightarrow\quad
+\frac1n\sum_{i=1}^n \hat p_i = \bar y
+$$
+where $\hat p_i=\sigma(\hat b+x_i^\top \hat w)$. The average fitted probability equals the empirical event rate.
+
+This constraint does not isolate $\hat b$, because $\hat p_i$ depends nonlinearly on the entire distribution of linear predictors. Another way to see the coupling is to view the intercept as an implicit function of $w$. Define
+$$
+g(b;w)=\sum_{i=1}^n \sigma(b+x_i^\top w)-\sum_{i=1}^n y_i
+$$
+For any fixed $w$, $g(\cdot;w)$ is strictly increasing in $b$ since
+$$
+\frac{\partial g}{\partial b}(b;w)=\sum_{i=1}^n \sigma'(b+x_i^\top w)
+=\sum_{i=1}^n \sigma(\eta_i)\big(1-\sigma(\eta_i)\big)>0.
+$$
+Hence the intercept is uniquely determined by $w$: $\hat b = b(w)$ such that $g(b(w);w)=0$.
+
+Differentiate $g(b(w);w)=0$ with respect to $w$ to obtain
+$$
+\frac{d b}{d w}
+= -\frac{\partial g/\partial w}{\partial g/\partial b}
+$$
+Now,
+$$
+\frac{\partial g}{\partial w}(b;w)=\sum_{i=1}^n \sigma'(b+x_i^\top w) x_i
+$$
+Even if the regressors are centered so that $\sum_i x_i = 0$, the quantity above is generally not zero because the weights $\sigma'(\eta_i)$ vary across observations. Centering would remove $\sum_i x_i$, but here we have $\sum_i \sigma'(\eta_i) x_i$, a *weighted* sum with weights that depend on $b,w$. Consequently, $\frac{d b}{d w}\neq 0$ generically: as $\hat w$ changes when new features are added, the intercept must adjust to maintain the constraint $\frac1n\sum_i \hat p_i=\bar y$.
+
+This is the essential difference from least squares. In OLS the intercept condition is affine in $\eta$ and collapses to $b=\bar y-\bar x^\top w$. In logistic regression the intercept condition is nonlinear in $\eta$, so the intercept depends on how the fitted linear predictors are distributed, not merely on their mean.
+
+## Robust regression and the narrow class of intercept-invariant models
+
+Robust regression makes the same structural point even more transparent. A broad class of robust estimators, such as M-estimators, solve
+$$
+\min_{b,w} \sum_{i=1}^n \rho\left(r_i\right) + \Omega(w),
+\qquad
+r_i = y_i - b - x_i^\top w
+$$
+for a convex, typically non-quadratic $\rho$. The intercept condition is
+$$
+0=\frac{\partial}{\partial b}\sum_{i=1}^n \rho(r_i)
+= -\sum_{i=1}^n \psi(r_i)
+\qquad
+\psi(r)=\rho'(r)
+$$
+Thus $\hat b$ solves
+$$
+\sum_{i=1}^n \psi\left(y_i-\hat b-x_i^\top \hat w\right)=0
+$$
+
+When $\rho(r)=\tfrac12 r^2$, we have $\psi(r)=r$, and the condition reduces to $\sum_i (y_i-b-x_i^\top w)=0$, yielding the least-squares invariance under centering. For a genuinely robust choice such as Huber’s loss, $\psi$ is nonlinear: small residuals are treated roughly linearly while large residuals are clipped. The same implicit-function logic as in logistic regression applies. Let
+$$
+g(b;w)=\sum_{i=1}^n \psi(y_i-b-x_i^\top w)
+$$
+Then
+$$
+\frac{\partial g}{\partial b}(b;w)= -\sum_{i=1}^n \psi'(y_i-b-x_i^\top w),
+\qquad
+\frac{\partial g}{\partial w}(b;w)= -\sum_{i=1}^n \psi'(y_i-b-x_i^\top w) x_i
+$$
+Even if $\sum_i x_i=0$, the term $\sum_i \psi'(r_i) x_i$ is generally nonzero because $\psi'(r_i)$ depends on the residual magnitude and thus varies across $i$. In robust regression, the intercept becomes sensitive to *which observations are downweighted* by the robust score; adding features changes residuals and therefore changes those weights, which in turn shifts the intercept.
+
+We see that least squares is truly a special case: the models whose intercept is invariant to adding centered features are essentially the quadratic ones (with an unpenalized intercept), including:
+
+* ordinary least squares with an intercept and regressors centered on the estimation sample,
+* penalized least squares (ridge, lasso, elastic net, group penalties) provided the intercept is not penalized and regressors are centered,
+* weighted/generalized least squares with fixed weights/metric, provided centering is done with respect to the same weights/metric.
+
+Everything else lacks the quadratic decoupling property. Centering may improve conditioning and interpretation, but it does not generally immunize the intercept against changes induced by adding features. In non-quadratic losses—logistic regression and robust M-estimation being archetypal—the intercept is the solution to a nonlinear balance equation that depends on the full configuration of fitted linear predictors (and often on endogenous weights), so altering the feature set typically alters the fitted bias as well.
