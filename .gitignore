@@ -30,3 +30,7 @@ assets/.DS_Store
 /.quarto/
 
 **/*.quarto_ipynb
+
+# Local alphaforge caches (not part of the post)
+**/.af_store/
+**/.af_cache/
