@@ -1,0 +1,10 @@
+# Graph-Regularized PCA estimator (standalone repo)
+grpca @ git+https://github.com/steveya/grpca.git
+
+# Data
+alphaforge @ git+https://github.com/steveya/alphaforge.git
+
+# Plotting / analysis
+matplotlib
+pandas
+scipy
