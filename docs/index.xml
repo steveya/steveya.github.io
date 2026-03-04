@@ -10,7 +10,41 @@
 <atom:link href="https://steveya.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Updates on quantitative analysis, data science, and ML education.</description>
 <generator>quarto-1.8.27</generator>
-<lastBuildDate>Sat, 24 Jan 2026 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 14 Feb 2026 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Graph-Regularized Low-Rank Models (Part 1: JGB Curve)</title>
+  <link>https://steveya.github.io/posts/graph-regularization-1/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Rates</category>
+  <category>Quantitative Finance</category>
+  <category>Dimensionality Reduction</category>
+  <category>Regularization</category>
+  <guid>https://steveya.github.io/posts/graph-regularization-1/</guid>
+  <pubDate>Sat, 14 Feb 2026 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Intercept Invariance to Added Standardized Features</title>
+  <dc:creator>Steve Yang</dc:creator>
+  <link>https://steveya.github.io/posts/intercept invariance to adding centered features/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Linear Models</category>
+  <category>Optimization</category>
+  <category>Statistics</category>
+  <guid>https://steveya.github.io/posts/intercept invariance to adding centered features/</guid>
+  <pubDate>Tue, 10 Feb 2026 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Signature Methods (Part 4 — Rolling Signatures in Volatility Forecasts)</title>
+  <dc:creator>Steve Yang</dc:creator>
+  <link>https://steveya.github.io/posts/signature-method-4/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Quantitative Finance</category>
+  <category>Signature Methods</category>
+  <category>Time Series</category>
+  <category>Volatility Modeling</category>
+  <guid>https://steveya.github.io/posts/signature-method-4/</guid>
+  <pubDate>Fri, 06 Feb 2026 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Volatility Forecasts (Part 3 - XGBSTES Algorithm 2)</title>
   <link>https://steveya.github.io/posts/volatility-forecasts-3/</link>

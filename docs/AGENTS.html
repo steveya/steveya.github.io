@@ -72,6 +72,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#citations-references" id="toc-citations-references"><span class="header-section-number">1.5</span> Citations / References</a></li>
   <li><a href="#search-page-custom" id="toc-search-page-custom"><span class="header-section-number">1.6</span> Search page (custom)</a></li>
   <li><a href="#cicd" id="toc-cicd"><span class="header-section-number">1.7</span> CI/CD</a></li>
+  <li><a href="#prose-writing-requirements-very-important" id="toc-prose-writing-requirements-very-important"><span class="header-section-number">1.8</span> PROSE / WRITING REQUIREMENTS (VERY IMPORTANT)</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -157,6 +158,18 @@ ul.task-list li input[type="checkbox"] {
 <li>Deploy workflow: <code>.github/workflows/pages-deploy.yml</code> (renders + runs smoke tests before deploy).</li>
 <li>PR/Push checks: <code>.github/workflows/ci.yml</code> (renders + runs smoke tests).</li>
 <li>Smoke tests are Playwright-based under <code>tests/e2e/</code>.</li>
+</ul>
+<h2 data-number="1.8" id="prose-writing-requirements-very-important" class="anchored"><span class="header-section-number">1.8</span> PROSE / WRITING REQUIREMENTS (VERY IMPORTANT)</h2>
+<ul>
+<li>Tone and vocabulary must be professional and academic, with precise definitions and careful caveats.</li>
+<li>Avoid bullet points except when absolutely necessary (prefer paragraphs).</li>
+<li>Section headers must be short and must NOT be phrased as questions.</li>
+<li>Avoid the symbol “:=” entirely. Use “=” with a short phrase like “where” or “defined as”.</li>
+<li>LaTeX display equations should NOT end with punctuation.</li>
+<li>Inline math should also avoid trailing punctuation when possible.</li>
+<li>Prefer consistent notation, and include a short “Notation” paragraph early (no bullet list).</li>
+<li>Avoid casual language, jokes, and informal asides.</li>
+<li>Mathematical explanations should be comprehensive. Do not avoid showing derivations when they clarify the method.</li>
 </ul>
 
 

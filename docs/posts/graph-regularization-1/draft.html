@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-02-14">
+
+<title>Graph-Regularized Low-Rank Models (Part 1: JGB Curve) – Steve Yang</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
+
+<header id="title-block-header">
+<h1 class="title">Graph-Regularized Low-Rank Models (Part 1: JGB Curve)</h1>
+
+<p class="date">2026-02-14</p>
+</header>
+
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#theoretical-underpinning" id="toc-theoretical-underpinning"><span class="header-section-number">1</span> Theoretical underpinning</a></li>
+  <li><a href="#jgb-experiment-setup" id="toc-jgb-experiment-setup"><span class="header-section-number">2</span> JGB experiment setup</a></li>
+  <li><a href="#hypotheses" id="toc-hypotheses"><span class="header-section-number">3</span> Hypotheses</a></li>
+  <li><a href="#full-sample-study" id="toc-full-sample-study"><span class="header-section-number">4</span> Full-sample study</a></li>
+  <li><a href="#rolling-study-one-year-training-windows" id="toc-rolling-study-one-year-training-windows"><span class="header-section-number">5</span> Rolling study: one-year training windows</a></li>
+  <li><a href="#rolling-study-three-month-training-windows" id="toc-rolling-study-three-month-training-windows"><span class="header-section-number">6</span> Rolling study: three-month training windows</a></li>
+  <li><a href="#discussion" id="toc-discussion"><span class="header-section-number">7</span> Discussion</a></li>
+  <li><a href="#conclusion" id="toc-conclusion"><span class="header-section-number">8</span> Conclusion</a></li>
+  <li><a href="#appendix-missing-data-imputation-with-the-40y-tenor" id="toc-appendix-missing-data-imputation-with-the-40y-tenor"><span class="header-section-number">9</span> Appendix: Missing-data imputation with the 40Y tenor</a></li>
+  </ul>
+</nav>
+<p>Regression and PCA in finance typically ignore two sources of structure that practitioners know exist: the relationships <em>between</em> variables and the dependence along the <em>time index</em>. A cross-sectional regression of returns on characteristics treats each predictor as exchangeable; PCA of a yield panel treats each tenor as an unordered column. In reality, variables cluster into hierarchies—sector, asset class, maturity bucket—and observations are temporally ordered. I have used graph-based priors in both regression and PCA settings to encode this exogenous information, for example using hierarchical graphs to group related variables together so that coefficient or loading estimates borrow strength within economically meaningful clusters.</p>
+<p>Econometric models take the opposite approach: VARs, state-space models, and panel regressions handle time-series and cross-sectional dependence natively, but they impose parametric structure on the dynamics—linearity, fixed lag order, homogeneous coefficients—that can be unrealistic when the data-generating process is nonstationary or high-dimensional.</p>
+<p>Graph-regularized dimensionality reduction sits between these two traditions. The approach preserves the nonparametric flexibility of PCA while injecting structural priors through Laplacian penalties, and it can encode <em>both</em> feature relationships and temporal continuity simultaneously. I came across a paper on <a href="https://openaccess.thecvf.com/content_cvpr_2017_workshops/w29/papers/Paradkar_Graph-Regularized_Generalized_Low-Rank_CVPR_2017_paper.pdf">Graph-Regularized Generalized Low-Rank Models (Paradkar, Udell. (2017))</a> that formalises this idea within a unified GLRM framework—supporting arbitrary loss functions, missing data, and two-sided graph penalties. The generality of the framework is what attracted me: the same objective can express PCA with temporal smoothing, PCA with hierarchical feature grouping, or both at once, and it extends naturally to non-Gaussian losses.</p>
+<p>I built the <a href="https://github.com/steveya/grpca"><code>grpca</code></a> package to implement this framework with two normalisation techniques—spectral Laplacian scaling and spectral data scaling—that Paradkar and Udell did not use. These normalizations make the regularization hyperparameters dimensionless and portable across rolling windows with different sample sizes, variance levels, and graph topologies, which is essential for the kind of rolling out-of-sample evaluation used in this series.</p>
+<p>The present post is the first in a planned series. I chose the JGB yield curve as the starting point because it is one of the first applications of PCA that people in finance learn about—a low-dimensional, well-understood setting where readers can build intuition before the framework is applied to harder problems. The yield curve is deliberately too easy for feature-side regularization: with only 11 tenors, PCA loadings are already smooth, and the interesting question is whether <em>temporal</em> regularization of the score matrix provides out-of-sample gains. Later posts will move to higher-dimensional settings where feature-side graph priors should matter more, with the eventual goal of incorporating graph-regularized PCA into nowcasting frameworks such as FAVAR, where the factor extraction step is standard PCA and replacing it with GR-PCA could improve both the factors and the downstream forecasts.</p>
+<p>Principal component analysis is the minimum-variance linear projector and coincides with the maximum-likelihood estimator under isotropic Gaussian noise, yet it makes no use of the ordered tenor geometry or temporal continuity of yield-curve data. Graph-regularized PCA adds Laplacian roughness penalties—on the maturity axis, the time axis, or both—to the PCA objective and introduces a structure-aware bias-variance trade-off. This note evaluates PCA and GR-PCA on Japanese Ministry of Finance constant-maturity JGB yields with short rolling train-test windows and frozen out-of-sample reconstruction. The central question is which graph channel—tenor smoothness, temporal smoothness, or both—provides the most benefit, and whether any effect is concentrated in higher components.</p>
+<h2 data-number="1" id="theoretical-underpinning" class="anchored"><span class="header-section-number">1</span> Theoretical underpinning</h2>
+<p>Let <span class="math inline">X\in\mathbb{R}^{n\times p}</span> denote the data matrix, with rows indexed by observations and columns indexed by features. Missing entries are allowed and are encoded as <code>np.nan</code>. We write <span class="math inline">\Omega\subset\{1,\dots,n\}\times\{1,\dots,p\}</span> for the observed-entry set and use <span class="math inline">P_\Omega(\cdot)</span> for the projection that keeps observed entries and sets missing entries to zero. After standardization, the working matrix is <span class="math inline">Z</span>.</p>
+<p>Given this notation, the estimator minimizes a masked two-sided graph-regularized low-rank objective:</p>
+<p><span class="math display">
+\min_{U\in\mathbb{R}^{n\times k},\,V\in\mathbb{R}^{p\times k}}\;
+\tfrac{1}{2\,s_X}\left\|P_\Omega\!\left(Z-UV^\top\right)\right\|_F^2
+\; +\; \tfrac12\lambda_s\,\operatorname{tr}(U^\top \widetilde{L}_s\, U)
+\; +\; \tfrac12\lambda_f\,\operatorname{tr}(V^\top \widetilde{L}_f\, V)
+\; +\; \tfrac12\mu_u\|U\|_F^2
+\; +\; \tfrac12\mu_v\|V\|_F^2.
+</span></p>
+<p>The factor <span class="math inline">U</span> contains observation embeddings, <span class="math inline">V</span> contains feature loadings, <span class="math inline">\widetilde{L}_s</span> is the observation-side graph Laplacian, and <span class="math inline">\widetilde{L}_f</span> is the feature-side graph Laplacian. The ridge terms with <span class="math inline">\mu_u,\mu_v&gt;0</span> improve coercivity and numerical conditioning.</p>
+<p>Each graph entering the objective is assumed to be undirected and possibly weighted, with a symmetric positive-semidefinite Laplacian <span class="math inline">L = D - W</span> where <span class="math inline">W</span> is the weighted adjacency matrix and <span class="math inline">D</span> is the degree matrix. No specific topology is assumed: the framework accommodates chains, trees, complete graphs, <span class="math inline">k</span>-nearest-neighbour graphs, or any other undirected weighted graph. The only mathematical requirements are symmetry (<span class="math inline">W = W^\top</span>), positive semidefiniteness (<span class="math inline">L \succeq 0</span>, guaranteed by construction for any combinatorial Laplacian), and separability (the observation graph <span class="math inline">L_s \in \mathbb{R}^{n \times n}</span> and the feature graph <span class="math inline">L_f \in \mathbb{R}^{p \times p}</span> are specified independently). The Laplacian quadratic form <span class="math inline">\operatorname{tr}(U^\top L_s\, U)</span> penalises disagreement between connected observations in the latent space, and <span class="math inline">\operatorname{tr}(V^\top L_f\, V)</span> penalises disagreement between connected features. The strength of the penalty between any pair <span class="math inline">(i,j)</span> is proportional to the edge weight <span class="math inline">w_{ij}</span>; pairs with no edge contribute nothing.</p>
+<p>Paradkar &amp; Udell (2017) use raw combinatorial Laplacians <span class="math inline">L = D - W</span> and unscaled data terms. When the same model is applied across multiple data windows of different sizes, this creates a practical problem: the magnitude of the graph penalty grows with <span class="math inline">\lambda_{\max}(L)</span>, which depends on graph size and edge weights, while the magnitude of the data-fidelity term scales with the variance and dimension of the data matrix. A fixed <span class="math inline">\lambda</span> that provides moderate regularization in one setting can be negligible or overwhelming in another. Our implementation introduces two normalizations that make the hyperparameters dimensionless and portable. First, every graph Laplacian entering the objective is divided by its largest eigenvalue: <span class="math inline">\widetilde{L} = L / \lambda_{\max}(L)</span>, so that <span class="math inline">\lambda_{\max}(\widetilde{L}) = 1</span>. (The spectral normalization is distinct from the symmetric normalized Laplacian <span class="math inline">D^{-1/2}LD^{-1/2}</span>; our normalization applies to whatever Laplacian the user supplies, including already degree-normalized ones.) With this convention, the quadratic form <span class="math inline">\operatorname{tr}(V^\top \widetilde{L} V)</span> lies in <span class="math inline">[0, \|V\|_F^2]</span> for any graph, so the regularization strength has a graph-independent upper bound on its effect. Second, the reconstruction term is divided by <span class="math inline">s_X = \sigma_1^2(Z_{\text{fill}})</span>, the squared leading singular value of the zero-filled standardized data matrix, scaling the data-fidelity term to order one regardless of sample size or variance level. Together, these normalizations mean that a given <span class="math inline">\tau</span> value represents roughly the same bias-variance trade-off regardless of sample size, data variance, or graph topology. The combined normalization allows a single hyperparameter grid to be used across multiple estimation windows without per-window rescaling.</p>
+<p>The factorization <span class="math inline">UV^\top</span> is not unique: for any orthogonal <span class="math inline">R\in\mathbb{R}^{k\times k}</span>, the rotated pair <span class="math inline">(UR,VR)</span> produces the same product. Individual columns of <span class="math inline">V</span> are therefore not uniquely identified as fixed population eigenvectors, and raw column-wise comparisons across estimation windows can be misleading. Meaningful comparison operates at the subspace level or after Procrustes alignment. Ridge penalties on both <span class="math inline">U</span> and <span class="math inline">V</span> improve numerical conditioning but do not resolve this rotational ambiguity. To simplify the hyperparameter search space, we parameterize regularization by total strength <span class="math inline">\tau\ge 0</span> and allocation <span class="math inline">\rho\in[0,1]</span>:</p>
+<p><span class="math display">
+\lambda_s=\tau\rho,\qquad \lambda_f=\tau(1-\rho).
+</span></p>
+<p>The reparametrization separates overall shrinkage intensity from how shrinkage is split between observation-side smoothness (<span class="math inline">U</span>) and feature-side smoothness (<span class="math inline">V</span>). Since both Laplacians and data are normalized, <span class="math inline">\tau</span> is dimensionless, comparable across windows, and more interpretable than tuning raw penalty magnitudes independently.</p>
+<p>Paradkar &amp; Udell (2017) solve Graph-Regularized GLRMs with <strong>PALM</strong> (Proximal Alternating Linearized Minimization), a framework designed for general (possibly non-smooth) loss functions such as Huber, hinge, or ordinal losses. Each PALM iteration linearizes the smooth data-fidelity term around the current iterate and applies a loss-specific proximal operator, with convergence guaranteed under a Lipschitz step-size rule. Restricting to <strong>squared-error loss</strong> makes the objective everywhere differentiable in <span class="math inline">(U,V)</span>, and the proximal operator reduces to the identity. The full PALM machinery is therefore unnecessary. Our implementation (<code>grpca</code>) replaces it with <strong>alternating gradient descent with monotone backtracking line search</strong>: each outer iteration computes the closed-form gradient</p>
+<p><span class="math display">\nabla_U = \frac{1}{s_X}\,P_\Omega\!\bigl(UV^\top\!-Z\bigr)\,V + \lambda_s\,\widetilde{L}_s\,U + \mu_u\,U, \qquad \nabla_V = \frac{1}{s_X}\,P_\Omega\!\bigl(UV^\top\!-Z\bigr)^\top U + \lambda_f\,\widetilde{L}_f\,V + \mu_v\,V,</span></p>
+<p>takes a gradient step <span class="math inline">U \leftarrow U - \eta\,\nabla_U</span> (then <span class="math inline">V \leftarrow V - \eta\,\nabla_V</span>), and halves the step size <span class="math inline">\eta</span> until the objective decreases monotonically. Convergence to a stationary point follows from the standard descent-lemma argument for smooth bi-convex problems. Unlike Paradkar &amp; Udell’s general framework, which optionally includes <span class="math inline">\ell_1</span> sparsity on <span class="math inline">U</span> or <span class="math inline">V</span>, we use dense (unpenalized) factors throughout—appropriate for settings where all features contribute to each latent factor. We initialize factors with a truncated SVD of the zero-filled matrix, providing a good starting point that typically converges in tens of iterations.</p>
+<p>The two penalty terms have natural economic readings in the yield-curve context. The observation-side penalty on <span class="math inline">U</span> encodes the prior that factor exposures—the market’s aggregate assessment of the policy rate (level), the term premium (slope), and convexity demand (curvature)—evolve smoothly from one trading day to the next. This is the same “slow-moving factor” assumption that underlies Kalman-filtered dynamic factor models (Stock and Watson, Doz et al.), where the state-transition equation <span class="math inline">u_t = u_{t-1} + \eta_t</span> imposes temporal continuity; the day-chain penalty strength <span class="math inline">\tau\rho</span> plays an analogous role to the signal-to-noise ratio in that framework. The feature-side penalty on <span class="math inline">V</span> encodes the prior that adjacent maturities load similarly on each factor—a discrete, nonparametric analogue of the smooth loading functions <span class="math inline">B(\tau)</span> in affine term-structure models, where the Ricatti ODEs guarantee that loadings vary continuously with maturity. Nelson-Siegel achieves this smoothness parametrically through exponential-decay basis functions; the tenor-chain Laplacian achieves it nonparametrically. Finally, the masked reconstruction loss has a direct financial application: it asks “given 10 of 11 tenors, how well can the model predict the held-out tenor?”—precisely the question a relative-value trader poses when identifying rich or cheap points on the curve, or a risk manager faces when interpolating illiquid tenor points from liquid ones.</p>
+<h2 data-number="2" id="jgb-experiment-setup" class="anchored"><span class="header-section-number">2</span> JGB experiment setup</h2>
+<p>The data are Japanese Ministry of Finance constant-maturity JGB yields. We work with a stable subset of tenors (in years) and compute daily yield changes. We standardize each rolling window using train-window statistics only; the train mean and standard deviation are applied to the test window with no leakage.</p>
+<p>We instantiate the framework with two chain graphs that encode the known structure of yield-curve data. The <strong>tenor-chain</strong> (feature graph) connects adjacent maturities with edge weights inversely proportional to the squared maturity gap:</p>
+<p><span class="math display">
+w_{i,i+1}^{(f)} = \frac{1}{(\Delta m_{i})^2}, \qquad \Delta m_i = m_{i+1} - m_i,
+</span></p>
+<p>where <span class="math inline">m_i</span> is the maturity in years of the <span class="math inline">i</span>-th tenor. The weighting gives tighter coupling between closely spaced tenors (e.g., 1Y–2Y) and weaker coupling between widely spaced ones (e.g., 20Y–30Y). The Laplacian quadratic form admits the pairwise-difference identity</p>
+<p><span class="math display">
+\operatorname{tr}(V^\top \widetilde{L}_f\, V) = \tfrac{1}{2}\sum_{i} \tilde{w}_{i,i+1}^{(f)}\,\|v_i - v_{i+1}\|_2^2,
+</span></p>
+<p>which penalizes high-frequency oscillation in the loading vectors: neighboring tenors are encouraged to have similar loading coordinates. The <strong>day-chain</strong> (observation graph) connects consecutive trading dates with unit weight. The day-chain is rebuilt on each training window so that its dimension matches the number of training observations. The analogous quadratic form</p>
+<p><span class="math display">
+\operatorname{tr}(U^\top \widetilde{L}_s\, U) = \tfrac{1}{2}\sum_{t} \tilde{w}_{t,t+1}^{(s)}\,\|u_t - u_{t+1}\|_2^2
+</span></p>
+<p>penalizes abrupt jumps in the latent score trajectories between adjacent dates, encoding temporal continuity of the factor structure.</p>
+<p>We compare four specifications, all with <span class="math inline">k = 3</span> latent components:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 36%">
+<col style="width: 28%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Observation graph</th>
+<th>Feature graph</th>
+<th>CV search</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>PCA</strong></td>
+<td>—</td>
+<td>—</td>
+<td><span class="math inline">\tau = 0</span> (no CV)</td>
+</tr>
+<tr class="even">
+<td><strong>Day</strong></td>
+<td>day-chain</td>
+<td>—</td>
+<td><span class="math inline">\tau</span> with <span class="math inline">\rho = 1</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Tenor</strong></td>
+<td>—</td>
+<td>tenor-chain</td>
+<td><span class="math inline">\tau</span> with <span class="math inline">\rho = 0</span></td>
+</tr>
+<tr class="even">
+<td><strong>Day+Tenor</strong></td>
+<td>day-chain</td>
+<td>tenor-chain</td>
+<td><span class="math inline">\tau</span> and <span class="math inline">\rho \in \{0.25, 0.5, 0.75\}</span></td>
+</tr>
+</tbody>
+</table>
+<p>Nested time-series cross-validation selects <span class="math inline">(\tau, \rho)</span> window by window. Before specifying hypotheses, we examine the data and graph structure that these penalties will act on.</p>
+<div id="cell-fig-yield-changes" class="cell" data-execution_count="96">
+<div class="cell-output cell-output-display">
+<div id="fig-yield-changes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-yield-changes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-yield-changes-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-yield-changes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Cross-tenor average daily yield change over the sample period
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-yield-changes" class="quarto-xref">Figure&nbsp;1</a> reveals several distinct volatility regimes driven by Bank of Japan policy shifts. The 2013 Quantitative and Qualitative Easing (QQE) announcement—Kuroda’s “shock-and-awe” bond-buying programme—triggered a 10Y limit-down and an abrupt widening of daily yield moves across the curve. Three years later the introduction of Yield Curve Control (YCC) in September 2016 explicitly capped the 10Y yield at approximately 0%, compressing daily volatility to near-zero for several years. The unwinding of that regime from December 2022 (YCC band widened to ±50 bp) through March 2024 (exit from YCC) produced a volatility resurgence, particularly at intermediate tenors.</p>
+<p>Two features are relevant for the graph-regularization setup. First, the regime heterogeneity motivates per-window standardisation (train-window mean and variance applied without leakage) and short one-year rolling windows that adapt to local market conditions. Second, the visible low-frequency structure in daily yield changes—slow regime evolution punctuated by policy-driven jumps—suggests the day-chain temporal-smoothness prior should be well-calibrated: true factor scores evolve on weekly-to-monthly time scales, so penalising day-to-day score jumps is unlikely to remove genuine signal. The day-chain itself is simply a unit-weighted path graph on <span class="math inline">n</span> consecutive training dates and needs no separate visualisation; its only role is to encode the ordering of observations.</p>
+<p><a href="#fig-graph-priors" class="quarto-xref">Figure&nbsp;2</a> displays the tenor-chain adjacency matrix <span class="math inline">W</span> that enters the feature-side Laplacian <span class="math inline">L_f = D - W</span>. The inverse-squared-gap weighting produces a tight cluster at 7Y–8Y–9Y (gap = 1 year, weight <span class="math inline">= 1.0</span>) and much weaker coupling between distant tenors such as 20Y–30Y (gap = 10 years, weight <span class="math inline">= 0.01</span>). The penalty therefore concentrates its effect on tenors that already co-move almost perfectly—precisely the region where PCA loadings are smoothest and least in need of regularisation.</p>
+<p>There is also a structural mismatch with the JGB policy environment. Under YCC the BOJ intervened specifically at the 10Y tenor, decoupling it from its nearest neighbours and creating a kink in the yield curve that traditional chain-graph smoothing would treat as noise. The wider maturity gaps where such policy-induced discontinuities appear receive the least penalty weight (<span class="math inline">0.04</span> for 5Y–7Y, <span class="math inline">0.01</span> for 20Y–30Y). Whether this graph topology provides any variance reduction, or merely adds bias by smoothing through genuine structural breaks, is the subject of the hypotheses below.</p>
+<div id="cell-fig-graph-priors" class="cell" data-execution_count="97">
+<div class="cell-output cell-output-display">
+<div id="fig-graph-priors" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-graph-priors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-graph-priors-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-graph-priors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Adjacency matrix for the tenor-chain feature graph
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h2 data-number="3" id="hypotheses" class="anchored"><span class="header-section-number">3</span> Hypotheses</h2>
+<p><strong>Variance-reduction channel.</strong> In one-year rolling windows with <span class="math inline">p\approx 11</span> tenors, estimation noise can destabilise higher-order loading vectors. Tenor-side Laplacian shrinkage should primarily reduce loading roughness <span class="math inline">\operatorname{tr}(V^\top L_f V)</span>, while day-side shrinkage should primarily reduce score roughness <span class="math inline">\operatorname{tr}(U^\top L_s U)</span>. The low-frequency regime structure visible in <a href="#fig-yield-changes" class="quarto-xref">Figure&nbsp;1</a> suggests the day-chain smoothness prior is well-matched to the data-generating process: if the true score trajectory varies on weekly-to-monthly scales, penalising daily jumps removes noise without distorting signal. Economically, this encodes the belief that JGB factor exposures—policy-rate expectations, term-premium dynamics, supply-demand imbalances—do not jump overnight except during explicit policy surprises, an assumption broadly consistent with the low-frequency evolution of BOJ accommodation since 1999. If this translates to out-of-sample gains, the effect should be concentrated in the third component where the eigengap is smallest.</p>
+<p><strong>Bias-dominance channel.</strong> If the underlying signal is already smooth and well identified at the subspace level, additional shrinkage increases bias without sufficient variance reduction. The tenor-chain structure in <a href="#fig-graph-priors" class="quarto-xref">Figure&nbsp;2</a> concentrates penalty weight on the 7Y–9Y cluster where PCA loadings are already near-smooth, suggesting the bias-dominance channel may prevail for the feature-side graph in this low-dimensional setting.</p>
+<p>These predictions are testable through roughness diagnostics, two window-to-window stability metrics—<em>subspace distance</em> <span class="math inline">\sin\theta_{\max}</span>, the sine of the largest principal angle between consecutive loading subspaces (Davis–Kahan), and <em>Procrustes drift</em> <span class="math inline">\min_R \|V_t - V_{t-1}R\|_F</span>, the Frobenius residual after optimal orthogonal alignment—and masked reconstruction error. The exercise is explicitly falsifiable and does not presuppose improvement. We test these predictions with full-sample fits followed by rolling out-of-sample evaluation at two window lengths.</p>
+<h2 data-number="4" id="full-sample-study" class="anchored"><span class="header-section-number">4</span> Full-sample study</h2>
+<p>Before rolling evaluation, we fit four GLRM specifications on the full sample with <span class="math inline">k=3</span> components. Three of the four models use nested time-series cross-validation to select their hyperparameters; PCA is the unregularized baseline. The models are:</p>
+<ul>
+<li><strong>PCA</strong>: no graph regularization (<span class="math inline">\tau=0</span>).</li>
+<li><strong>Day</strong>: example-graph (day-chain) regularization only; CV searches over <span class="math inline">\tau</span> with <span class="math inline">\rho=1</span>.</li>
+<li><strong>Tenor</strong>: feature-graph (tenor-chain) regularization only; CV searches over <span class="math inline">\tau</span> with <span class="math inline">\rho=0</span>.</li>
+<li><strong>Day+Tenor</strong>: both graphs; CV searches over <span class="math inline">\tau</span> and <span class="math inline">\rho\in\{0.25,0.5,0.75\}</span>.</li>
+</ul>
+<p>We align loadings from each model to the PCA baseline via orthogonal Procrustes before comparison.</p>
+<div class="cell" data-execution_count="98">
+<div id="fig-full-sample-loading-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="98">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-full-sample-loading-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="fig-full-sample-loading-comparison-1" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-full-sample-loading-comparison-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<style type="text/css">
+#T_8848b table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_8848b thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_8848b tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_8848b tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_8848b" class="do-not-create-environment caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_8848b_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">day_graph</th>
+<th id="T_8848b_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">tenor_graph</th>
+<th id="T_8848b_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">tau</th>
+<th id="T_8848b_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">rho</th>
+<th id="T_8848b_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">lambda_s</th>
+<th id="T_8848b_level0_col5" class="col_heading level0 col5" data-quarto-table-cell-role="th">lambda_f</th>
+<th id="T_8848b_level0_col6" class="col_heading level0 col6" data-quarto-table-cell-role="th">recon_error</th>
+<th id="T_8848b_level0_col7" class="col_heading level0 col7" data-quarto-table-cell-role="th">loading_roughness</th>
+<th id="T_8848b_level0_col8" class="col_heading level0 col8" data-quarto-table-cell-role="th">score_roughness</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">model</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col2" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col3" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col4" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col5" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col6" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col7" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col8" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_8848b_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">PCA</th>
+<td id="T_8848b_row0_col0" class="data row0 col0">False</td>
+<td id="T_8848b_row0_col1" class="data row0 col1">False</td>
+<td id="T_8848b_row0_col2" class="data row0 col2">0.0000</td>
+<td id="T_8848b_row0_col3" class="data row0 col3">0.0000</td>
+<td id="T_8848b_row0_col4" class="data row0 col4">0.0000</td>
+<td id="T_8848b_row0_col5" class="data row0 col5">0.0000</td>
+<td id="T_8848b_row0_col6" class="data row0 col6">0.9874</td>
+<td id="T_8848b_row0_col7" class="data row0 col7">0.0011</td>
+<td id="T_8848b_row0_col8" class="data row0 col8">5908694.7152</td>
+</tr>
+<tr class="even">
+<th id="T_8848b_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">Day</th>
+<td id="T_8848b_row1_col0" class="data row1 col0">True</td>
+<td id="T_8848b_row1_col1" class="data row1 col1">False</td>
+<td id="T_8848b_row1_col2" class="data row1 col2">0.0100</td>
+<td id="T_8848b_row1_col3" class="data row1 col3">1.0000</td>
+<td id="T_8848b_row1_col4" class="data row1 col4">0.0100</td>
+<td id="T_8848b_row1_col5" class="data row1 col5">0.0000</td>
+<td id="T_8848b_row1_col6" class="data row1 col6">0.9728</td>
+<td id="T_8848b_row1_col7" class="data row1 col7">0.0024</td>
+<td id="T_8848b_row1_col8" class="data row1 col8">125820.9565</td>
+</tr>
+<tr class="odd">
+<th id="T_8848b_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">Tenor</th>
+<td id="T_8848b_row2_col0" class="data row2 col0">False</td>
+<td id="T_8848b_row2_col1" class="data row2 col1">True</td>
+<td id="T_8848b_row2_col2" class="data row2 col2">0.0000</td>
+<td id="T_8848b_row2_col3" class="data row2 col3">0.0000</td>
+<td id="T_8848b_row2_col4" class="data row2 col4">0.0000</td>
+<td id="T_8848b_row2_col5" class="data row2 col5">0.0000</td>
+<td id="T_8848b_row2_col6" class="data row2 col6">0.9874</td>
+<td id="T_8848b_row2_col7" class="data row2 col7">0.0011</td>
+<td id="T_8848b_row2_col8" class="data row2 col8">5908694.7152</td>
+</tr>
+<tr class="even">
+<th id="T_8848b_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">Day+Tenor</th>
+<td id="T_8848b_row3_col0" class="data row3 col0">True</td>
+<td id="T_8848b_row3_col1" class="data row3 col1">True</td>
+<td id="T_8848b_row3_col2" class="data row3 col2">0.0300</td>
+<td id="T_8848b_row3_col3" class="data row3 col3">0.5000</td>
+<td id="T_8848b_row3_col4" class="data row3 col4">0.0150</td>
+<td id="T_8848b_row3_col5" class="data row3 col5">0.0150</td>
+<td id="T_8848b_row3_col6" class="data row3 col6">0.9734</td>
+<td id="T_8848b_row3_col7" class="data row3 col7">0.0023</td>
+<td id="T_8848b_row3_col8" class="data row3 col8">66555.2307</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-full-sample-loading-comparison-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Full-sample Procrustes-aligned loading comparison (k=3) across PCA, Day, Tenor, and Day+Tenor GLRM models with cross-validated hyperparameters
+</figcaption>
+</figure>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-full-sample-loading-comparison-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-full-sample-loading-comparison-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-full-sample-loading-comparison-output-2.png" id="fig-full-sample-loading-comparison-2" class="img-fluid" data-ref-parent="fig-full-sample-loading-comparison">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-full-sample-loading-comparison-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-full-sample-loading-comparison-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-full-sample-loading-comparison-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-full-sample-loading-comparison-output-3.png" id="fig-full-sample-loading-comparison-3" class="img-fluid" data-ref-parent="fig-full-sample-loading-comparison">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-full-sample-loading-comparison-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-full-sample-loading-comparison-4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-full-sample-loading-comparison-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-full-sample-loading-comparison-output-4.png" id="fig-full-sample-loading-comparison-4" class="img-fluid" data-ref-parent="fig-full-sample-loading-comparison">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-full-sample-loading-comparison-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(d)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-full-sample-loading-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3
+</figcaption>
+</figure>
+</div>
+</div>
+<p>In GLRM the factorisation <span class="math inline">UV^\top</span> is invariant under orthogonal rotation, so individual columns of <span class="math inline">V</span> are not uniquely identified. The loading comparison above first aligns each model to the PCA baseline via orthogonal Procrustes, which finds the rotation <span class="math inline">R^\star=\arg\min_R\|V_{\text{PCA}}-V_{\text{model}}R\|_F</span> subject to <span class="math inline">R^\top R=I</span>. Differences that remain after alignment reflect genuine changes in the factor geometry, not relabelling or sign ambiguity.</p>
+<p>The Procrustes-aligned loading profiles are consistent with the standard yield-curve factor taxonomy. Component 1 is a <em>level</em> factor: positive loadings across all tenors with a broad plateau at intermediate maturities, corresponding to parallel shifts driven by the common component of rate expectations. Component 2 is a <em>slope</em> factor: monotonically decreasing from positive at the short end to negative at the long end, capturing the steepening and flattening moves associated with BOJ accommodation cycles and term-premium variation. Component 3 is a <em>curvature</em> (butterfly) factor: a hump-shaped profile peaking around 5Y–7Y, reflecting the belly-vs.-wings dynamics that arise from supply concentration in benchmark tenors and relative-value positioning. Together the three components explain the vast majority of daily yield-change variation, consistent with decades of term-structure research on both U.S. Treasuries and JGBs.</p>
+<p>The results table reveals an immediate finding: cross-validation selects <span class="math inline">\tau=0</span> for the Tenor model, collapsing it to PCA. The tenor-chain smoothness prior brings no improvement to the full-sample validation loss, so the conservative selection rule defaults to zero regularisation. By contrast, the Day model selects <span class="math inline">\tau=0.01</span> and the Day+Tenor model selects <span class="math inline">\tau=0.03</span> (<span class="math inline">\rho=0.5</span>), and both achieve lower in-sample reconstruction error than PCA. Day-graph regularisation sharply reduces score roughness <span class="math inline">\operatorname{tr}(U^\top L_s U)</span>, confirming that the temporal-smoothness penalty reaches its intended target. The rolling study below examines whether these in-sample improvements persist out of sample.</p>
+<div class="cell" data-execution_count="99">
+<div id="tbl-explained-variance" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="99">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-explained-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Explained variance by PCA component (full sample)
+</figcaption>
+<div aria-describedby="tbl-explained-variance-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<style type="text/css">
+#T_91c43 table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_91c43 thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_91c43 tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_91c43 tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_91c43" class="do-not-create-environment cell caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_91c43_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">Variance explained (%)</th>
+<th id="T_91c43_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">Cumulative (%)</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">Component</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_91c43_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">1</th>
+<td id="T_91c43_row0_col0" class="data row0 col0">83.39</td>
+<td id="T_91c43_row0_col1" class="data row0 col1">83.39</td>
+</tr>
+<tr class="even">
+<th id="T_91c43_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">2</th>
+<td id="T_91c43_row1_col0" class="data row1 col0">10.53</td>
+<td id="T_91c43_row1_col1" class="data row1 col1">93.92</td>
+</tr>
+<tr class="odd">
+<th id="T_91c43_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">3</th>
+<td id="T_91c43_row2_col0" class="data row2 col0">3.08</td>
+<td id="T_91c43_row2_col1" class="data row2 col1">97.00</td>
+</tr>
+<tr class="even">
+<th id="T_91c43_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">4</th>
+<td id="T_91c43_row3_col0" class="data row3 col0">0.98</td>
+<td id="T_91c43_row3_col1" class="data row3 col1">97.98</td>
+</tr>
+<tr class="odd">
+<th id="T_91c43_level0_row4" class="row_heading level0 row4" data-quarto-table-cell-role="th">5</th>
+<td id="T_91c43_row4_col0" class="data row4 col0">0.62</td>
+<td id="T_91c43_row4_col1" class="data row4 col1">98.60</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div id="cell-fig-score-trajectories" class="cell" data-execution_count="127">
+<div class="cell-output cell-output-display">
+<div id="fig-score-trajectories" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-score-trajectories-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-score-trajectories-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-score-trajectories-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Full-sample factor scores (monthly last, level/slope/curvature) for PCA vs Day-regularised model with BOJ policy events
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The score trajectories (plotted at month-end frequency for visual clarity; the smoothing effect is present in the underlying daily data) make the effect of day-chain regularisation visually concrete. The PCA level score (Component 1) displays rapid oscillations that are largely absent in the Day-regularised counterpart, which tracks a smoother path through the same macro regimes—the 2003 VaR shock sell-off, the 2008 GFC flight-to-quality, the 2013 QQE-induced volatility, and the 2022–2024 YCC exit. The smoothing is most dramatic in the curvature score (Component 3), where PCA produces chaotic high-frequency noise while the Day model isolates a slowly evolving butterfly signal. Economically, this smoothing aligns with the prior that macro and policy factors shift on weekly-to-monthly frequencies; the high-frequency residual captured by PCA is predominantly market microstructure noise (bid-ask bounce, inventory effects) rather than tradeable signal.</p>
+<h2 data-number="5" id="rolling-study-one-year-training-windows" class="anchored"><span class="header-section-number">5</span> Rolling study: one-year training windows</h2>
+<p>Each rolling window uses one year of training data with three months of out-of-sample testing, advancing by one month. The sample begins on the first date where all eleven tenors have real observations. Within each training window, nested time-series cross-validation splits the first nine months as inner-train and the last three months as validation, then selects <span class="math inline">(\tau,\rho)</span> via a conservative rule: find the minimum validation loss, keep candidates within a small tolerance neighborhood (<span class="math inline">1+\delta</span>), and choose the smallest admissible <span class="math inline">\tau</span> with optional Procrustes stability tie-breaking against the previous window’s loadings. PCA is the unregularized baseline with no hyperparameters. The feature graph (tenor-chain) remains constant across windows; we rebuild the example graph (day-chain) on each window’s training dates. Final outer test evaluation refits on the full outer training block with the selected hyperparameters and applies the frozen train-window scaler to the test data with no leakage.</p>
+<p>The summary tables below report, for each method: the mean, median, and 90th-percentile OOS masked reconstruction loss; the fraction of windows where the method strictly outperforms PCA (<code>win_rate_vs_PCA</code>); and a Diebold–Mariano test statistic (<code>DM_stat</code>) with Newey–West HAC-corrected <span class="math inline">p</span>-value (<code>DM_p</code>) that accounts for the serial dependence induced by overlapping test windows.</p>
+<div class="cell" data-execution_count="105">
+<div id="fig-oos-loss" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="105">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-oos-loss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div id="fig-oos-loss-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-oos-loss-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-oos-loss-output-1.png" class="img-fluid" data-ref-parent="fig-oos-loss">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-oos-loss-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Rolling out-of-sample reconstruction error (k=3) for PCA, Day, Tenor, and Day+Tenor
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="fig-oos-loss-2" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-oos-loss-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<style type="text/css">
+#T_3bfdd table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_3bfdd thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_3bfdd tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_3bfdd tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_3bfdd" class="do-not-create-environment caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_3bfdd_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">mean</th>
+<th id="T_3bfdd_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">median</th>
+<th id="T_3bfdd_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">p90</th>
+<th id="T_3bfdd_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">win_rate_vs_PCA</th>
+<th id="T_3bfdd_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">DM_stat</th>
+<th id="T_3bfdd_level0_col5" class="col_heading level0 col5" data-quarto-table-cell-role="th">DM_p</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">method</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col2" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col3" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col4" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col5" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_3bfdd_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">Day</th>
+<td id="T_3bfdd_row0_col0" class="data row0 col0">1.1476</td>
+<td id="T_3bfdd_row0_col1" class="data row0 col1">0.6179</td>
+<td id="T_3bfdd_row0_col2" class="data row0 col2">2.2803</td>
+<td id="T_3bfdd_row0_col3" class="data row0 col3">0.9967</td>
+<td id="T_3bfdd_row0_col4" class="data row0 col4">-2.2507</td>
+<td id="T_3bfdd_row0_col5" class="data row0 col5">0.0122</td>
+</tr>
+<tr class="even">
+<th id="T_3bfdd_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">Day+Tenor</th>
+<td id="T_3bfdd_row1_col0" class="data row1 col0">1.1009</td>
+<td id="T_3bfdd_row1_col1" class="data row1 col1">0.6192</td>
+<td id="T_3bfdd_row1_col2" class="data row1 col2">2.2511</td>
+<td id="T_3bfdd_row1_col3" class="data row1 col3">0.9967</td>
+<td id="T_3bfdd_row1_col4" class="data row1 col4">-8.0592</td>
+<td id="T_3bfdd_row1_col5" class="data row1 col5">0.0000</td>
+</tr>
+<tr class="odd">
+<th id="T_3bfdd_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">PCA</th>
+<td id="T_3bfdd_row2_col0" class="data row2 col0">1.2930</td>
+<td id="T_3bfdd_row2_col1" class="data row2 col1">0.7404</td>
+<td id="T_3bfdd_row2_col2" class="data row2 col2">2.6745</td>
+<td id="T_3bfdd_row2_col3" class="data row2 col3">nan</td>
+<td id="T_3bfdd_row2_col4" class="data row2 col4">nan</td>
+<td id="T_3bfdd_row2_col5" class="data row2 col5">nan</td>
+</tr>
+<tr class="even">
+<th id="T_3bfdd_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">Tenor</th>
+<td id="T_3bfdd_row3_col0" class="data row3 col0">1.2930</td>
+<td id="T_3bfdd_row3_col1" class="data row3 col1">0.7404</td>
+<td id="T_3bfdd_row3_col2" class="data row3 col2">2.6745</td>
+<td id="T_3bfdd_row3_col3" class="data row3 col3">0.0000</td>
+<td id="T_3bfdd_row3_col4" class="data row3 col4">nan</td>
+<td id="T_3bfdd_row3_col5" class="data row3 col5">nan</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-oos-loss-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-oos-loss-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5
+</figcaption>
+</figure>
+</div>
+</div>
+<p>The rolling OOS reconstruction paths separate into two groups: Day and Day+Tenor consistently outperform PCA, while Tenor tracks PCA exactly in OOS reconstruction because cross-validation always selects <span class="math inline">\tau=0</span> for the tenor-only model. Both Day and Day+Tenor achieve near-100% window-level win rates against PCA, and the Diebold–Mariano test (with Newey–West HAC standard errors for overlapping-window dependence) rejects equal predictive accuracy at conventional significance levels. The day-chain temporal-smoothing channel is the primary driver: it is both necessary and sufficient for the OOS improvement, while the tenor-chain maturity-smoothing channel adds no incremental benefit on its own.</p>
+<div id="cell-fig-oos-improvement" class="cell" data-execution_count="106">
+<div class="cell-output cell-output-display">
+<div id="fig-oos-improvement" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-oos-improvement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-oos-improvement-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-oos-improvement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: OOS improvement of Day model over PCA (negative = Day better) with BOJ policy events
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The improvement is persistent and most pronounced during policy-transition windows. The largest gains cluster around the late-2012 to mid-2013 period (QQE anticipation and initial implementation) and again during the 2022–2024 YCC unwinding, both episodes where daily yield volatility spiked abruptly. In such regimes the PCA score matrix overfits high-frequency noise, while the day-chain penalty absorbs the shock by smoothing scores across the transition. Conversely, during the quiet YCC-era windows (2017–2019), the improvement is small but still consistently negative, indicating that temporal regularisation helps even when volatility is suppressed.</p>
+<div class="cell" data-execution_count="107">
+<div id="fig-stability" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="107">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-stability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div id="fig-stability-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-stability-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-stability-output-1.png" class="img-fluid" data-ref-parent="fig-stability">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-stability-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Rolling subspace and Procrustes loading stability (k=3)
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="fig-stability-2" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-stability-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<style type="text/css">
+#T_fe945 table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_fe945 thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_fe945 tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_fe945 tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_fe945" class="do-not-create-environment caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_fe945_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">subspace_sinmax_mean</th>
+<th id="T_fe945_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">subspace_sinmax_median</th>
+<th id="T_fe945_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">procrustes_drift_mean</th>
+<th id="T_fe945_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">procrustes_drift_median</th>
+<th id="T_fe945_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">win_sub_vs_PCA</th>
+<th id="T_fe945_level0_col5" class="col_heading level0 col5" data-quarto-table-cell-role="th">win_proc_vs_PCA</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">method</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col2" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col3" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col4" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col5" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_fe945_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">Day</th>
+<td id="T_fe945_row0_col0" class="data row0 col0">0.1418</td>
+<td id="T_fe945_row0_col1" class="data row0 col1">0.1120</td>
+<td id="T_fe945_row0_col2" class="data row0 col2">0.2147</td>
+<td id="T_fe945_row0_col3" class="data row0 col3">0.1560</td>
+<td id="T_fe945_row0_col4" class="data row0 col4">0.1405</td>
+<td id="T_fe945_row0_col5" class="data row0 col5">0.0000</td>
+</tr>
+<tr class="even">
+<th id="T_fe945_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">Day+Tenor</th>
+<td id="T_fe945_row1_col0" class="data row1 col0">0.1331</td>
+<td id="T_fe945_row1_col1" class="data row1 col1">0.1020</td>
+<td id="T_fe945_row1_col2" class="data row1 col2">0.1804</td>
+<td id="T_fe945_row1_col3" class="data row1 col3">0.1366</td>
+<td id="T_fe945_row1_col4" class="data row1 col4">0.1830</td>
+<td id="T_fe945_row1_col5" class="data row1 col5">0.0033</td>
+</tr>
+<tr class="odd">
+<th id="T_fe945_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">PCA</th>
+<td id="T_fe945_row2_col0" class="data row2 col0">0.0818</td>
+<td id="T_fe945_row2_col1" class="data row2 col1">0.0496</td>
+<td id="T_fe945_row2_col2" class="data row2 col2">0.0303</td>
+<td id="T_fe945_row2_col3" class="data row2 col3">0.0205</td>
+<td id="T_fe945_row2_col4" class="data row2 col4">nan</td>
+<td id="T_fe945_row2_col5" class="data row2 col5">nan</td>
+</tr>
+<tr class="even">
+<th id="T_fe945_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">Tenor</th>
+<td id="T_fe945_row3_col0" class="data row3 col0">0.0818</td>
+<td id="T_fe945_row3_col1" class="data row3 col1">0.0496</td>
+<td id="T_fe945_row3_col2" class="data row3 col2">0.0303</td>
+<td id="T_fe945_row3_col3" class="data row3 col3">0.0205</td>
+<td id="T_fe945_row3_col4" class="data row3 col4">0.0000</td>
+<td id="T_fe945_row3_col5" class="data row3 col5">0.0000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-stability-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-stability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7
+</figcaption>
+</figure>
+</div>
+</div>
+<p>Subspace distance <span class="math inline">\sin\theta_{\max}</span> ranges between 0.08 and 0.14 across methods, indicating that the three-dimensional loading subspace is well identified in one-year windows regardless of regularisation. The spike in subspace instability around the 2013 QQE launch and the 2016 YCC introduction reflects genuine structural breaks in the factor geometry: shifts in the yield-curve regime alter which linear combination of tenors constitutes the third (curvature) component, and all models must re-estimate. Procrustes drift, by contrast, reveals a cost of temporal regularisation: Day and Day+Tenor exhibit roughly 6–7<span class="math inline">\times</span> the drift of PCA/Tenor on average, because the smooth-score constraint redistributes variance across the loading columns, producing window-to-window loading rotations that inflate the Frobenius residual. This loading instability is a mechanical trade-off, not a sign of model failure—the same constraint that causes it also delivers the OOS reconstruction gains documented above.</p>
+<div id="cell-fig-hyperparams" class="cell" data-execution_count="108">
+<div class="cell-output cell-output-display">
+<div id="fig-hyperparams" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-hyperparams-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-hyperparams-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hyperparams-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Cross-validated hyperparameters over time for the three GLRM models
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The hyperparameter paths reveal a stark asymmetry. The Tenor model selects <span class="math inline">\tau=0</span> in every window, meaning cross-validation never finds the tenor-chain penalty beneficial—the regularised model collapses to PCA across the entire sample. Day selects moderate to strong <span class="math inline">\tau</span> values (mean 0.056, never zero), indicating persistent benefit from temporal smoothing. Day+Tenor also selects non-zero <span class="math inline">\tau</span> in every window, with <span class="math inline">\rho</span> values reflecting the data-driven balance between temporal and maturity smoothness.</p>
+<p>The event lines reveal an economically coherent pattern in the Day <span class="math inline">\tau</span> path. Regularisation strength rises during transitions between calm and volatile regimes—notably around the 2013 QQE launch and the 2022 YCC band widening—when the cross-validation inner-loop penalises PCA’s tendency to overfit abrupt score jumps. During the sustained low-volatility YCC era (2017–2019), <span class="math inline">\tau</span> settles at moderate levels: temporal smoothing remains beneficial but the penalty budget shrinks because there is less high-frequency noise to absorb.</p>
+<div class="cell" data-execution_count="109">
+<div id="fig-roughness" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="109">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-roughness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div id="fig-roughness-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-roughness-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-roughness-output-1.png" class="img-fluid" data-ref-parent="fig-roughness">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-roughness-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Loading and score roughness over time for models with the corresponding graph
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="fig-roughness-2" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-roughness-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<style type="text/css">
+#T_d5ae8 table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_d5ae8 thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_d5ae8 tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_d5ae8 tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_d5ae8" class="do-not-create-environment caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_d5ae8_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">loading_roughness_mean</th>
+<th id="T_d5ae8_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">loading_roughness_median</th>
+<th id="T_d5ae8_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">score_roughness_mean</th>
+<th id="T_d5ae8_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">score_roughness_median</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">method</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col2" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col3" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_d5ae8_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">Day</th>
+<td id="T_d5ae8_row0_col0" class="data row0 col0">nan</td>
+<td id="T_d5ae8_row0_col1" class="data row0 col1">nan</td>
+<td id="T_d5ae8_row0_col2" class="data row0 col2">441.4170</td>
+<td id="T_d5ae8_row0_col3" class="data row0 col3">123.9683</td>
+</tr>
+<tr class="even">
+<th id="T_d5ae8_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">Day+Tenor</th>
+<td id="T_d5ae8_row1_col0" class="data row1 col0">0.0259</td>
+<td id="T_d5ae8_row1_col1" class="data row1 col1">0.0157</td>
+<td id="T_d5ae8_row1_col2" class="data row1 col2">385.7558</td>
+<td id="T_d5ae8_row1_col3" class="data row1 col3">81.3492</td>
+</tr>
+<tr class="odd">
+<th id="T_d5ae8_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">PCA</th>
+<td id="T_d5ae8_row2_col0" class="data row2 col0">nan</td>
+<td id="T_d5ae8_row2_col1" class="data row2 col1">nan</td>
+<td id="T_d5ae8_row2_col2" class="data row2 col2">nan</td>
+<td id="T_d5ae8_row2_col3" class="data row2 col3">nan</td>
+</tr>
+<tr class="even">
+<th id="T_d5ae8_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">Tenor</th>
+<td id="T_d5ae8_row3_col0" class="data row3 col0">0.0154</td>
+<td id="T_d5ae8_row3_col1" class="data row3 col1">0.0108</td>
+<td id="T_d5ae8_row3_col2" class="data row3 col2">nan</td>
+<td id="T_d5ae8_row3_col3" class="data row3 col3">nan</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-roughness-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-roughness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9
+</figcaption>
+</figure>
+</div>
+</div>
+<p>Day-graph regularisation cuts score roughness <span class="math inline">\operatorname{tr}(U^\top L_s U)</span>, confirming the temporal-smoothness penalty reaches its intended target. The Tenor model, which always selects <span class="math inline">\tau=0</span>, produces roughness identical to PCA. The day-side score-roughness improvement translates directly to OOS accuracy gains, as confirmed by the near-100% window-level win rates and significant DM statistics above. Score roughness spikes visibly around the 2013 QQE launch and the 2022 YCC band widening for all models, but the Day-regularised variants dampen these spikes substantially—consistent with the economic interpretation that policy-driven volatility increases daily score noise, and temporal smoothing absorbs precisely this component.</p>
+<div class="cell" data-execution_count="128">
+<div id="fig-regime-snapshots" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="128">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-regime-snapshots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div id="fig-regime-snapshots-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-regime-snapshots-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-regime-snapshots-output-1.png" class="img-fluid" data-ref-parent="fig-regime-snapshots">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-regime-snapshots-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Procrustes-aligned loadings at representative windows from different market regimes
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-regime-snapshots-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-regime-snapshots-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-regime-snapshots-output-2.png" id="fig-regime-snapshots-2" class="img-fluid" data-ref-parent="fig-regime-snapshots">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-regime-snapshots-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-regime-snapshots-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-regime-snapshots-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-regime-snapshots-output-3.png" id="fig-regime-snapshots-3" class="img-fluid" data-ref-parent="fig-regime-snapshots">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-regime-snapshots-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-regime-snapshots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10
+</figcaption>
+</figure>
+</div>
+</div>
+<p>The regime snapshots show that PCA and Tenor (which selects <span class="math inline">\tau=0</span> and is therefore PCA-equivalent) produce identical loading shapes, while Day and Day+Tenor share a distinct pattern with smoother profiles after Procrustes alignment. The differences between the two groups are most visible in Component 3, where the signal-to-noise ratio is lowest and the day-chain prior has the most room to act. Differences across regimes remain larger than differences across models within a regime, reflecting the nonstationarity of the JGB curve.</p>
+<p>Taken together, the one-year rolling results support both hypotheses posed above. The variance-reduction channel operates as predicted: the day-chain penalty targets the high-variance score matrix, reduces its roughness, and delivers statistically significant OOS improvement—with the effect most visible in Component 3 where the eigengap is smallest. The bias-dominance channel also holds: the tenor-chain penalty finds nothing to smooth in the already-regular loading matrix and adds only bias, so cross-validation zeroes it out in every window. A natural follow-up is whether these patterns intensify when training data is scarce enough that PCA overfits.</p>
+<h2 data-number="6" id="rolling-study-three-month-training-windows" class="anchored"><span class="header-section-number">6</span> Rolling study: three-month training windows</h2>
+<p>We repeat the rolling evaluation with three-month training windows (~63 business days), one-month test windows, and one-month steps. With <span class="math inline">n/p \approx 6</span>, the sample covariance matrix is poorly conditioned and higher-order eigenvectors are noisy. Within each training window, nested time-series cross-validation uses the first two months for inner training and the last month for validation.</p>
+<div class="cell" data-execution_count="113">
+<div id="fig-oos-loss-3m" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="113">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-oos-loss-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div id="fig-oos-loss-3m-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-oos-loss-3m-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-oos-loss-3m-output-1.png" class="img-fluid" data-ref-parent="fig-oos-loss-3m">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-oos-loss-3m-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Rolling out-of-sample reconstruction error (k=3, 3M training windows)
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="fig-oos-loss-3m-2" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-oos-loss-3m-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<style type="text/css">
+#T_42e37 table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_42e37 thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_42e37 tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_42e37 tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_42e37" class="do-not-create-environment caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_42e37_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">mean</th>
+<th id="T_42e37_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">median</th>
+<th id="T_42e37_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">p90</th>
+<th id="T_42e37_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">win_rate_vs_PCA</th>
+<th id="T_42e37_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">DM_stat</th>
+<th id="T_42e37_level0_col5" class="col_heading level0 col5" data-quarto-table-cell-role="th">DM_p</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">method</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col2" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col3" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col4" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col5" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_42e37_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">Day</th>
+<td id="T_42e37_row0_col0" class="data row0 col0">0.9080</td>
+<td id="T_42e37_row0_col1" class="data row0 col1">0.6460</td>
+<td id="T_42e37_row0_col2" class="data row0 col2">1.5906</td>
+<td id="T_42e37_row0_col3" class="data row0 col3">0.9968</td>
+<td id="T_42e37_row0_col4" class="data row0 col4">-8.5778</td>
+<td id="T_42e37_row0_col5" class="data row0 col5">0.0000</td>
+</tr>
+<tr class="even">
+<th id="T_42e37_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">Day+Tenor</th>
+<td id="T_42e37_row1_col0" class="data row1 col0">0.9165</td>
+<td id="T_42e37_row1_col1" class="data row1 col1">0.6023</td>
+<td id="T_42e37_row1_col2" class="data row1 col2">1.6121</td>
+<td id="T_42e37_row1_col3" class="data row1 col3">0.9842</td>
+<td id="T_42e37_row1_col4" class="data row1 col4">-7.5292</td>
+<td id="T_42e37_row1_col5" class="data row1 col5">0.0000</td>
+</tr>
+<tr class="odd">
+<th id="T_42e37_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">PCA</th>
+<td id="T_42e37_row2_col0" class="data row2 col0">1.1960</td>
+<td id="T_42e37_row2_col1" class="data row2 col1">0.8102</td>
+<td id="T_42e37_row2_col2" class="data row2 col2">1.9875</td>
+<td id="T_42e37_row2_col3" class="data row2 col3">nan</td>
+<td id="T_42e37_row2_col4" class="data row2 col4">nan</td>
+<td id="T_42e37_row2_col5" class="data row2 col5">nan</td>
+</tr>
+<tr class="even">
+<th id="T_42e37_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">Tenor</th>
+<td id="T_42e37_row3_col0" class="data row3 col0">1.1960</td>
+<td id="T_42e37_row3_col1" class="data row3 col1">0.8102</td>
+<td id="T_42e37_row3_col2" class="data row3 col2">1.9875</td>
+<td id="T_42e37_row3_col3" class="data row3 col3">0.0000</td>
+<td id="T_42e37_row3_col4" class="data row3 col4">1.0016</td>
+<td id="T_42e37_row3_col5" class="data row3 col5">0.8417</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-oos-loss-3m-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-oos-loss-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11
+</figcaption>
+</figure>
+</div>
+</div>
+<p>Shortening the training window to three months (≈63 observations) amplifies the day-chain regularisation advantage. Day wins 99.7% of windows (DM <span class="math inline">= -8.58</span>, <span class="math inline">p &lt; 10^{-17}</span>), and Day+Tenor wins 98.4% (DM <span class="math inline">= -7.53</span>, <span class="math inline">p &lt; 10^{-13}</span>). Mean reconstruction error drops from 1.20 (PCA) to 0.91 (Day)—a 24% reduction, more pronounced than the 11% improvement seen with one-year windows. Tenor again selects <span class="math inline">\tau\approx 0</span> in virtually every window and is indistinguishable from PCA.</p>
+<p>The wider error separation during stress episodes aligns with identifiable policy events: the 2013 QQE launch (when the three-month training window spans both the pre- and post-announcement regimes), the 2016–2017 NIRP/YCC transition (when short samples straddle a discrete jump in the yield-curve anchoring point), and the 2022 YCC band widening. In each case, three months of data is too short for PCA to disentangle signal from noise, and day-chain temporal smoothing provides an effective shrinkage remedy by enforcing the prior that factor exposures evolve slowly through these transitions.</p>
+<div class="cell" data-execution_count="114">
+<div id="fig-stability-3m" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="114">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-stability-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div id="fig-stability-3m-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-stability-3m-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-stability-3m-output-1.png" class="img-fluid" data-ref-parent="fig-stability-3m">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-stability-3m-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Rolling subspace and Procrustes loading stability (k=3, 3M training windows)
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="fig-stability-3m-2" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-stability-3m-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<style type="text/css">
+#T_5f626 table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_5f626 thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_5f626 tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_5f626 tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_5f626" class="do-not-create-environment caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_5f626_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">subspace_sinmax_mean</th>
+<th id="T_5f626_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">subspace_sinmax_median</th>
+<th id="T_5f626_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">procrustes_drift_mean</th>
+<th id="T_5f626_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">procrustes_drift_median</th>
+<th id="T_5f626_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">win_sub_vs_PCA</th>
+<th id="T_5f626_level0_col5" class="col_heading level0 col5" data-quarto-table-cell-role="th">win_proc_vs_PCA</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">method</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col2" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col3" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col4" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col5" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_5f626_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">Day</th>
+<td id="T_5f626_row0_col0" class="data row0 col0">0.2921</td>
+<td id="T_5f626_row0_col1" class="data row0 col1">0.2307</td>
+<td id="T_5f626_row0_col2" class="data row0 col2">0.3743</td>
+<td id="T_5f626_row0_col3" class="data row0 col3">0.3467</td>
+<td id="T_5f626_row0_col4" class="data row0 col4">0.4146</td>
+<td id="T_5f626_row0_col5" class="data row0 col5">0.0032</td>
+</tr>
+<tr class="even">
+<th id="T_5f626_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">Day+Tenor</th>
+<td id="T_5f626_row1_col0" class="data row1 col0">0.2945</td>
+<td id="T_5f626_row1_col1" class="data row1 col1">0.2359</td>
+<td id="T_5f626_row1_col2" class="data row1 col2">0.4288</td>
+<td id="T_5f626_row1_col3" class="data row1 col3">0.3543</td>
+<td id="T_5f626_row1_col4" class="data row1 col4">0.4589</td>
+<td id="T_5f626_row1_col5" class="data row1 col5">0.0285</td>
+</tr>
+<tr class="odd">
+<th id="T_5f626_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">PCA</th>
+<td id="T_5f626_row2_col0" class="data row2 col0">0.2860</td>
+<td id="T_5f626_row2_col1" class="data row2 col1">0.2297</td>
+<td id="T_5f626_row2_col2" class="data row2 col2">0.1749</td>
+<td id="T_5f626_row2_col3" class="data row2 col3">0.1459</td>
+<td id="T_5f626_row2_col4" class="data row2 col4">nan</td>
+<td id="T_5f626_row2_col5" class="data row2 col5">nan</td>
+</tr>
+<tr class="even">
+<th id="T_5f626_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">Tenor</th>
+<td id="T_5f626_row3_col0" class="data row3 col0">0.2860</td>
+<td id="T_5f626_row3_col1" class="data row3 col1">0.2297</td>
+<td id="T_5f626_row3_col2" class="data row3 col2">0.1749</td>
+<td id="T_5f626_row3_col3" class="data row3 col3">0.1459</td>
+<td id="T_5f626_row3_col4" class="data row3 col4">0.0032</td>
+<td id="T_5f626_row3_col5" class="data row3 col5">0.0032</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-stability-3m-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-stability-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="cell-fig-hyperparams-3m" class="cell" data-execution_count="115">
+<div class="cell-output cell-output-display">
+<div id="fig-hyperparams-3m" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-hyperparams-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-hyperparams-3m-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hyperparams-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13: Cross-validated hyperparameters over time (3M training windows)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Fraction of windows selecting τ=0 (3M):
+  PCA: 100.0%
+  Day: 0.0%
+  Tenor: 99.7%
+  Day+Tenor: 0.0%
+
+Mean τ by method (3M):
+               mean  median
+method                     
+Day        0.003000   0.003
+Day+Tenor  0.010606   0.010
+PCA        0.000000   0.000
+Tenor      0.000095   0.000</code></pre>
+</div>
+</div>
+<p>All four models exhibit markedly higher subspace instability with 3M windows compared to 1Y, with mean <span class="math inline">\sin(\theta_{\max})</span> rising to ≈0.29 across all methods (vs.&nbsp;≈0.08–0.14 with 1Y windows). The Procrustes-drift ranking mirrors 1Y but with wider gaps: PCA/Tenor remain the most stable (mean drift 0.17) while Day (0.37) and Day+Tenor (0.43) drift 2–2.5× more. Procrustes win rates for Day and Day+Tenor against PCA are ≈0–3%, confirming that the day-chain penalty’s indirect effect on loadings worsens with shorter windows.</p>
+<p>Tenor cross-validation again selects <span class="math inline">\tau\approx 0</span> in virtually every window. Day selects much smaller <span class="math inline">\tau</span> values (mean 0.003 vs.&nbsp;0.056 in 1Y), consistent with the reduced sample providing less room for temporal smoothing before over-regularising. Day+Tenor selects mean <span class="math inline">\tau = 0.011</span> with <span class="math inline">\rho</span> varying across the full 0.25–0.75 grid, reflecting greater uncertainty in the optimal regularization balance when data is scarce.</p>
+<div class="cell" data-execution_count="116">
+<div id="fig-roughness-3m" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="116">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-roughness-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div id="fig-roughness-3m-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-roughness-3m-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-roughness-3m-output-1.png" class="img-fluid" data-ref-parent="fig-roughness-3m">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-roughness-3m-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Loading and score roughness over time (3M training windows)
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="fig-roughness-3m-2" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-roughness-3m-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<style type="text/css">
+#T_c3225 table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_c3225 thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_c3225 tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_c3225 tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_c3225" class="do-not-create-environment caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_c3225_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">loading_roughness_mean</th>
+<th id="T_c3225_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">loading_roughness_median</th>
+<th id="T_c3225_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">score_roughness_mean</th>
+<th id="T_c3225_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">score_roughness_median</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">method</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col2" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col3" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_c3225_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">Day</th>
+<td id="T_c3225_row0_col0" class="data row0 col0">nan</td>
+<td id="T_c3225_row0_col1" class="data row0 col1">nan</td>
+<td id="T_c3225_row0_col2" class="data row0 col2">992.5572</td>
+<td id="T_c3225_row0_col3" class="data row0 col3">811.1620</td>
+</tr>
+<tr class="even">
+<th id="T_c3225_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">Day+Tenor</th>
+<td id="T_c3225_row1_col0" class="data row1 col0">0.1118</td>
+<td id="T_c3225_row1_col1" class="data row1 col1">0.0835</td>
+<td id="T_c3225_row1_col2" class="data row1 col2">823.6332</td>
+<td id="T_c3225_row1_col3" class="data row1 col3">936.4316</td>
+</tr>
+<tr class="odd">
+<th id="T_c3225_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">PCA</th>
+<td id="T_c3225_row2_col0" class="data row2 col0">nan</td>
+<td id="T_c3225_row2_col1" class="data row2 col1">nan</td>
+<td id="T_c3225_row2_col2" class="data row2 col2">nan</td>
+<td id="T_c3225_row2_col3" class="data row2 col3">nan</td>
+</tr>
+<tr class="even">
+<th id="T_c3225_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">Tenor</th>
+<td id="T_c3225_row3_col0" class="data row3 col0">0.0538</td>
+<td id="T_c3225_row3_col1" class="data row3 col1">0.0448</td>
+<td id="T_c3225_row3_col2" class="data row3 col2">nan</td>
+<td id="T_c3225_row3_col3" class="data row3 col3">nan</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-roughness-3m-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-roughness-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14
+</figcaption>
+</figure>
+</div>
+</div>
+<p>Loading roughness remains low for Tenor (mean <span class="math inline">\operatorname{tr}(V^\top L_f V) = 0.054</span>) because the model collapses to PCA, which naturally produces smooth loadings with only 11 tenors. Day+Tenor loading roughness is approximately double (0.112), reflecting the interaction between the two penalty channels: the optimisation trades some loading smoothness for score smoothness. Score roughness <span class="math inline">\operatorname{tr}(U^\top L_s U)</span> is roughly 2<span class="math inline">\times</span> higher than in 1Y windows for both Day (mean 993 vs.&nbsp;441) and Day+Tenor (mean 824 vs.&nbsp;386), with Day+Tenor achieving smoother temporal trajectories—suggesting the dual-penalty formulation marginally improves score regularization.</p>
+<div class="cell" data-execution_count="129">
+<div id="fig-regime-snapshots-3m" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="129">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-regime-snapshots-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div id="fig-regime-snapshots-3m-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-regime-snapshots-3m-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-regime-snapshots-3m-output-1.png" class="img-fluid" data-ref-parent="fig-regime-snapshots-3m">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-regime-snapshots-3m-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Procrustes-aligned loadings at representative windows (3M training windows)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-regime-snapshots-3m-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-regime-snapshots-3m-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-regime-snapshots-3m-output-2.png" id="fig-regime-snapshots-3m-2" class="img-fluid" data-ref-parent="fig-regime-snapshots-3m">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-regime-snapshots-3m-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-regime-snapshots-3m-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-regime-snapshots-3m-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-regime-snapshots-3m-output-3.png" id="fig-regime-snapshots-3m-3" class="img-fluid" data-ref-parent="fig-regime-snapshots-3m">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-regime-snapshots-3m-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-regime-snapshots-3m-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15
+</figcaption>
+</figure>
+</div>
+</div>
+<p>The Procrustes-aligned regime snapshots with 3M windows show broadly similar patterns to 1Y: PCA and Tenor remain indistinguishable, while Day and Day+Tenor form a visually distinct group, particularly in Component 3 where the signal-to-noise ratio is lowest. The loading-shape differences between models are more pronounced with 3M windows, consistent with the greater subspace instability identified above. Cross-regime variation (e.g., the pre-YCC vs.&nbsp;YCC-era loading inversion in Component 2) remains the dominant source of variation, reinforcing that JGB curve nonstationarity dominates model-choice effects.</p>
+<h2 data-number="7" id="discussion" class="anchored"><span class="header-section-number">7</span> Discussion</h2>
+<p>The rolling OOS evaluation reveals a clear and robust separation across both window lengths. With one-year windows, Day and Day+Tenor achieve near-100% window-level win rates (99.7%) against PCA, with Diebold–Mariano statistics rejecting equal predictive accuracy at conventional levels (Day: DM <span class="math inline">= -2.25</span>, <span class="math inline">p = 0.012</span>; Day+Tenor: DM <span class="math inline">= -8.06</span>, <span class="math inline">p &lt; 10^{-15}</span>). Shortening to three-month windows amplifies the absolute MSE reduction from 11% to 24%, with Day maintaining a 99.7% win rate (DM <span class="math inline">= -8.58</span>, <span class="math inline">p &lt; 10^{-17}</span>) and Day+Tenor at 98.4% (DM <span class="math inline">= -7.53</span>, <span class="math inline">p &lt; 10^{-13}</span>). The Tenor model produces OOS results identical to PCA in both settings because cross-validation selects <span class="math inline">\tau=0</span> in every 1Y window and <span class="math inline">\tau\approx 0</span> in virtually every 3M window. The effective regularization channel is day-chain (temporal) smoothing of the score matrix <span class="math inline">U</span>, not tenor-chain (maturity) smoothing of the loading matrix <span class="math inline">V</span>. These results map directly onto the two channels posed in the Hypotheses section.</p>
+<p>The central result of this study is the stark asymmetry between the two regularization channels. Understanding it requires examining the bias–variance trade-off separately for the score matrix <span class="math inline">U</span> and the loading matrix <span class="math inline">V</span>.</p>
+<p><strong>Estimation noise is concentrated in <span class="math inline">U</span>, not <span class="math inline">V</span>.</strong> In unregularised PCA, the loading matrix <span class="math inline">V \in \mathbb{R}^{p \times k}</span> is estimated from the full <span class="math inline">n \times p</span> training matrix and benefits from averaging across all <span class="math inline">n</span> dates. The score at date <span class="math inline">t</span>, <span class="math inline">\hat{u}_t = V^\top z_t</span>, is a point estimate from a single <span class="math inline">p</span>-dimensional observation—it carries the full noise of that one cross-section with no temporal averaging. With <span class="math inline">p = 11</span>, each score estimate has very few effective degrees of freedom. The roughness diagnostics reflect this asymmetry. Empirical score roughness <span class="math inline">\operatorname{tr}(U^\top \widetilde{L}_s U)</span> averages roughly 440 in one-year windows and 990 in three-month windows—large day-to-day jumps—while loading roughness <span class="math inline">\operatorname{tr}(V^\top \widetilde{L}_f V)</span> is approximately 0.02–0.05 across settings, placing PCA loadings near the null space of the tenor-chain Laplacian. The two penalties therefore face fundamentally different variance-reduction opportunities.</p>
+<p><strong>Why the day-chain penalty reduces MSE</strong>—confirming the variance-reduction channel. The day-chain penalty <span class="math inline">\operatorname{tr}(U^\top \widetilde{L}_s U) = \tfrac{1}{2}\sum_{t=1}^{n-1}\|u_t - u_{t+1}\|_2^2</span> is a first-difference roughness penalty on each score trajectory. Writing the regularised score estimate as an approximate local average,</p>
+<p><span class="math display">\tilde{u}_t \approx (1 - \alpha)\,\hat{u}_t + \tfrac{\alpha}{2}\bigl(\hat{u}_{t-1} + \hat{u}_{t+1}\bigr), \qquad \alpha \propto \tau,</span></p>
+<p>the variance of <span class="math inline">\tilde{u}_t</span> decreases by a factor proportional to the effective smoothing bandwidth, at a bias cost proportional to the local curvature <span class="math inline">\|u_{t+1} - 2u_t + u_{t-1}\|</span>. This trade-off favours smoothing whenever the true score trajectory is smoother than white noise. JGB factor scores—driven by BOJ policy rates, term premia, and inflation expectations—evolve on weekly-to-monthly time scales, as the low-frequency regime structure in <a href="#fig-yield-changes" class="quarto-xref">Figure&nbsp;1</a> suggests. Day-to-day changes are small relative to estimation noise, so the smoothness prior is well-calibrated to the true data-generating process. Spectrally, the day-chain Laplacian <span class="math inline">\widetilde{L}_s = \Phi\Lambda\Phi^\top</span> has eigenvalues <span class="math inline">\lambda_j \propto 1 - \cos(\pi j/n)</span>; the penalty shrinks high-frequency Laplacian eigenmodes (large <span class="math inline">\lambda_j</span>) more than the low-frequency modes where the true factor dynamics are concentrated. The result is a low-pass filter that removes estimation artifacts while preserving signal. The effect intensifies with shorter windows: with 3M training (<span class="math inline">n \approx 63</span>), PCA estimates each score from a single <span class="math inline">p=11</span> cross-section drawn from a noisier subsample. The day-chain penalty constrains the trajectory to be temporally coherent, acting as an implicit prior that factor exposures do not jump overnight. The MSE reduction grows from 11% (1Y) to 24% (3M)—exactly the regime where shrinkage should help most.</p>
+<p><strong>Why the tenor-chain penalty adds only bias</strong>—confirming the bias-dominance channel. The tenor-chain penalty <span class="math inline">\operatorname{tr}(V^\top \widetilde{L}_f V) = \tfrac{1}{2}\sum_{i,j} w_{ij}\|v_i - v_j\|^2</span> shrinks adjacent-tenor loading rows toward each other. Yet the PCA eigenvectors of the <span class="math inline">11 \times 11</span> sample covariance are already near the null space of this quadratic form: PC1 (level) is nearly flat, PC2 (slope) is monotone, and PC3 (curvature) is a single-hump shape—all smooth functions with low Laplacian energy. As a result, the variance reduction is negligible:</p>
+<p><span class="math display">\text{Var reduction} \propto \tau \cdot \underbrace{\operatorname{tr}(V_{\text{true}}^\top \widetilde{L}_f\, V_{\text{true}})}_{\approx\, 0} \approx 0, \qquad \text{Bias}^2 \propto \tau^2 &gt; 0.</span></p>
+<p>The OOS MSE therefore increases monotonically in <span class="math inline">\tau</span>, and the conservative selection rule picks <span class="math inline">\tau = 0</span>. Several features of this JGB application compound the effect: (1) MOF pre-smoothing—constant-maturity yields the Ministry of Finance interpolates onto a fixed maturity grid, removing cross-tenor noise at the data level before PCA ever sees it; (2) inverse-squared-gap weighting concentrates penalty on closely spaced tenors (7Y–8Y–9Y) that already co-move almost perfectly (visible in <a href="#fig-graph-priors" class="quarto-xref">Figure&nbsp;2</a>), while under-penalizing the wider gaps (10Y–15Y) where structural breaks could appear; (3) under Yield Curve Control (2016–2024) the BOJ pinned the 10Y rate, creating genuine loading discontinuities around 10Y that the tenor-chain penalty incorrectly treats as roughness to be smoothed away; (4) with <span class="math inline">p = 11</span>, the sample covariance <span class="math inline">\hat\Sigma \in \mathbb{R}^{11\times 11}</span> is estimated from at least <span class="math inline">n/p \geq 6</span> observations per parameter even with 3M windows, so the dimensionality that motivates loading regularisation does not bite.</p>
+<p><strong>Dimensionality of the regularisation targets.</strong> The asymmetry extends to the leverage available to each penalty. The day-chain Laplacian is <span class="math inline">n \times n</span> with <span class="math inline">n-1</span> edges, providing <span class="math inline">n-1</span> independent smoothness constraints on the <span class="math inline">n \times k</span> score matrix—a substantial number of soft constraints relative to the free parameters. The tenor-chain Laplacian is <span class="math inline">11 \times 11</span> with only 10 edges acting on 33 loading parameters, and applied to an object that is already smooth. The day-side penalty has far more room to reshape the solution.</p>
+<p>Despite their OOS reconstruction advantage, Day and Day+Tenor models produce less stable loadings than PCA across all stability metrics and both window lengths. With 1Y windows, subspace win rates against PCA are 14.1% (Day) and 18.3% (Day+Tenor), with Procrustes win rates near 0%. With 3M windows, all models exhibit far higher instability (<span class="math inline">\sin(\theta_{\max}) \approx 0.29</span> vs.&nbsp;0.08–0.14 for 1Y), and PCA’s Procrustes-drift advantage grows (mean drift 0.17 vs.&nbsp;0.37–0.43 for the regularised models). The result is not paradoxical once the bilinear structure of the factorisation <span class="math inline">Z \approx UV^\top</span> is considered. The day-chain penalty directly constrains <span class="math inline">U</span>, but the first-order optimality conditions couple <span class="math inline">U</span> and <span class="math inline">V</span>: any change in the regularised score trajectory <span class="math inline">\tilde{U}</span> propagates through the loading update <span class="math inline">V \leftarrow (U^\top U + \lambda I)^{-1} U^\top Z</span>. When CV selects different <span class="math inline">\tau</span> values across adjacent windows, the resulting shifts in <span class="math inline">\tilde{U}</span> produce corresponding rotations in <span class="math inline">V</span>, amplifying Procrustes drift relative to the unregularised PCA baseline. Shorter windows (<span class="math inline">n \approx 63</span>) exacerbate this effect because the <span class="math inline">\tau</span>-selection surface becomes noisier, leading to larger window-to-window jumps in the chosen penalty strength. The practical implication is that day-chain regularisation improves OOS reconstruction at the cost of loading interpretability. Applications that require stable factor loadings (e.g., structural interpretation of principal components) may prefer PCA despite its higher reconstruction error, while applications that prioritise predictive accuracy (e.g., imputation, forecasting, portfolio construction) should prefer the Day model.</p>
+<p>Cross-validation reveals a consistent hyperparameter pattern across both window lengths: Day and Day+Tenor always select non-zero <span class="math inline">\tau</span>, while Tenor selects <span class="math inline">\tau=0</span> in every 1Y window and <span class="math inline">\tau\approx 0</span> in virtually every 3M window. The optimal <span class="math inline">\tau</span> scales with window length—Day mean 0.056 (1Y) vs.&nbsp;0.003 (3M)—consistent with the bias–variance interpretation above. With fewer observations, the smoothing bandwidth must shrink to avoid over-regularising the score trajectory; CV correctly adapts the penalty strength to the available sample size. For Day+Tenor with 1Y windows, <span class="math inline">\rho</span> is typically above 0.5, allocating most regularisation to the day-chain channel; with 3M windows, <span class="math inline">\rho</span> varies more widely across the 0.25–0.75 grid, reflecting greater uncertainty in the validation surface when data is scarce. The Procrustes-aligned loading snapshots confirm that PCA and Tenor are indistinguishable in every regime and at both window lengths, while Day and Day+Tenor form a separate group with smoother Component 3 profiles. The pattern is consistent with the mathematical analysis: PC3 has the smallest eigengap and hence the highest estimation variance in its loading vector (Davis–Kahan), giving the day-chain penalty the most room to reshape the solution through the bilinear coupling. Cross-regime differences (e.g., pre-YCC vs.&nbsp;post-YCC) remain an order of magnitude larger than cross-model differences within a regime, reflecting the nonstationarity of the JGB curve.</p>
+<p>Several patterns merit caution. The day-chain OOS improvement, while statistically significant and perfectly consistent, is modest in absolute terms—mean reconstruction error drops from 1.196 to 0.908 (Day) with 3M windows; whether this magnitude matters depends on the downstream application. With 3M windows, the day-chain model’s Procrustes drift reaches 2–2.5<span class="math inline">\times</span> PCA’s (and 6–7<span class="math inline">\times</span> with 1Y windows), so interpretations based on individual loading vectors require care, particularly with short training windows. Day+Tenor introduces a <span class="math inline">\rho</span> degree of freedom and additional tuning cost relative to Day-only; while it achieves statistically significant OOS gains against PCA at both horizons, it offers negligible incremental improvement over Day-only (slightly better at 1Y, slightly worse at 3M), so parsimony favours the Day-only specification. The tenor-chain penalty assumes smooth local maturity dependence, but JGB curves exhibit structural kinks (e.g., around the 10Y delivery basket boundary under YCC) that the penalty incorrectly treats as noise. An alternative graph topology—such as inverse-gap weighting or a graph learned from cross-tenor correlations—might partially address this, though the fundamental low-dimensionality constraint (<span class="math inline">p = 11</span>) would likely still limit the variance-reduction channel. The Hypotheses also predicted that OOS gains should concentrate in the third component where the eigengap is smallest; the regime snapshots and Component 3 loading differences are consistent with this prediction, though we did not perform a formal per-component OOS decomposition to test it directly.</p>
+<h2 data-number="8" id="conclusion" class="anchored"><span class="header-section-number">8</span> Conclusion</h2>
+<p>This notebook evaluated four GLRM specifications—PCA, Day-only, Tenor-only, and Day+Tenor graph regularization—on rolling one-year and three-month windows of daily JGB yield-curve changes with <span class="math inline">k=3</span> components and nested cross-validated hyperparameter selection.</p>
+<p><strong>PCA</strong> serves as the unregularized baseline. With <span class="math inline">p\approx 11</span> tenors and well-conditioned covariance estimates, its loadings are smooth, stable, and interpretable. Day-chain regularization consistently outperforms PCA in out-of-sample reconstruction, winning 99.7% of 1Y windows and 99.7% of 3M windows.</p>
+<p><strong>Tenor-graph</strong> regularization targeting the maturity axis is entirely ineffective in this setting. Cross-validation selects <span class="math inline">\tau=0</span> in every 1Y rolling window and <span class="math inline">\tau\approx 0</span> in virtually every 3M window, collapsing the model to PCA at both horizons and in the full-sample study. The low dimensionality of the loading matrix makes the tenor-chain penalty purely biasing, confirming the bias-dominance hypothesis for the feature-side channel.</p>
+<p><strong>Day-graph</strong> regularization targeting the temporal axis is the clear winner. Day-graph regularization achieves near-perfect OOS win rates against PCA at both window lengths (99.7% at 1Y, 99.7% at 3M) with significant Diebold–Mariano statistics. By smoothing the score trajectories, the day-chain penalty reduces overfitting and improves generalization—an effect that grows in proportional magnitude as the training window shrinks (11% MSE reduction at 1Y, 24% at 3M). The trade-off is reduced loading stability: the bilinear coupling between scores and loadings means that day-side regularization indirectly destabilizes the loading geometry, particularly in short-window regimes.</p>
+<p><strong>Day+Tenor</strong> regularization achieves statistically significant OOS gains against PCA at both horizons, but offers negligible incremental improvement over Day-only. CV allocates most of the regularization budget to the day-chain channel. The additional tenor-chain component adds tuning complexity without meaningful incremental benefit, making Day-only the preferred specification on parsimony grounds.</p>
+<p>The key finding is that temporal smoothing of scores provides the OOS improvement, not maturity smoothness of loadings. Temporal smoothing was not the expected channel—the original motivation targeted tenor-side regularization—but it is consistent with the view that short rolling windows benefit from temporal coherence constraints on the latent factors. The 3M results strengthen this conclusion: when PCA has fewer observations to estimate scores, the day-chain shrinkage benefit is proportionally larger.</p>
+<p>Several directions could extend this analysis:</p>
+<ul>
+<li><strong>Higher-dimensional panels</strong> (e.g., volatility surfaces, large macro datasets) where the tenor-chain channel may activate because loading estimation is noisier.</li>
+<li><strong>Alternative graph weights</strong> such as inverse-gap weighting or liquidity-adjusted edges that may make the feature-side penalty more effective.</li>
+<li><strong>Scalability analysis</strong> comparing regularization benefit as <span class="math inline">p</span> increases and the PCA baseline becomes less reliable.</li>
+<li><strong>Alternative validation targets</strong> beyond masked reconstruction, such as portfolio-level hedging error or factor-mimicking portfolio tracking.</li>
+</ul>
+<p>In the next post we apply the same GLRM framework to a higher-dimensional macroeconomic panel where the bias–variance balance may favor feature-side regularization more .</p>
+<h2 data-number="9" id="appendix-missing-data-imputation-with-the-40y-tenor" class="anchored"><span class="header-section-number">9</span> Appendix: Missing-data imputation with the 40Y tenor</h2>
+<p>The GLRM objective optimises over observed entries only, via the mask projection <span class="math inline">P_\Omega</span>. The main analysis uses a complete panel (<span class="math inline">p = 11</span>, no missing data), so this capability was not exercised. To demonstrate it, we expand the tenor set to include the 40Y JGB—which was not issued until 2007—creating a naturally jagged missingness pattern in the early part of the sample. The masked factorisation <span class="math inline">Z \approx UV^\top</span> is fit on observed entries, and the product <span class="math inline">UV^\top</span> provides imputed values for the missing 40Y entries in the pre-2007 period.</p>
+<p>This section is a single full-sample proof of concept, not a rolling evaluation. Its purpose is to verify that the masked GLRM solver handles partial observations gracefully and to examine whether graph regularisation affects imputation quality.</p>
+<div id="cell-fig-missing-data-pattern" class="cell" data-execution_count="118">
+<div class="cell-output cell-output-stdout">
+<pre><code>Extended panel: 6470 dates x 12 tenors
+Total entries: 77,640  |  Missing: 2,012  (2.6%)
+
+Missing days per tenor:
+40Y    2012
+
+Panel starts: 1999-09-03, 40Y first available: 2007-11-06</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-missing-data-pattern" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-missing-data-pattern-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-missing-data-pattern-output-2.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-missing-data-pattern-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16: Missing-data pattern in the extended 12-tenor JGB panel
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="119">
+<div class="cell-output cell-output-stdout">
+<pre><code>  PCA: τ=0.0000, ρ=0.00, recon=0.9913
+  Day: τ=0.0100, ρ=1.00, recon=0.9809
+  Tenor: τ=0.0000, ρ=0.00, recon=0.9913
+  Day+Tenor: τ=0.0300, ρ=0.50, recon=0.9812</code></pre>
+</div>
+<div id="fig-missing-data-models" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="119">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-missing-data-models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="fig-missing-data-models-1" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-missing-data-models-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<style type="text/css">
+#T_24f30 table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_24f30 thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_24f30 tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_24f30 tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_24f30" class="do-not-create-environment caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_24f30_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">tau</th>
+<th id="T_24f30_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">rho</th>
+<th id="T_24f30_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">recon_error</th>
+<th id="T_24f30_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">loading_roughness</th>
+<th id="T_24f30_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">score_roughness</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">model</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col2" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col3" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col4" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_24f30_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">PCA</th>
+<td id="T_24f30_row0_col0" class="data row0 col0">0.0000</td>
+<td id="T_24f30_row0_col1" class="data row0 col1">0.0000</td>
+<td id="T_24f30_row0_col2" class="data row0 col2">0.9913</td>
+<td id="T_24f30_row0_col3" class="data row0 col3">0.0007</td>
+<td id="T_24f30_row0_col4" class="data row0 col4">6169316.1365</td>
+</tr>
+<tr class="even">
+<th id="T_24f30_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">Day</th>
+<td id="T_24f30_row1_col0" class="data row1 col0">0.0100</td>
+<td id="T_24f30_row1_col1" class="data row1 col1">1.0000</td>
+<td id="T_24f30_row1_col2" class="data row1 col2">0.9809</td>
+<td id="T_24f30_row1_col3" class="data row1 col3">0.0015</td>
+<td id="T_24f30_row1_col4" class="data row1 col4">131843.4958</td>
+</tr>
+<tr class="odd">
+<th id="T_24f30_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">Tenor</th>
+<td id="T_24f30_row2_col0" class="data row2 col0">0.0000</td>
+<td id="T_24f30_row2_col1" class="data row2 col1">0.0000</td>
+<td id="T_24f30_row2_col2" class="data row2 col2">0.9913</td>
+<td id="T_24f30_row2_col3" class="data row2 col3">0.0007</td>
+<td id="T_24f30_row2_col4" class="data row2 col4">6169316.1365</td>
+</tr>
+<tr class="even">
+<th id="T_24f30_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">Day+Tenor</th>
+<td id="T_24f30_row3_col0" class="data row3 col0">0.0300</td>
+<td id="T_24f30_row3_col1" class="data row3 col1">0.5000</td>
+<td id="T_24f30_row3_col2" class="data row3 col2">0.9812</td>
+<td id="T_24f30_row3_col3" class="data row3 col3">0.0015</td>
+<td id="T_24f30_row3_col4" class="data row3 col4">69586.3455</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-missing-data-models-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Full-sample fit on the extended 12-tenor panel with structural missingness
+</figcaption>
+</figure>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-missing-data-models-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-missing-data-models-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-missing-data-models-output-3.png" id="fig-missing-data-models-2" class="img-fluid" data-ref-parent="fig-missing-data-models">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-missing-data-models-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-missing-data-models-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-missing-data-models-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-missing-data-models-output-4.png" id="fig-missing-data-models-3" class="img-fluid" data-ref-parent="fig-missing-data-models">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-missing-data-models-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="fig-missing-data-models-4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-missing-data-models-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-missing-data-models-output-5.png" id="fig-missing-data-models-4" class="img-fluid" data-ref-parent="fig-missing-data-models">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-missing-data-models-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(d)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-missing-data-models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;17
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="cell-fig-40y-imputation" class="cell" data-execution_count="120">
+<div class="cell-output cell-output-display">
+<div id="fig-40y-imputation" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-40y-imputation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-40y-imputation-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-40y-imputation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;18: Imputed vs.&nbsp;observed 40Y yield changes: missing period (top) and overlap period (bottom)
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Reconstruction RMSE on observed 40Y entries (standardised scale):
+  PCA: 0.1927
+  Day: 0.7587
+  Tenor: 0.1927
+  Day+Tenor: 0.8193</code></pre>
+</div>
+</div>
+<p>The extended panel contains 6,470 dates and 12 tenors. The 40Y JGB was not issued until November 2007, creating a contiguous block of 2,012 missing entries (2.6% of the panel) concentrated in the first ~8 years; the remaining 11 tenors are fully observed throughout. All four models fit successfully on this jagged panel, confirming that the masked GLRM solver handles structural missingness without special-case preprocessing.</p>
+<p>Cross-validation again selects <span class="math inline">\tau = 0</span> for the Tenor model, making it numerically identical to PCA (same reconstruction of 0.9913, same roughness values). This replicates the main-body finding in a setting where one might expect tenor smoothness to help: the 40Y loading must be inferred partly from the graph prior because 31% of the 40Y column is unobserved. Even so, the data from the observed period is sufficient for the GLRM to determine the 40Y loading without graph assistance. The Day model (<span class="math inline">\tau = 0.01</span>, <span class="math inline">\rho = 1</span>) and Day+Tenor model (<span class="math inline">\tau = 0.03</span>, <span class="math inline">\rho = 0.5</span>), by contrast, accept a modest reconstruction penalty (0.98 vs.&nbsp;0.99) in exchange for large reductions in score roughness—47<span class="math inline">\times</span> for Day (131,843 vs.&nbsp;6,169,316) and 89<span class="math inline">\times</span> for Day+Tenor (69,586 vs.&nbsp;6,169,316). This smoothing effect is consistent with the rolling-window results: temporal regularisation dampens daily score noise at a small cost to in-sample fit.</p>
+<p>Procrustes-aligned loadings show all models extending the 1Y–30Y profile naturally to 40Y. For Component 1 (level), the 40Y loading declines from its 30Y value. This is consistent with the convexity-driven attenuation of parallel-shift sensitivity at the ultra-long end: a 40Y zero-coupon bond has substantially higher convexity than 30Y, so for a given parallel yield move its price return is increasingly dominated by the second-order (convexity) term, reducing the linear DV01 loading. For Component 2 (slope), the monotonic short-vs.-long pattern continues through 40Y. Component 3 (curvature) rises sharply beyond 30Y, reflecting the distinct supply-demand dynamics of the 40Y sector—dominated by Japanese life insurers and pension funds hedging long-duration liabilities, with limited liquidity relative to the 10Y and 20Y benchmarks. The Tenor model, despite selecting <span class="math inline">\tau = 0</span>, shows visibly compressed loading magnitudes relative to PCA; the compression reflects the bilinear scaling ambiguity of the <span class="math inline">UV^\top</span> factorisation, where the solver distributes variance between <span class="math inline">U</span> and <span class="math inline">V</span> differently when traversing from the SVD warm-start.</p>
+<p>Imputation quality, however, diverges across models. On the observed 40Y entries (post-2007), PCA and Tenor achieve a standardised RMSE of 0.19, while Day and Day+Tenor are markedly worse (0.76–0.82). The temporal smoothing that benefits score denoising in the rolling study actively harms reconstruction of the 40Y column here, because 40Y yield changes are the most volatile tenor in the panel and score smoothing attenuates precisely the high-frequency variation needed to fit them. In the missing period (1999–2007), all four models produce imputed 40Y yield changes with plausible time-varying volatility; the imputed series displays spike clusters during the 2001 recession and the June 2003 VaR shock—the episode in which a pro-cyclical cascade of risk-limit breaches among Japanese banks forced simultaneous liquidation of long-duration positions, sending 10Y–30Y yields up by 100 bp in three weeks. Since no ground truth exists for this period, the imputed values are best regarded as model-consistent interpolations rather than validated estimates.</p>
+<p>Taken together, the appendix demonstrates that <code>grpca</code>’s masked GLRM formulation handles structural missingness correctly. Graph regularisation does not improve imputation quality in this setting—the unregularised factorisation already extrapolates the 40Y loading from the observed-entry structure—but the day-chain model still achieves its primary purpose of temporal score smoothing, at a measurable cost to per-tenor reconstruction fidelity.</p>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/steveya\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

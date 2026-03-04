@@ -22,6 +22,9 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/graph-regularization-1/index.html",
+      "/posts/intercept invariance to adding centered features/index.html",
+      "/posts/signature-method-4/index.html",
       "/posts/volatility-forecasts-3/index.html",
       "/posts/signature-method-3/index.html",
       "/posts/signature-method-2/index.html",

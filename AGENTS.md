@@ -92,3 +92,14 @@ Listings/pages in this site generally target `posts/*/index.qmd`.
 - PR/Push checks: `.github/workflows/ci.yml` (renders + runs smoke tests).
 - Smoke tests are Playwright-based under `tests/e2e/`.
 
+## PROSE / WRITING REQUIREMENTS (VERY IMPORTANT)
+
+- Tone and vocabulary must be professional and academic, with precise definitions and careful caveats.
+- Avoid bullet points except when absolutely necessary (prefer paragraphs).
+- Section headers must be short and must NOT be phrased as questions.
+- Avoid the symbol ":=" entirely. Use "=" with a short phrase like “where” or “defined as”.
+- LaTeX display equations should NOT end with punctuation.
+- Inline math should also avoid trailing punctuation when possible.
+- Prefer consistent notation, and include a short “Notation” paragraph early (no bullet list).
+- Avoid casual language, jokes, and informal asides.
+- Mathematical explanations should be comprehensive. Do not avoid showing derivations when they clarify the method.
