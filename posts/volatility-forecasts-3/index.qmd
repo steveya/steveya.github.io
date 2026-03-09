@@ -3,7 +3,11 @@ title: "Volatility Forecasts (Part 3 - XGBSTES Algorithm 2)"
 date: 2026-01-24
 description: "We extend STES by replacing its linear component with XGBoost, then dig into why RMSE can underperform and propose a more stable end-to-end fitting algorithm."
 categories: [Quantitative Finance, Volatility Modeling, Time Series]
-
+content-type: "series"
+series-id: "volatility-forecasting"
+series-title: "Volatility Forecasts"
+series-part: 3
+project-ids: [volatility-forecasting]
 ---
 (Code snippets for this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/blob/main/examples/volatility_forecast_2.py).)
 Update: added discussion and a new fitting algorithm
@@ -34,15 +38,15 @@ For each time step $t$, the forecasted variance $\sigma_t^2$ is a weighted combi
 
 ## Brief Introduction to ``XGBoost``
 
-``XGBoost`` is a general-purpose engine for functional gradient descent. At its core, it optimizes an objective function by iteratively adding functions $f_t(x)$ (regression trees) to an ensemble. For example, the model at step $j$ is $F_j(x) = \sum_{k=1}^j f_k(x)$.
+``XGBoost`` is a general-purpose engine for functional gradient descent. At its core, it optimizes an objective function by iteratively adding functions $f_j(x)$ (regression trees) to an ensemble. For example, the model at step $j$ is $F_j(x) = \sum_{k=1}^j f_k(x)$.
 
-``XGBoost`` does not optimize the loss directly. Instead, at each step $t$, it approximates the loss using a second-order Taylor expansion around the current prediction $z_i^{(t-1)}$. If we wish to minimize a loss $\mathcal{L} = \sum_i \ell(y_i, z_i)$, ``XGBoost`` solves for the term $f_t(x_i)$ that minimizes:
+``XGBoost`` does not optimize the loss directly. Instead, at each step $j$, it approximates the loss using a second-order Taylor expansion around the current prediction $z_i^{(j-1)}$. If we wish to minimize a loss $\mathcal{L} = \sum_i \ell(y_i, z_i)$, ``XGBoost`` solves for the term $f_j(x_i)$ that minimizes:
 
 $$
-\mathcal{L}^{(j)} \approx \sum_{i=1}^N \left[ \ell(y_i, z_i^{(t-1)}) + g_i f_j(x_i) + \frac{1}{2}h_i f_j^2(x_i) \right] + \Omega(f_j)
+\mathcal{L}^{(j)} \approx \sum_{i=1}^N \left[ \ell(y_i, z_i^{(j-1)}) + g_i f_j(x_i) + \frac{1}{2}h_i f_j^2(x_i) \right] + \Omega(f_j)
 $$
 
-where $g_i = \partial \ell / \partial z_i$ is the gradient and $h_i = \partial^2 \ell / \partial z_i^2$ is the Hessian. The term $\Omega(f_t)$ penalizes the complexity of the tree. We minimize this loss function with respect to $f_j$, and the term $\ell(y_i, z_i^{(t-1)})$ depends only on the previous trees and is a constant that can be dropped from this step.
+where $g_i = \partial \ell / \partial z_i$ is the gradient and $h_i = \partial^2 \ell / \partial z_i^2$ is the Hessian. The term $\Omega(f_j)$ penalizes the complexity of the tree. We minimize this loss function with respect to $f_j$, and the term $\ell(y_i, z_i^{(j-1)})$ depends only on the previous trees and is a constant that can be dropped from this step.
 
 In XGBoost, the function $f_j$ is a regression tree. A regression tree maps a data point $x_i$ to a leaf node $m$ and assign it a score $w_m$. i.e. 
 
@@ -52,15 +56,15 @@ $$
 
 where $m(x_i)$ is if-else rule that maps $x_i$ to the leaf node $m$, $w$ is the vector of scores for all leaves. The $\mathcal{L}^{(j)}$ above sums over all $x_i$, and we can rewrite it as a summation over all $M$ leaf groups. Let $I_m = \left[i \mid m(x_i) = m\right]$, $\mathcal{L}^{(j)}$ and the regularization term 
 
-$\Omega(f_j) = \gamma M + \frac{1}{2}\lambda\sum_{j=m}^M w_m^2$ 
+$\Omega(f_j) = \gamma M + \frac{1}{2}\lambda\sum_{m=1}^M w_m^2$ 
 
 can be written as
 
 $$
-\mathcal{L}^{(j)} \approx \sum_{m=1}^M \left[ \left(\sum_{i \in I_m} g_m\right) w_m + \frac{1}{2} \left(\sum_{i \in I_m} h_i\right) w_m^2 \right] + \gamma M + \frac{1}{2}\lambda\sum_{j=m}^M w_m^2
+\mathcal{L}^{(j)} \approx \sum_{m=1}^M \left[ \left(\sum_{i \in I_m} g_i\right) w_m + \frac{1}{2} \left(\sum_{i \in I_m} h_i\right) w_m^2 \right] + \gamma M + \frac{1}{2}\lambda\sum_{m=1}^M w_m^2
 $$
 
-We minimize this loss function with respect to $f_j$, or rather, the weight vector $w$.  and does not depend on $w$, so it can be removed in the optimization. Rewrite $G_m = \sum_{m \in I_m} g_m$ and $H_m = \sum_{m \in I_m} h_m$. We can rearrange the terms to get
+We minimize this loss function with respect to $f_j$, or rather, the weight vector $w$. The constant term $\ell(y_i, z_i^{(j-1)})$ does not depend on $w$, so it can be removed in the optimization. Rewrite $G_m = \sum_{i \in I_m} g_i$ and $H_m = \sum_{i \in I_m} h_i$. We can rearrange the terms to get
 
 $$
 \mathcal{L}^{(j)} \approx \sum_{m=1}^M \left[ G_m w_m + \frac{1}{2} \left(H_m + \lambda \right) w_m^2 \right] + \gamma M
@@ -80,10 +84,10 @@ $$
 
 ``XGBoost`` then calculates the "Gain" of a split, it drops the negative sign (to convert Loss to Gain) and compares ``Score(Left) + Score(Right) - Score(Parent)``. ``XGBoost`` creates a split if the Gain is above a certain threshold, and $\gamma$ acts to reduce the gain from each split 
 
-This formulation reveals that to adapt ``XGBoost`` to any problem, we only need to provide two arrays: the gradient vector $g$ and the Hessian "vector" $h$. The library handles the tree construction, which involves finding splits that maximize the reduction in this regularized quadratic loss. Specifically, for a leaf node $j$ containing a set of instance indices $I_j$, the optimal weight $w_j$ and the resulting structure score are derived from the sums $G_j = \sum_{i \in I_j} g_i$ and $H_j = \sum_{i \in I_j} h_i$:
+This formulation reveals that to adapt ``XGBoost`` to any problem, we only need to provide two arrays: the gradient vector $g$ and the Hessian "vector" $h$. The library handles the tree construction, which involves finding splits that maximize the reduction in this regularized quadratic loss. Specifically, for a leaf node $m$ containing a set of instance indices $I_m$, the optimal weight $w_m$ and the resulting structure score are derived from the sums $G_m = \sum_{i \in I_m} g_i$ and $H_m = \sum_{i \in I_m} h_i$:
 
 $$
-w_j^* = -\frac{G_j}{H_j + \lambda}, \quad \text{Score}_j = -\frac{1}{2} \frac{G_j^2}{H_j + \lambda} + \gamma
+w_m^* = -\frac{G_m}{H_m + \lambda}, \quad \text{Score}_m = -\frac{1}{2} \frac{G_m^2}{H_m + \lambda} + \gamma
 $$
 
 Here, $\lambda$ acts as an L2 regularizer on the leaf weights, and $\gamma$ acts as a threshold for creating new leaves. A split is only accepted if the difference between the child scores and the parent score (the gain) exceeds $\gamma$. This interaction between the magnitude of our derivatives ($G, H$) and the regularization parameters ($\lambda, \gamma$) becomes critical when we apply this model to volatility forecasting later.
@@ -96,7 +100,7 @@ Here, $\lambda$ acts as an L2 regularizer on the leaf weights, and $\gamma$ acts
 > To make the problem solvable, ``XGBoost`` makes a **diagonal approximation**. It assumes that for the purpose of finding the next split, the rows are independent. It ignores the cross-dependencies and only asks for the diagonal elements:
 >
 > $$
-> h_t = \frac{\partial^2 L}{\partial z_t^2}
+> h_i = \frac{\partial^2 L}{\partial z_i^2}
 > $$
 
 >
@@ -104,7 +108,7 @@ Here, $\lambda$ acts as an L2 regularizer on the leaf weights, and $\gamma$ acts
 
 ### Previous Implementation
 
-We chose to break the dependency loop to avoid computing the recursive gradient and Hessian vectors. If we assume the variance path is fixed, we can algebraically invert the recursion to find the "optimal" gate $\alpha_t^*$ that would minimize the error at a single step. Rearranging the recursion equation for $\alpha_t$:
+Writing $v_t \equiv \widehat{\sigma}_t^2$ for brevity, we chose to break the dependency loop to avoid computing the recursive gradient and Hessian vectors. If we assume the variance path is fixed, we can algebraically invert the recursion to find the "optimal" gate $\alpha_t^*$ that would minimize the error at a single step. Rearranging the recursion equation for $\alpha_t$:
 
 $$
 \alpha_t^* = \frac{r_{t+1}^2 - v_t}{r_t^2 - v_t}
@@ -129,7 +133,7 @@ The theoretically correct approach is to compute the exact gradient of the cumul
 We define the adjoint variable $\delta_t$ as the sensitivity of the total loss to the variance state $v_t$:
 
 $$
-\delta_t = \frac{\partial L}{\partial v_t} = \frac{\partial \ell_{t-1}}{\partial v_t} + \frac{\partial v_{t+1}}{\partial v_t} \delta_{t+1}
+\delta_t = \frac{\partial L}{\partial v_t} = \frac{\partial \ell_t}{\partial v_t} + \frac{\partial v_{t+1}}{\partial v_t} \delta_{t+1}
 $$
 
 From the ``STES`` recursion, the term $\frac{\partial v_{t+1}}{\partial v_t} = (1 - \alpha_t)$. Substituting this into the equation, we get a backward recurrence relation:
@@ -200,7 +204,7 @@ $$
 \text{Score} = -\frac{1}{2} \frac{G^2}{H + \lambda}
 $$
 
-where $G \approx 10^{-8}$ and $H \approx 10^{-16}$, and the default regularization parameter $\lambda = 1$, the denominator is dominated by $\lambda$. The resulting score is roughly $10^{-16}$, which is numerically indistinguishable from zero. Furthermore, we initially ran with the default `min_child_weight` parameter, which requires the sum of Hessians in a leaf to exceed 1. Our Hessians at $10^{-16}$ is just on a different scale.
+where $G \approx 10^{-8}$ and $H \approx 10^{-8}$ (the Gauss-Newton Hessian squares the Jacobian, which is of the same order as the sensitivity), and the default regularization parameter $\lambda = 1$, the denominator is dominated by $\lambda$. The resulting score is roughly $G^2/\lambda \approx 10^{-16}$, which is numerically indistinguishable from zero. Furthermore, we initially ran with the default `min_child_weight` parameter, which requires the sum of Hessians in a leaf to exceed 1. Our Hessians at $10^{-8}$ are just on a different scale.
 
 This is analogous to the scaling issues found in Lasso or Ridge regression, where unstandardized features can lead to disproportionate penalization. Here, the "feature" is the gradient signal itself. To fix this, we multiply returns by 100 before squaring them. This scales the variance targets by $10,000$. The gradient, which is quadratic in the scale of returns, increases by a factor of $10^8$, bringing it to order $O(1)$. With this adjustment, the standard ``XGBoost`` hyperparameters function as intended.
 
