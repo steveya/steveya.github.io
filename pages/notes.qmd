@@ -8,4 +8,5 @@ title-block-banner: false
 
 A generated index of standalone technical notes and essays.
 
+- [Forecasts Comparison](../posts/forecast-comparison/) (2026-03-04): An introduction to the statistical tools for comparing forecast accuracy — the Diebold-Mariano test, the role of the loss function, and the Mincer-Zarnowitz regression as a calibration diagnostic.
 - [Intercept Invariance to Added Standardized Features](../posts/intercept invariance to adding centered features/) (2026-02-10): When centering (or standardizing) features leaves the intercept unchanged, and when it does not.

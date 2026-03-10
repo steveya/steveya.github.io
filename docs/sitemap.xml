@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://steveya.github.io/pages/categories.html</loc>
-    <lastmod>2026-03-08T11:43:24.768Z</lastmod>
+    <lastmod>2026-03-10T01:56:51.900Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/pages/projects.html</loc>
-    <lastmod>2026-03-08T11:43:24.768Z</lastmod>
+    <lastmod>2026-03-10T01:56:51.900Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/pages/search.html</loc>
@@ -42,7 +42,7 @@
   </url>
   <url>
     <loc>https://steveya.github.io/posts/volatility-forecasts-3/index.html</loc>
-    <lastmod>2026-03-09T14:40:39.932Z</lastmod>
+    <lastmod>2026-03-09T14:41:39.191Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/posts/volatility-forecasts-6/draft.html</loc>
@@ -61,28 +61,32 @@
     <lastmod>2026-03-07T19:06:37.828Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/intercept invariance to adding centered features/index.html</loc>
-    <lastmod>2026-03-07T19:06:37.874Z</lastmod>
+    <loc>https://steveya.github.io/posts/malaria-detection-2/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.828Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/mean-reversion-strategy-3/index.html</loc>
-    <lastmod>2026-03-07T19:06:37.837Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/migration-log.html</loc>
-    <lastmod>2026-02-10T03:19:10.850Z</lastmod>
+    <loc>https://steveya.github.io/posts/mean-reversion-strategy-4/index.html</loc>
+    <lastmod>2026-03-08T11:44:26.857Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/posts/mean-reversion-strategy-2/index.html</loc>
     <lastmod>2026-03-07T19:06:37.833Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/mean-reversion-strategy-4/index.html</loc>
-    <lastmod>2026-03-08T11:39:30.483Z</lastmod>
+    <loc>https://steveya.github.io/migration-log.html</loc>
+    <lastmod>2026-02-10T03:19:10.850Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/malaria-detection-2/index.html</loc>
-    <lastmod>2026-03-07T19:06:37.828Z</lastmod>
+    <loc>https://steveya.github.io/posts/mean-reversion-strategy-3/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.837Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/intercept invariance to adding centered features/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.874Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/volatility-forecasts-7/draft.html</loc>
+    <lastmod>2026-03-09T18:30:56.136Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/posts/signature-method-1/index.html</loc>
@@ -102,7 +106,7 @@
   </url>
   <url>
     <loc>https://steveya.github.io/posts/volatility-forecasts-4/index.html</loc>
-    <lastmod>2026-03-08T11:43:09.755Z</lastmod>
+    <lastmod>2026-03-09T21:59:31.001Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/posts/signature-method-3/index.html</loc>
@@ -114,10 +118,10 @@
   </url>
   <url>
     <loc>https://steveya.github.io/posts/volatility-forecasts-5/draft.html</loc>
-    <lastmod>2026-03-09T16:33:17.190Z</lastmod>
+    <lastmod>2026-03-09T16:53:25.751Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/forecast-comparison/draft.html</loc>
+    <loc>https://steveya.github.io/posts/forecast-comparison/index.html</loc>
     <lastmod>2026-03-10T01:14:50.760Z</lastmod>
   </url>
   <url>
@@ -130,18 +134,14 @@
   </url>
   <url>
     <loc>https://steveya.github.io/pages/notes.html</loc>
-    <lastmod>2026-03-08T11:43:24.767Z</lastmod>
+    <lastmod>2026-03-10T01:56:51.900Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/pages/series.html</loc>
-    <lastmod>2026-03-08T11:43:24.766Z</lastmod>
+    <lastmod>2026-03-10T01:56:51.900Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/pages/about.html</loc>
     <lastmod>2026-02-04T20:35:06.517Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/volatility-forecasts-4/draft.html</loc>
-    <lastmod>2026-03-09T21:59:31.001Z</lastmod>
   </url>
 </urlset>

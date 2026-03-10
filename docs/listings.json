@@ -23,7 +23,9 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/forecast-comparison/index.html",
       "/posts/mean-reversion-strategy-4/index.html",
+      "/posts/volatility-forecasts-4/index.html",
       "/posts/mean-reversion-strategy-3/index.html",
       "/posts/mean-reversion-strategy-2/index.html",
       "/posts/graph-regularization-1/index.html",

@@ -9,12 +9,16 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError:
+    yaml = None
 
 ROOT = Path(__file__).resolve().parent.parent
 POSTS_DIR = ROOT / "posts"
@@ -88,8 +92,176 @@ PART_RE = re.compile(r"\(Part\s*(\d+)[:\-\u2014\)]", re.IGNORECASE)
 SLUG_PART_RE = re.compile(r"-(\d+)$")
 
 
+def _split_top_level(value: str, separator: str) -> list[str]:
+    parts: list[str] = []
+    current: list[str] = []
+    depth = 0
+    quote: str | None = None
+
+    for char in value:
+        if quote:
+            current.append(char)
+            if char == quote:
+                quote = None
+            continue
+
+        if char in {'"', "'"}:
+            quote = char
+            current.append(char)
+            continue
+
+        if char == "[":
+            depth += 1
+        elif char == "]":
+            depth -= 1
+
+        if char == separator and depth == 0:
+            parts.append("".join(current).strip())
+            current = []
+            continue
+
+        current.append(char)
+
+    parts.append("".join(current).strip())
+    return [part for part in parts if part]
+
+
+def _split_key_value(line: str) -> tuple[str, str | None]:
+    quote: str | None = None
+    depth = 0
+
+    for index, char in enumerate(line):
+        if quote:
+            if char == quote:
+                quote = None
+            continue
+
+        if char in {'"', "'"}:
+            quote = char
+            continue
+        if char == "[":
+            depth += 1
+            continue
+        if char == "]":
+            depth -= 1
+            continue
+        if char == ":" and depth == 0:
+            key = line[:index].strip()
+            value = line[index + 1 :].strip()
+            return key, value if value else None
+
+    raise MetadataError(f"Could not parse YAML line: {line}")
+
+
+def _parse_scalar(value: str) -> Any:
+    if value in {"true", "True"}:
+        return True
+    if value in {"false", "False"}:
+        return False
+    if value in {"null", "Null", "none", "None", "~"}:
+        return None
+
+    if value.startswith("[") and value.endswith("]"):
+        inner = value[1:-1].strip()
+        if not inner:
+            return []
+        return [_parse_scalar(part) for part in _split_top_level(inner, ",")]
+
+    if (value.startswith('"') and value.endswith('"')) or (
+        value.startswith("'") and value.endswith("'")
+    ):
+        return value[1:-1]
+
+    if re.fullmatch(r"-?\d+", value):
+        return int(value)
+
+    return value
+
+
+def _parse_yaml_block(lines: Sequence[str], start: int, indent: int) -> tuple[Any, int]:
+    index = start
+    while index < len(lines) and not lines[index].strip():
+        index += 1
+
+    if index >= len(lines):
+        return {}, index
+
+    stripped = lines[index].lstrip()
+    current_indent = len(lines[index]) - len(stripped)
+    if current_indent < indent:
+        return {}, index
+
+    if stripped.startswith("- "):
+        items: list[Any] = []
+        while index < len(lines):
+            line = lines[index]
+            if not line.strip():
+                index += 1
+                continue
+
+            stripped = line.lstrip()
+            current_indent = len(line) - len(stripped)
+            if current_indent < indent or not stripped.startswith("- "):
+                break
+
+            remainder = stripped[2:].strip()
+            index += 1
+            if not remainder:
+                nested, index = _parse_yaml_block(lines, index, indent + 2)
+                items.append(nested)
+                continue
+
+            key, value = _split_key_value(remainder)
+            if value is None:
+                nested, index = _parse_yaml_block(lines, index, indent + 2)
+                item = {key: nested}
+            else:
+                item = {key: _parse_scalar(value)}
+
+            continuation, new_index = _parse_yaml_block(lines, index, indent + 2)
+            if isinstance(continuation, dict) and continuation:
+                item.update(continuation)
+                index = new_index
+            items.append(item)
+
+        return items, index
+
+    mapping: dict[str, Any] = {}
+    while index < len(lines):
+        line = lines[index]
+        if not line.strip():
+            index += 1
+            continue
+
+        stripped = line.lstrip()
+        current_indent = len(line) - len(stripped)
+        if current_indent < indent:
+            break
+        if current_indent > indent:
+            raise MetadataError(f"Unexpected indentation in YAML: {line}")
+
+        key, value = _split_key_value(stripped)
+        index += 1
+        if value is None:
+            nested, index = _parse_yaml_block(lines, index, indent + 2)
+            mapping[key] = nested
+        else:
+            mapping[key] = _parse_scalar(value)
+
+    return mapping, index
+
+
+def load_yaml_text(text: str) -> Any:
+    if yaml is not None:
+        return yaml.safe_load(text) or {}
+
+    lines = text.splitlines()
+    parsed, _ = _parse_yaml_block(lines, 0, 0)
+    return parsed or {}
+
+
 def load_projects() -> list[Project]:
-    data = yaml.safe_load(PROJECTS_FILE.read_text(encoding="utf-8")) or {}
+    data = load_yaml_text(PROJECTS_FILE.read_text(encoding="utf-8"))
     projects = []
     for item in data.get("projects", []):
         projects.append(
@@ -129,7 +301,7 @@ def extract_qmd_frontmatter(path: Path) -> dict[str, Any]:
     frontmatter, sep, _ = rest.partition("\n---")
     if not sep:
         raise MetadataError(f"Missing frontmatter end in {path}")
-    return yaml.safe_load(frontmatter) or {}
+    return load_yaml_text(frontmatter)
 
 
 def extract_notebook_frontmatter(path: Path) -> dict[str, Any]:
@@ -158,7 +330,7 @@ def extract_notebook_frontmatter(path: Path) -> dict[str, Any]:
     frontmatter = "\n".join(frontmatter_lines).strip()
     if not frontmatter:
         raise MetadataError(f"Notebook frontmatter malformed: {path}")
-    return yaml.safe_load(frontmatter) or {}
+    return load_yaml_text(frontmatter)
 
 
 def infer_series_part(title: str, slug: str) -> int | None:

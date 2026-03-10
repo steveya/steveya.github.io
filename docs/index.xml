@@ -10,7 +10,17 @@
 <atom:link href="https://steveya.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Updates on quantitative analysis, data science, and ML education.</description>
 <generator>quarto-1.8.27</generator>
-<lastBuildDate>Tue, 03 Mar 2026 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 04 Mar 2026 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Forecasts Comparison</title>
+  <link>https://steveya.github.io/posts/forecast-comparison/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Econometrics</category>
+  <category>Forecasting</category>
+  <category>Time Series</category>
+  <guid>https://steveya.github.io/posts/forecast-comparison/</guid>
+  <pubDate>Wed, 04 Mar 2026 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Expected Performance of a Mean-Reversion Trading Strategy — Part 4</title>
   <link>https://steveya.github.io/posts/mean-reversion-strategy-4/</link>
@@ -19,6 +29,16 @@
   <category>Trading Strategies</category>
   <category>Stochastic Processes</category>
   <guid>https://steveya.github.io/posts/mean-reversion-strategy-4/</guid>
+  <pubDate>Tue, 03 Mar 2026 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Volatility Forecasts (Part 4 — RMSE Benchmarks and QLIKE Training)</title>
+  <link>https://steveya.github.io/posts/volatility-forecasts-4/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Quantitative Finance</category>
+  <category>Volatility Modeling</category>
+  <category>Time Series</category>
+  <guid>https://steveya.github.io/posts/volatility-forecasts-4/</guid>
   <pubDate>Tue, 03 Mar 2026 05:00:00 GMT</pubDate>
 </item>
 <item>
@@ -198,26 +218,6 @@
   <category>Stochastic Processes</category>
   <guid>https://steveya.github.io/posts/short-rate-models-2/</guid>
   <pubDate>Sun, 19 May 2024 04:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Short Rate Models (Part 1: Introducing Merton’s Model)</title>
-  <link>https://steveya.github.io/posts/short-rate-models-1/</link>
-  <description><![CDATA[ undefined ]]></description>
-  <category>Quantitative Finance</category>
-  <category>Interest Rate Models</category>
-  <category>Stochastic Processes</category>
-  <guid>https://steveya.github.io/posts/short-rate-models-1/</guid>
-  <pubDate>Fri, 10 May 2024 04:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Expected Performance of a Mean-Reversion Trading Strategy - Part 1</title>
-  <link>https://steveya.github.io/posts/mean-reversion-strategy-1/</link>
-  <description><![CDATA[ undefined ]]></description>
-  <category>Quantitative Finance</category>
-  <category>Trading Strategies</category>
-  <category>Stochastic Processes</category>
-  <guid>https://steveya.github.io/posts/mean-reversion-strategy-1/</guid>
-  <pubDate>Thu, 01 Sep 2022 04:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>
