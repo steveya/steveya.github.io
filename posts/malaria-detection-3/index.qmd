@@ -3,6 +3,11 @@ title: "Malaria Detection (Part 3: Results and Reflections)"
 date: 2024-07-17
 description: "I was honestly amazed by these results. Even the base model achieved 98% accuracy! However, accuracy isn't everything. Let's break down what these numbers really mean."
 categories: [Machine Learning, Computer Vision, Deep Learning, Healthcare AI]
+content-type: "series"
+series-id: "malaria-detection"
+series-title: "Malaria Detection"
+series-part: 3
+project-ids: [malaria-detection]
 ---
 The notebook for this post can be found [here](https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb).
 

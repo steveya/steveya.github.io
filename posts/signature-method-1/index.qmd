@@ -3,6 +3,11 @@ title: Signature Methods (Part 1 - Motivation)
 date: 2025-12-14
 description: "I am starting a series on the signature method now that I have some free time on my hands over the 2025 holiday season."
 categories: [Quantitative Finance, Signature Methods, Time Series]
+content-type: "series"
+series-id: "signature-methods"
+series-title: "Signature Methods"
+series-part: 1
+project-ids: [signature-methods]
 ---
 I am starting a series on the **signature method** now that I have some free time on my hands over the 2025 holiday season. In this post I talk about what motivates me to study the signature method, and as the series progresses I will build up examples and applications to see how well it works in practice. The signature method has deep connections with rough path theory and Lie algebra, neither of which I have studied enough to write about intelligently. Hopefully, towards the end of the series I will have accumulated enough knowledge to write about their connections to the signature method.
 

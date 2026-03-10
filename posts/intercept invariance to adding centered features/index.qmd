@@ -4,6 +4,7 @@ description: "When centering (or standardizing) features leaves the intercept un
 author: "Steve Yang"
 date: "2026-02-10"
 categories: [Linear Models, Optimization, Statistics]
+content-type: "note"
 draft: false
 ---
 

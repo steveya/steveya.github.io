@@ -142,47 +142,7 @@ window.Quarto = {
 <p class="date">2026-02-06</p>
 </header>
 
-<nav id="TOC" role="doc-toc">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#setup" id="toc-setup"><span class="header-section-number">1</span> Setup</a>
-  <ul>
-  <li><a href="#models" id="toc-models"><span class="header-section-number">1.1</span> Models</a></li>
-  <li><a href="#signature-configuration" id="toc-signature-configuration"><span class="header-section-number">1.2</span> Signature Configuration</a></li>
-  <li><a href="#data" id="toc-data"><span class="header-section-number">1.3</span> Data</a></li>
-  </ul></li>
-  <li><a href="#experiment-1-single-channel-signatures" id="toc-experiment-1-single-channel-signatures"><span class="header-section-number">2</span> Experiment 1: Single-Channel Signatures</a>
-  <ul>
-  <li><a href="#feature-exploration" id="toc-feature-exploration"><span class="header-section-number">2.1</span> Feature Exploration</a></li>
-  <li><a href="#cluster-based-feature-selection" id="toc-cluster-based-feature-selection"><span class="header-section-number">2.2</span> Cluster-Based Feature Selection</a></li>
-  </ul></li>
-  <li><a href="#experiment-1-evaluation" id="toc-experiment-1-evaluation"><span class="header-section-number">3</span> Experiment 1: Evaluation</a>
-  <ul>
-  <li><a href="#baseline-results" id="toc-baseline-results"><span class="header-section-number">3.1</span> Baseline Results</a></li>
-  <li><a href="#with-signature-features" id="toc-with-signature-features"><span class="header-section-number">3.2</span> With Signature Features</a></li>
-  <li><a href="#diagnosing-via-alpha_t-paths" id="toc-diagnosing-via-alpha_t-paths"><span class="header-section-number">3.3</span> Diagnosing via <span class="math inline">\alpha_t</span> Paths</a></li>
-  </ul></li>
-  <li><a href="#experiment-2-multi-channel-signatures" id="toc-experiment-2-multi-channel-signatures"><span class="header-section-number">4</span> Experiment 2: Multi-Channel Signatures</a></li>
-  <li><a href="#experiment-2-evaluation" id="toc-experiment-2-evaluation"><span class="header-section-number">5</span> Experiment 2: Evaluation</a>
-  <ul>
-  <li><a href="#diagnosing-via-alpha_t-paths-multi-channel" id="toc-diagnosing-via-alpha_t-paths-multi-channel"><span class="header-section-number">5.1</span> Diagnosing via <span class="math inline">\alpha_t</span> Paths (Multi-Channel)</a></li>
-  </ul></li>
-  <li><a href="#feature-redundancy-and-regularization" id="toc-feature-redundancy-and-regularization"><span class="header-section-number">6</span> Feature Redundancy and Regularization</a>
-  <ul>
-  <li><a href="#cross-correlation-with-baseline-features" id="toc-cross-correlation-with-baseline-features"><span class="header-section-number">6.1</span> Cross-Correlation with Baseline Features</a></li>
-  <li><a href="#weight-distortion-under-uniform-l2" id="toc-weight-distortion-under-uniform-l2"><span class="header-section-number">6.2</span> Weight Distortion Under Uniform L2</a></li>
-  <li><a href="#recovering-the-baseline-with-group-specific-regularization" id="toc-recovering-the-baseline-with-group-specific-regularization"><span class="header-section-number">6.3</span> Recovering the Baseline with Group-Specific Regularization</a></li>
-  <li><a href="#xgboost-feature-weights" id="toc-xgboost-feature-weights"><span class="header-section-number">6.4</span> XGBoost Feature Weights</a></li>
-  <li><a href="#diagnosing-the-smoothing-parameter-shift" id="toc-diagnosing-the-smoothing-parameter-shift"><span class="header-section-number">6.5</span> Diagnosing the Smoothing-Parameter Shift</a></li>
-  <li><a href="#warm-start-and-two-stage-fitting" id="toc-warm-start-and-two-stage-fitting"><span class="header-section-number">6.6</span> Warm-Start and Two-Stage Fitting</a></li>
-  <li><a href="#nonlinearity-and-truncation-level" id="toc-nonlinearity-and-truncation-level"><span class="header-section-number">6.7</span> Nonlinearity and Truncation Level</a></li>
-  <li><a href="#interpretation" id="toc-interpretation"><span class="header-section-number">6.8</span> Interpretation</a></li>
-  </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion"><span class="header-section-number">7</span> Conclusion</a></li>
-  <li><a href="#appendix-analytical-jacobian-for-stes" id="toc-appendix-analytical-jacobian-for-stes"><span class="header-section-number">8</span> Appendix: Analytical Jacobian for STES</a></li>
-  </ul>
-</nav>
+
 <p>In <a href="../signature-method-3/">Part 3</a> of the signature series we built intuition for which functionals signatures represent efficiently (variance, averages) and which they do not (running maximum, drawdown). The central result from that investigation was that signatures provide a principled feature hierarchy for ordered interactions, but augmentation design determines what information is accessible at low depth, and some targets are structurally incompatible with low-order truncation.</p>
 <p>In this post we put that theory to work. We take the SPY volatility forecasting setup from our <a href="../volatility-forecasts-3/">volatility series</a> — Exponential Smoothing (ES), Smooth Transition Exponential Smoothing (STES), and XGBoost-STES — and ask a concrete question: <strong>can rolling signature features, computed over a trailing window of daily returns, improve out-of-sample variance forecasts within the STES framework?</strong></p>
 <p>The answer is negative. However, the experiment is worth reporting in detail because the <em>way</em> it fails is informative. We show that:</p>
@@ -196,8 +156,6 @@ window.Quarto = {
 <blockquote>
 <p><strong>Note</strong></p>
 <p>This is my first post published as a Quarto notebook. Most code blocks are folded by default — expand them if you want to see the implementation details. The full notebook is available in the <a href="https://github.com/steveya/steveya.github.io">blog repository</a>. This post depends on the <a href="https://github.com/steveya/alphaforge">alphaforge project</a> (data + dataset plumbing) and the <a href="https://github.com/steveya/volatility-forecast">volatility-forecast project</a> (models + evaluation).</p>
-</blockquote>
-</div>
 <div id="246eda05" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <style>
@@ -229,8 +187,8 @@ window.Quarto = {
 </style>
 </div>
 </div>
-<h2 data-number="1" id="setup" class="anchored"><span class="header-section-number">1</span> Setup</h2>
-<h3 data-number="1.1" id="models" class="anchored"><span class="header-section-number">1.1</span> Models</h3>
+<h2 id="setup" data-number="1" class="anchored"><span class="header-section-number">1</span> Setup</h2>
+<h3 id="models" data-number="1.1" class="anchored"><span class="header-section-number">1.1</span> Models</h3>
 <p>We forecast next-day squared returns <span class="math inline">y_t = r_{t+1}^2</span> using three model architectures from our <a href="../volatility-forecasts-3/">volatility series</a>:</p>
 <ol type="1">
 <li><p><strong>ES (Exponential Smoothing):</strong> A fixed-decay exponential moving average <span class="math inline">v_{t+1} = \alpha r_t^2 + (1-\alpha) v_t</span> with constant <span class="math inline">\alpha</span>. Simple and hard to beat.</p></li>
@@ -283,7 +241,7 @@ In-sample starts at index: 200
 Out-of-sample starts at index: 4000</code></pre>
 </div>
 </div>
-<h3 data-number="1.2" id="signature-configuration" class="anchored"><span class="header-section-number">1.2</span> Signature Configuration</h3>
+<h3 id="signature-configuration" data-number="1.2" class="anchored"><span class="header-section-number">1.2</span> Signature Configuration</h3>
 <p>We compute level-2 signatures over a rolling 20-day window with the following augmentation pipeline. We use <a href="https://www.sktime.net/en/stable/">sktime</a>’s <code>SignatureTransformer</code> for the computation. It already comes with a set of supported augmentations. Note that the order of the augmentations matters because each step transforms what the next step sees:</p>
 <ol type="1">
 <li><strong>cumsum</strong> — integrate returns into a log-price path so the signature sees geometry, not just increments.</li>
@@ -369,7 +327,7 @@ Out-of-sample starts at index: 4000</code></pre>
 <span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># → sig_df columns are the signature coefficients used as features</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<h3 data-number="1.3" id="data" class="anchored"><span class="header-section-number">1.3</span> Data</h3>
+<h3 id="data" data-number="1.3" class="anchored"><span class="header-section-number">1.3</span> Data</h3>
 <p>We use SPY daily data from January 2000 to December 2023. The first 200 business days are reserved for model initialization, the next 3,800 form the in-sample training window, and the remaining ~2,000 days are the out-of-sample test set. Baseline features are the current day’s log return, absolute return, and squared return, plus a constant.</p>
 <div id="e9ef8b7b" class="cell" data-execution_count="95">
 <details class="code-fold">
@@ -533,8 +491,8 @@ Out-of-sample starts at index: 4000</code></pre>
 <span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> X_aligned</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<h2 data-number="2" id="experiment-1-single-channel-signatures" class="anchored"><span class="header-section-number">2</span> Experiment 1: Single-Channel Signatures</h2>
-<h3 data-number="2.1" id="feature-exploration" class="anchored"><span class="header-section-number">2.1</span> Feature Exploration</h3>
+<h2 id="experiment-1-single-channel-signatures" data-number="2" class="anchored"><span class="header-section-number">2</span> Experiment 1: Single-Channel Signatures</h2>
+<h3 id="feature-exploration" data-number="2.1" class="anchored"><span class="header-section-number">2.1</span> Feature Exploration</h3>
 <p>Before feeding signatures into the models, we characterize the feature set. The level-2 signature of the augmented 1D return path produces 20 coordinates in this configuration. We examine their mutual correlation structure and evaluate how much independent information they carry.</p>
 <p>Most of the level-2 signature of a 20-day augmented return path have near-zero correlation with the target (next-day squared return), and many are highly correlated with each other — a direct consequence of the augmentation pipeline generating algebraically related terms.</p>
 <p>The clustered correlation matrix below makes the redundancy structure visible. Large off-diagonal blocks of near-perfect correlation (<span class="math inline">|\rho| &gt; 0.95</span>) indicate groups of features that carry the same information.</p>
@@ -572,7 +530,7 @@ Out-of-sample starts at index: 4000</code></pre>
 </div>
 </div>
 </div>
-<h3 data-number="2.2" id="cluster-based-feature-selection" class="anchored"><span class="header-section-number">2.2</span> Cluster-Based Feature Selection</h3>
+<h3 id="cluster-based-feature-selection" data-number="2.2" class="anchored"><span class="header-section-number">2.2</span> Cluster-Based Feature Selection</h3>
 <p>Rather than manually pruning augmentations, we keep the full pipeline and <strong>select one representative per correlation cluster</strong>:</p>
 <ol type="1">
 <li>Compute the pairwise correlation matrix on the <strong>training set only</strong> (no look-ahead).</li>
@@ -766,7 +724,7 @@ Selected features (one per cluster): 6
 </div>
 </div>
 </div>
-<h2 data-number="3" id="experiment-1-evaluation" class="anchored"><span class="header-section-number">3</span> Experiment 1: Evaluation</h2>
+<h2 id="experiment-1-evaluation" data-number="3" class="anchored"><span class="header-section-number">3</span> Experiment 1: Evaluation</h2>
 <p>We test whether appending the 6 selected signature coordinates to the model feature set improves out-of-sample forecasts. The three model tiers are the same as in <a href="../volatility-forecasts-3/">Part 3</a>:</p>
 <ol type="1">
 <li><strong>ES</strong> — fixed smoothing parameter <span class="math inline">\alpha</span>.</li>
@@ -1237,7 +1195,7 @@ Selected features (one per cluster): 6
 <span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.DataFrame(rows).sort_values(<span class="st">"rmse"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<h3 data-number="3.1" id="baseline-results" class="anchored"><span class="header-section-number">3.1</span> Baseline Results</h3>
+<h3 id="baseline-results" data-number="3.1" class="anchored"><span class="header-section-number">3.1</span> Baseline Results</h3>
 <p>First the baseline — identical to <a href="../volatility-forecasts-3/">Part 3</a>. XGBoost-STES dominates on RMSE and MAE.</p>
 <div id="997e77b2" class="cell" data-execution_count="146">
 <div class="cell-output cell-output-stdout">
@@ -1306,7 +1264,7 @@ Selected features (one per cluster): 6
 </table>
 </div>
 </div>
-<h3 data-number="3.2" id="with-signature-features" class="anchored"><span class="header-section-number">3.2</span> With Signature Features</h3>
+<h3 id="with-signature-features" data-number="3.2" class="anchored"><span class="header-section-number">3.2</span> With Signature Features</h3>
 <p>Now we append the 6 cluster-selected signature coordinates as additional features. For STES, an L2 regularization penalty is tuned via 5-fold CV (grid: <span class="math inline">\lambda \in \{0, 0.01, 0.1, 1.0, 10.0\}</span>).</p>
 <div id="35507e8f" class="cell" data-execution_count="150">
 <div class="cell-output cell-output-display">
@@ -1383,7 +1341,7 @@ Selected features (one per cluster): 6
 </div>
 </div>
 <p>The above table suggests that signatures do not carry useful information in determining the learning rate <span class="math inline">\alpha</span>. Both STES and XGBoost-STES degrade slightly when signature features are added. The L2 CV for STES selects a high penalty — the optimizer effectively shrinks the signature coefficients toward zero. It is equally informative to examine the predicted smoothing parameter <span class="math inline">\alpha_t</span> with and without signature features.</p>
-<h3 data-number="3.3" id="diagnosing-via-alpha_t-paths" class="anchored"><span class="header-section-number">3.3</span> Diagnosing via <span class="math inline">\alpha_t</span> Paths</h3>
+<h3 id="diagnosing-via-alpha_t-paths" data-number="3.3" class="anchored"><span class="header-section-number">3.3</span> Diagnosing via <span class="math inline">\alpha_t</span> Paths</h3>
 <p>The plot below overlays the predicted <span class="math inline">\alpha_t</span> for STES and XGBoost-STES, with and without signature features. If signatures carried genuine signal, we would expect the augmented <span class="math inline">\alpha_t</span> to track volatility regimes more tightly. Instead, the signature-augmented paths are noisier — the additional features introduce high-frequency variation in <span class="math inline">\alpha_t</span> that does not correspond to actual regime changes. Moreover, there appears to be an <span class="math inline">\alpha</span> level shift. This is a more serious problem, which we examine later in this post.</p>
 <div id="fd277923" class="cell" data-execution_count="155">
 <details class="code-fold">
@@ -1510,7 +1468,7 @@ Implied shock half-life (days):
   This systematically changes the forecast character.</code></pre>
 </div>
 </div>
-<h2 data-number="4" id="experiment-2-multi-channel-signatures" class="anchored"><span class="header-section-number">4</span> Experiment 2: Multi-Channel Signatures</h2>
+<h2 id="experiment-2-multi-channel-signatures" data-number="4" class="anchored"><span class="header-section-number">4</span> Experiment 2: Multi-Channel Signatures</h2>
 <p>The single-channel signature only sees the log-return path. Volatility is a second-moment phenomenon — it cares about magnitudes and asymmetry, not direction alone. We can build a richer path by stacking multiple return transformations as channels before computing the signature:</p>
 <table class="caption-top">
 <thead>
@@ -1761,7 +1719,7 @@ Selected features (one per cluster): 20
 Pairs with |corr| &gt;= 0.90: 0</code></pre>
 </div>
 </div>
-<h2 data-number="5" id="experiment-2-evaluation" class="anchored"><span class="header-section-number">5</span> Experiment 2: Evaluation</h2>
+<h2 id="experiment-2-evaluation" data-number="5" class="anchored"><span class="header-section-number">5</span> Experiment 2: Evaluation</h2>
 <p>With 20 selected multi-channel features (capped via <code>max_features</code>), the correlation threshold auto-adjusted from 0.95 to a lower value to stay within budget. The hypothesis is that cross-channel terms — e.g.&nbsp;the iterated integral of price against downside shocks — provide genuinely new information for volatility prediction.</p>
 <div id="e615068c" class="cell" data-execution_count="152">
 <div class="cell-output cell-output-display">
@@ -1838,7 +1796,7 @@ Pairs with |corr| &gt;= 0.90: 0</code></pre>
 </div>
 </div>
 <p>We see the same pattern as in the single-channel case. Including signature features on the multi-channel path yields no improvement. Despite encoding cross-channel interactions (leverage effect, volatility clustering), the multi-channel signatures add noise rather than signal. The baseline models remain dominant.</p>
-<h3 data-number="5.1" id="diagnosing-via-alpha_t-paths-multi-channel" class="anchored"><span class="header-section-number">5.1</span> Diagnosing via <span class="math inline">\alpha_t</span> Paths (Multi-Channel)</h3>
+<h3 id="diagnosing-via-alpha_t-paths-multi-channel" data-number="5.1" class="anchored"><span class="header-section-number">5.1</span> Diagnosing via <span class="math inline">\alpha_t</span> Paths (Multi-Channel)</h3>
 <p>As with Experiment 1, we overlay the predicted <span class="math inline">\alpha_t</span> with and without multi-channel signature features. The same pattern emerges: the signature-augmented paths are noisier without being more accurate. Moreover, for the XGBoost-STES model, there is a significant <span class="math inline">\alpha</span> level shift. This could reflect a mix of score-distribution rebalancing (signatures change the mean/variance of <span class="math inline">z_t</span>) and training path dependence in the end-to-end fit.</p>
 <div id="ce6ba9dc" class="cell" data-execution_count="156">
 <details class="code-fold">
@@ -1889,9 +1847,9 @@ Pairs with |corr| &gt;= 0.90: 0</code></pre>
 </div>
 </div>
 </div>
-<h2 data-number="6" id="feature-redundancy-and-regularization" class="anchored"><span class="header-section-number">6</span> Feature Redundancy and Regularization</h2>
+<h2 id="feature-redundancy-and-regularization" data-number="6" class="anchored"><span class="header-section-number">6</span> Feature Redundancy and Regularization</h2>
 <p>Both experiments show that including signatures degrades out-of-sample forecasts. Since the baseline model is nested within the augmented model (set signature coefficients to zero), any degradation must come from estimation/regularization/optimization rather than from a hard restriction of the feature set. We investigate three potential mechanisms: (i) signature features may be redundant with baseline features; (ii) the STES regularization architecture distorts baseline weights; and (iii) the XGBoost linear booster assigns excessive weight to noisy signature features.</p>
-<h3 data-number="6.1" id="cross-correlation-with-baseline-features" class="anchored"><span class="header-section-number">6.1</span> Cross-Correlation with Baseline Features</h3>
+<h3 id="cross-correlation-with-baseline-features" data-number="6.1" class="anchored"><span class="header-section-number">6.1</span> Cross-Correlation with Baseline Features</h3>
 <p>If signature features are strongly correlated with the existing baseline features — lagged log-return, absolute log-return, and squared log-return — then adding them provides little novel information while increasing estimation noise. The heatmap below shows the training-set cross-correlation between the six selected single-channel signature features and the three baseline features. Several of the signature features exhibit correlations exceeding 30% with the baseline features.</p>
 <div id="d1abae19" class="cell" data-execution_count="125">
 <details class="code-fold">
@@ -1952,7 +1910,7 @@ Pairs with |corr| &gt; 0.3:
 Max |cross-corr|: 0.527</code></pre>
 </div>
 </div>
-<h3 data-number="6.2" id="weight-distortion-under-uniform-l2" class="anchored"><span class="header-section-number">6.2</span> Weight Distortion Under Uniform L2</h3>
+<h3 id="weight-distortion-under-uniform-l2" data-number="6.2" class="anchored"><span class="header-section-number">6.2</span> Weight Distortion Under Uniform L2</h3>
 <p>The STES model uses L2 regularization to prevent overfitting when extra features are added. Cross-validation selects a penalty <span class="math inline">\lambda</span> large enough to suppress the noisy signature coefficients, but a uniform penalty simultaneously shrinks the three baseline feature weights. This is a standard bias–variance tradeoff in ridge regression: the penalty shrinks <em>all</em> coefficients toward zero, so a <span class="math inline">\lambda</span> chosen to neutralize a noisy feature block can also move well-tuned baseline coefficients away from their near-optimal values.</p>
 <div>
 <blockquote>
@@ -2282,7 +2240,7 @@ Baseline OS RMSE (no sig): 0.000448
 Best augmented OS RMSE:    0.000447 at λ=0.050</code></pre>
 </div>
 </div>
-<h3 data-number="6.3" id="recovering-the-baseline-with-group-specific-regularization" class="anchored"><span class="header-section-number">6.3</span> Recovering the Baseline with Group-Specific Regularization</h3>
+<h3 id="recovering-the-baseline-with-group-specific-regularization" data-number="6.3" class="anchored"><span class="header-section-number">6.3</span> Recovering the Baseline with Group-Specific Regularization</h3>
 <p>Our initial STES model penalizes every feature, including the baseline parameters. If we instead penalize only the signature features while leaving the baseline weights free, the results differ. With this group-specific penalty (<span class="math inline">\lambda_{\text{base}} = 0</span>, <span class="math inline">\lambda_{\text{sig}}</span> varies), the augmented model converges to the exact baseline RMSE as <span class="math inline">\lambda_{\text{sig}} \to \infty</span> — the baseline is correctly recovered as a limiting case. At intermediate <span class="math inline">\lambda_{\text{sig}}</span>, the augmented model performs on par with the baseline but does not improve upon it.</p>
 <div id="7d9f0578" class="cell">
 <details class="code-fold">
@@ -2419,7 +2377,7 @@ Best group-L2 OS RMSE: 0.000448 at λ_sig=100.000</code></pre>
 <ol start="2" type="1">
 <li><strong>Low-order signatures re-encode moment information.</strong> With truncation at level 2 and augmentations like lead–lag and addtime, most signature coordinates are algebraically related to first- and second-order path statistics such as cumulative return, quadratic variation, and their cross-terms. The baseline already includes <span class="math inline">r_t</span>, <span class="math inline">|r_t|</span>, and <span class="math inline">r_t^2</span>, which are direct proxies for these quantities. The cross-correlation heatmap above shows that selected signature features have <span class="math inline">|\rho|</span> up to 0.53 with baseline features. Any genuinely novel content, such as the sequencing and smoothness of returns within the window, is too weak at daily frequency to overcome the statistical cost of additional parameters.</li>
 </ol>
-<h3 data-number="6.4" id="xgboost-feature-weights" class="anchored"><span class="header-section-number">6.4</span> XGBoost Feature Weights</h3>
+<h3 id="xgboost-feature-weights" data-number="6.4" class="anchored"><span class="header-section-number">6.4</span> XGBoost Feature Weights</h3>
 <p>For the <code>gblinear</code> booster, each boosting round fits an additive <strong>linear</strong> update to the prediction. After <span class="math inline">M</span> rounds the model output is</p>
 <p><span class="math display">
 \hat{y}(\mathbf{x}) \;=\; b + \sum_{j=1}^{p} w_j\, x_j,
@@ -2554,7 +2512,7 @@ Best group-L2 OS RMSE: 0.000448 at λ_sig=100.000</code></pre>
 reg_lambda: 1.0</code></pre>
 </div>
 </div>
-<h3 data-number="6.5" id="diagnosing-the-smoothing-parameter-shift" class="anchored"><span class="header-section-number">6.5</span> Diagnosing the Smoothing-Parameter Shift</h3>
+<h3 id="diagnosing-the-smoothing-parameter-shift" data-number="6.5" class="anchored"><span class="header-section-number">6.5</span> Diagnosing the Smoothing-Parameter Shift</h3>
 <p>When signature features are added, the model’s typical smoothing parameter shifts upward. The goal here is to show <em>where that shift can come from</em> in XGBoost-STES.</p>
 <p>For the <code>gblinear</code> booster, the model produces a linear score <span class="math display">
 z_t = b + \sum_{j=1}^{p} w_j\,x_{t,j},
@@ -2580,7 +2538,7 @@ v_{t+1} = v_t + \alpha_t\,(r_t^2 - v_t).
 <p>In our fit, adding signatures shifts the bias from <span class="math inline">b=-1.95</span> to <span class="math inline">b=-1.81</span>, and the unconditional level <span class="math inline">\sigma(b)</span> rises from 12.4% to 14.1%. This is the concrete symptom of the rebalancing described above.</p>
 <p>Finally, note that although the baseline is nested in the augmented feature set (signature weights could be zero), adding signatures can still degrade out-of-sample RMSE because the end-to-end objective is non-convex and the training procedure can land in a different solution when the feature space changes.</p>
 <p>The next code cells quantify how the distribution of <span class="math inline">z_t</span> changes with signatures (and which features drive it), and then test whether warm-starting/two-stage fits can recover baseline-like behaviour.</p>
-<h4 data-number="6.5.1" id="signatures-change-z_t-and-alpha_t" class="anchored"><span class="header-section-number">6.5.1</span> Signatures change <span class="math inline">z_t</span> and <span class="math inline">\alpha_t</span></h4>
+<h4 id="signatures-change-z_t-and-alpha_t" data-number="6.5.1" class="anchored"><span class="header-section-number">6.5.1</span> Signatures change <span class="math inline">z_t</span> and <span class="math inline">\alpha_t</span></h4>
 <p>Mechanically, the signature features can move <span class="math inline">\alpha_t</span> in two ways. They can shift the overall level of the linear score <span class="math inline">z_t = b + \sum_j w_j x_{t j}</span>, and they can change the dispersion of <span class="math inline">z_t</span> over time.</p>
 <p>Since we preprocessed the signature features such that <span class="math inline">\mathbb{E}[x_{t,j}] = 0</span> on the training set, we might expect that the intercept <span class="math inline">b</span> remains unchanged. Since <span class="math inline">\mathbb{E}[z_t]\approx b</span>, we might consequently expect the overall level of <span class="math inline">z_t</span> and <span class="math inline">\alpha_t</span> to be unchanged. This is the correct expectation in a standard linear regression. However, the STES model embeds a logistic regression in estimating <span class="math inline">\alpha_t</span>. For logistic regression, the intercept is not determined by <span class="math inline">\bar z</span> alone, so adding predictors can change it even if the new predictors are centered.</p>
 <p>Relatedly, the dispersion matters because <span class="math inline">\alpha_t = \sigma(z_t)</span> is a nonlinear transformation of <span class="math inline">z_t</span>. Once signatures change the distribution of <span class="math inline">z_t</span> (especially <span class="math inline">\mathrm{Var}(z_t)</span>), the best global “shift” of that distribution can change too, and the model expresses that through <span class="math inline">b</span>.</p>
@@ -2690,7 +2648,7 @@ v_{t+1} = v_t + \alpha_t\,(r_t^2 - v_t).
 </div>
 </div>
 <p>We see that signatures improve in-sample fit (IS RMSE <span class="math inline">\downarrow</span> 0.018) but hurt out-of-sample performance (OOS RMSE <span class="math inline">\uparrow</span> 0.143). With a larger feature set, a lower training error is not surprising; the question is what the extra features are doing to the smoothing dynamics <span class="math inline">\alpha_t</span> that ultimately generate <span class="math inline">v_t</span>.</p>
-<h4 data-number="6.5.2" id="alpha-variation-is-higher" class="anchored"><span class="header-section-number">6.5.2</span> <span class="math inline">\alpha</span> variation is higher</h4>
+<h4 id="alpha-variation-is-higher" data-number="6.5.2" class="anchored"><span class="header-section-number">6.5.2</span> <span class="math inline">\alpha</span> variation is higher</h4>
 <p>A convenient way to see this is to look at the scale of each feature’s contribution to the score variation, <span class="math inline">|w_j|\,\mathrm{std}(x_j)</span>. In the augmented model, a large fraction of that total comes from signature coordinates. As <span class="math inline">\mathrm{std}(z_t)</span> increases substantially, the sigmoid maps that wider range of <span class="math inline">z_t</span> into a wider range of <span class="math inline">\alpha_t</span>. Whether that additional variation reflects genuine regime adaptation or just extra flexibility that does not generalize is exactly what the rest of the section is trying to pin down.</p>
 <div id="2e4605a1" class="cell" data-execution_count="163">
 <details class="code-fold">
@@ -2779,13 +2737,13 @@ v_{t+1} = v_t + \alpha_t\,(r_t^2 - v_t).
    z distribution pushes more mass into the sigmoid tails.</code></pre>
 </div>
 </div>
-<h4 data-number="6.5.3" id="model-nesting-does-not-protect-out-of-sample-performance" class="anchored"><span class="header-section-number">6.5.3</span> Model nesting does not protect out-of-sample performance</h4>
+<h4 id="model-nesting-does-not-protect-out-of-sample-performance" data-number="6.5.3" class="anchored"><span class="header-section-number">6.5.3</span> Model nesting does not protect out-of-sample performance</h4>
 <p>The nonlinearity of the sigmoid helps explain why the bias changes, but it still leaves a more basic question: how can the augmented model fit better in-sample and still do worse out-of-sample, even though the baseline is nested (we could set all signature weights to zero and recover the baseline form)?</p>
 <p>One reason is that the end-to-end STES loss is not convex. The objective is <span class="math display">
 L = \sum_t (y_t - v_t)^2, \qquad v_{t+1} = v_t + \sigma(z_t)(r_t^2 - v_t),
 </span> and the composition of a sigmoid gate with a recursive filter can produce multiple locally optimal solutions. Changing the feature set and re-running CV can change where the optimizer lands.</p>
 <p>We address this instability in the next section and focus on warm-start and two-stage fits. These techniques keep the augmented training anchored near the baseline behavior and make it easier to analyze the incremental value of signatures once we constrain ourselves to stay close to the baseline solution.</p>
-<h3 data-number="6.6" id="warm-start-and-two-stage-fitting" class="anchored"><span class="header-section-number">6.6</span> Warm-Start and Two-Stage Fitting</h3>
+<h3 id="warm-start-and-two-stage-fitting" data-number="6.6" class="anchored"><span class="header-section-number">6.6</span> Warm-Start and Two-Stage Fitting</h3>
 <p>If adding new features leads to significant changes in the objective function landscape, one can keep the optimizer anchored near the baseline solution and only let the new features make incremental changes. We use two simple strategies that are common in transfer-learning style setups:</p>
 <p><strong>Warm-start.</strong> Set XGBoost’s <code>base_margin</code> to the baseline model’s fitted score <span class="math inline">z_t^{(0)} = \hat b_{\text{base}} + \hat w_{\text{base}}^\top x_t^{\text{base}}</span>. With <code>base_score = 0</code>, the booster starts from <span class="math inline">z_t^{(0)}</span> and learns only a correction <span class="math inline">\Delta z_t</span>, so the total score is <span class="math inline">z_t = z_t^{(0)} + \Delta z_t</span>. This is a practical way to bias training toward the baseline basin.</p>
 <p><strong>Two-stage (adapter).</strong> Freeze the baseline entirely via <code>base_margin</code> and train only on the signature features. In other words, the baseline model becomes a fixed “backbone” and the signatures can only contribute additively; they cannot distort the baseline weights.</p>
@@ -3239,7 +3197,7 @@ STES EXPERIMENTS
        Multi-start (best=seed=1)    0.1167      0.0005   0.000449    +0.13%</code></pre>
 </div>
 </div>
-<h3 data-number="6.7" id="nonlinearity-and-truncation-level" class="anchored"><span class="header-section-number">6.7</span> Nonlinearity and Truncation Level</h3>
+<h3 id="nonlinearity-and-truncation-level" data-number="6.7" class="anchored"><span class="header-section-number">6.7</span> Nonlinearity and Truncation Level</h3>
 <p>It’s tempting to argue that signatures are only “failing” here because we are truncating too aggressively. The universality theorem is an existence result: if we take signatures to a high enough level, then linear functionals of those signatures can approximate any continuous path functional. However, in our experiment above we truncate at level 2, which only captures up to pairwise interactions of increments.</p>
 <p>There are two obvious ways to try to recover some of what truncation throws away. One is to keep level 2 but add a nonlinear model on top (a tree ensemble can form products and threshold-type interactions of low-level terms, which can mimic some higher-order effects). The other is to stay linear but raise the truncation to level 3, which supplies cubic interaction terms directly.</p>
 <p>That motivates a simple <span class="math inline">2\times 3</span> grid: two boosters (<code>gblinear</code>, <code>gbtree</code>) crossed with three feature sets (baseline only, +L2 signatures, +L3 signatures). The custom end-to-end objective is the same in all cases — it differentiates <span class="math inline">L</span> with respect to <span class="math inline">z_t</span> through the recursion <span class="math inline">v_{t+1} = v_t + \sigma(z_t)(r_t^2 - v_t)</span> — so swapping the booster changes only how <span class="math inline">z_t</span> is parameterized, not how the loss is defined.</p>
@@ -3356,18 +3314,18 @@ NONLINEARITY × TRUNCATION LEVEL RESULTS
     E vs D    (trees + L3 vs linear + L3):     -2.16pp</code></pre>
 </div>
 </div>
-<h3 data-number="6.8" id="interpretation" class="anchored"><span class="header-section-number">6.8</span> Interpretation</h3>
+<h3 id="interpretation" data-number="6.8" class="anchored"><span class="header-section-number">6.8</span> Interpretation</h3>
 <p>The pattern is consistent: every variant that includes signatures — linear or tree-based, level 2 or level 3 — worsens OOS RMSE relative to the <code>gblinear</code> baseline. Nonlinearity by itself is not the issue: the <code>gbtree</code> baseline is roughly on par with <code>gblinear</code> (+0.34%), so simply moving from linear to tree does not change much.</p>
 <p>What does change things is adding signatures. Trees plus L2 signatures are substantially worse (+9.02%), which fits what we have seen throughout: the extra degrees of freedom reduce training error but do not translate into better forecasts at this frequency.</p>
 <p>Raising the truncation level does not rescue it. Level-3 signatures with <code>gblinear</code> (+5.95%) perform worse than level-2 (+1.57%), even though level 3 supplies the cubic interaction terms you might hope were missing. That makes it hard to blame “not enough expressiveness”: the limiting factor looks like signal rather than function class.</p>
 <p>A genuinely favorable nonlinearity test would be one where signatures receive meaningful weight <em>and</em> improve OOS performance, or where we change the path construction (higher-frequency sampling, richer channels) so that the signatures have something new to say beyond the baseline volatility features. In this daily-SPY setup, neither seems to be the case.</p>
-<h2 data-number="7" id="conclusion" class="anchored"><span class="header-section-number">7</span> Conclusion</h2>
+<h2 id="conclusion" data-number="7" class="anchored"><span class="header-section-number">7</span> Conclusion</h2>
 <p>We tested whether rolling path signatures — single-channel and multi-channel — improve variance forecasts when fed into STES and XGBoost-STES. Across all the diagnostics in this notebook, the answer is consistent: in this daily-SPY setup, signature features do not improve out-of-sample accuracy, and they often make it slightly worse.</p>
 <p>For STES, the main issue is regularization geometry. When we add signature features and cross-validation chooses a large <span class="math inline">\lambda</span> to suppress their coefficients, that same uniform <span class="math inline">\ell_2</span> penalty also shrinks the baseline feature weights far away from their unregularized optima. Once we separate the penalties (regularize signatures without simultaneously crushing the baseline), the augmented model can match the baseline RMSE — but it still does not beat it. On the optimization side, the SciPy Gauss–Newton fit with an analytical Jacobian is stable: warm-start, cold-start, and multi-start all converge to the same solution in the small-<span class="math inline">p</span> regime considered here.</p>
 <p>For XGBoost-STES, the picture is different because the end-to-end objective is non-convex. Fitting a linear score through a sigmoid gate and a recursive filter gives a loss surface with multiple basins, and <code>gblinear</code> coordinate descent can land in different local optima when the feature set changes. Cold-starting with signatures can produce a lower in-sample loss and a worse out-of-sample RMSE at the same time. Warm-start and two-stage fits keep training closer to the baseline behavior, but even after tuning on the augmented feature set they still do not beat the baseline — and in the warm-started solutions the signature weights are effectively negligible.</p>
 <p>The nonlinearity experiment reinforces the same point. Switching the booster to <code>gbtree</code> does not unlock value: the tree baseline matches <code>gblinear</code>, and adding signatures to trees is worse. Raising the truncation level to 3 does not help either.</p>
 <p>Our takeaways are as follows. First, generic signatures on daily return paths do not automatically add incremental signal beyond standard volatility features. Universality guarantees that a rich enough signature expansion can represent many functionals, but it does not guarantee that a low-level truncation will be a statistically efficient representation in finite samples. Second, once we augment a strong baseline, regularization design and optimization path-dependence can matter as much as the feature engineering. Third, when we do have a non-convex end-to-end loss, warm-starting from a good solution is a sensible default — even if, as in this case, it mostly confirms that the new features are not predictive.</p>
-<h2 data-number="8" id="appendix-analytical-jacobian-for-stes" class="anchored"><span class="header-section-number">8</span> Appendix: Analytical Jacobian for STES</h2>
+<h2 id="appendix-analytical-jacobian-for-stes" data-number="8" class="anchored"><span class="header-section-number">8</span> Appendix: Analytical Jacobian for STES</h2>
 <p>One previous implementation of the STES model uses finite-difference Jacobians built into the scipy solver. When we have 20+ signature features, fitting can become uncomfortably slow. By default, <code>scipy.optimize.least_squares</code> approximates the Jacobian numerically, which means: for <span class="math inline">p</span> parameters, it has to run the full sequential <span class="math inline">T</span>-step recursion about <span class="math inline">p+1</span> times per iteration.</p>
 <p>For this model, we can write down the Jacobian analytically and compute it alongside the forward recursion. If we define <span class="math display">
 J_{t,j} = \frac{\partial v_{t+1}}{\partial \beta_j},
@@ -3511,6 +3469,8 @@ J_{t,j} = \alpha_t(1-\alpha_t)\, X_{t,j}\,(r_t^2 - v_t) \;+\; (1-\alpha_t)\, J_{
 </details>
 </div>
 
+</blockquote>
+</div>
 
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

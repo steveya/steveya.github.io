@@ -1,0 +1,67 @@
+projects:
+  - id: volatility-forecasting
+    title: "Volatility Forecasting"
+    order: 10
+    status: active
+    summary: "My work on volatility forecasting. How far can we go by extending a simple exponential smoothing filter?"
+    repo_links:
+      - label: "Research Code"
+        text: "volatility-forecast examples"
+        url: "https://github.com/steveya/volatility-forecast/blob/main/examples"
+      - label: "Research Library"
+        text: "volatility-forecast"
+        url: "https://github.com/steveya/volatility-forecast"
+
+  - id: signature-methods
+    title: "Signature Method"
+    order: 20
+    status: active
+    summary: "My study notes on the signature method."
+
+  - id: short-rate-models
+    title: "Short Rate Models"
+    order: 30
+    status: active
+    summary: "A long-running refresher series on short-rate and term-structure models."
+    repo_links:
+      - label: "WIP GitHub Repository"
+        text: "short-rate-models"
+        url: "https://github.com/steveya/short-rate-models"
+
+  - id: mean-reversion-strategy
+    title: "Mean Reversion Strategies"
+    order: 40
+    status: active
+    summary: "Analytical notes on the expected performance of mean-reversion trading strategies under progressively more realistic assumptions."
+
+  - id: malaria-detection
+    title: "Malaria Detection"
+    order: 50
+    status: active
+    summary: "My capstone project for the Applied Data Science certificate program with MIT Professional Education."
+    repo_links:
+      - label: "GitHub Repository"
+        text: "data-science"
+        url: "https://github.com/steveya/data-science/blob/main/notebook/malaria-detection/malaria-detection.ipynb"
+
+  - id: graph-regularized-low-rank-models
+    title: "Graph-Regularized Low-Rank Models"
+    order: 60
+    status: active
+    summary: "Notes and experiments on graph-regularized low-rank models and related dimensionality-reduction ideas."
+    repo_links:
+      - label: "Research Library"
+        text: "grpca"
+        url: "https://github.com/steveya/grpca"
+
+  - id: nowcasting
+    title: "Nowcasting"
+    order: 70
+    status: wip
+    summary: "A step-by-step guide to implementing nowcasting models based on dynamic factor models in Python."
+
+  - id: teaching-kids-math
+    title: "Teaching Kids Math"
+    order: 80
+    status: wip
+    summary: "Notes and future videos on mathematical ideas I have been teaching my kids."

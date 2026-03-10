@@ -3,6 +3,11 @@ title: 'Expected Performance of a Mean-Reversion Trading Strategy - Part 1'
 date: 2022-09-01
 description: "A value strategy posits that the worth of an asset tends to oscillate around a more gradual, underlying trend."
 categories: [Quantitative Finance, Trading Strategies, Stochastic Processes]
+content-type: "series"
+series-id: "mean-reversion-strategy"
+series-title: "Expected Performance of a Mean-Reversion Trading Strategy"
+series-part: 1
+project-ids: [mean-reversion-strategy]
 ---
 A value strategy posits that the worth of an asset tends to oscillate around a more gradual, underlying trend. When an asset's current value falls below this trend, it is deemed undervalued and becomes an attractive acquisition. Conversely, we considered it overvalued when it exceeds the trend, presenting an opportunity for short selling. In this exploration, we develop a simple model designed to estimate and elucidate the expected performance of such a strategy. This model encapsulates the essence of the quantitative value approach and provides practical insights into the dynamics of asset valuation and investment decision-making in today's financial markets.
 

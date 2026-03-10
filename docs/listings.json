@@ -2,6 +2,7 @@
   {
     "listing": "/pages/search.html",
     "items": [
+      "/posts/intercept invariance to adding centered features/index.html",
       "/posts/volatility-forecasts-3/index.html",
       "/posts/signature-method-3/index.html",
       "/posts/signature-method-2/index.html",
@@ -22,6 +23,9 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/mean-reversion-strategy-4/index.html",
+      "/posts/mean-reversion-strategy-3/index.html",
+      "/posts/mean-reversion-strategy-2/index.html",
       "/posts/graph-regularization-1/index.html",
       "/posts/intercept invariance to adding centered features/index.html",
       "/posts/signature-method-4/index.html",

@@ -2,134 +2,146 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://steveya.github.io/pages/categories.html</loc>
-    <lastmod>2026-02-04T05:24:37.549Z</lastmod>
+    <lastmod>2026-03-08T11:43:24.768Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/pages/projects.html</loc>
-    <lastmod>2026-02-04T05:29:18.607Z</lastmod>
+    <lastmod>2026-03-08T11:43:24.768Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/pages/search.html</loc>
-    <lastmod>2026-02-04T15:30:52.284Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/index.html</loc>
-    <lastmod>2026-02-10T22:29:21.807Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/signature-method-2/index.html</loc>
-    <lastmod>2026-02-04T14:17:04.824Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/short-rate-models-4/index.html</loc>
-    <lastmod>2026-02-04T15:18:21.530Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/signature-method-3/index.html</loc>
-    <lastmod>2026-02-04T14:17:04.825Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/volatility-forecasts-3/index.html</loc>
-    <lastmod>2026-02-04T15:30:52.284Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/volatility-forecasts-1/index.html</loc>
-    <lastmod>2026-02-04T15:18:33.804Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/graph-regularization-1/preview.html</loc>
-    <lastmod>2026-02-04T16:03:20.308Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/short-rate-models-1/index.html</loc>
-    <lastmod>2026-02-04T15:18:33.804Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/malaria-detection-3/index.html</loc>
-    <lastmod>2026-02-04T14:19:12.121Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/migration-log.html</loc>
-    <lastmod>2026-02-02T17:45:26.982Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/malaria-detection-2/index.html</loc>
-    <lastmod>2026-02-04T14:18:24.594Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/signature-method-1/index.html</loc>
-    <lastmod>2026-02-04T14:17:04.824Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/malaria-detection-4/index.html</loc>
-    <lastmod>2026-02-04T14:17:04.821Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/graph-regularization-1/draft.html</loc>
-    <lastmod>2026-02-28T05:05:50.268Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/mean-reversion-strategy-1/index.html</loc>
-    <lastmod>2026-03-03T16:06:22.234Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/malaria-detection-1/index.html</loc>
-    <lastmod>2026-02-04T14:18:24.594Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/short-rate-models-3/index.html</loc>
-    <lastmod>2026-02-04T14:17:04.823Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/volatility-forecasts-2/index.html</loc>
-    <lastmod>2026-02-04T14:19:12.123Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/short-rate-models-2/index.html</loc>
-    <lastmod>2026-02-04T14:17:04.823Z</lastmod>
+    <lastmod>2026-02-04T20:35:06.518Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/AGENTS.html</loc>
     <lastmod>2026-02-13T02:02:09.693Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/pages/series.html</loc>
-    <lastmod>2026-02-04T15:18:33.804Z</lastmod>
+    <loc>https://steveya.github.io/posts/short-rate-models-2/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.826Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/pages/about.html</loc>
-    <lastmod>2026-02-04T15:14:11.164Z</lastmod>
+    <loc>https://steveya.github.io/posts/oil-shock-on-rates/draft.html</loc>
+    <lastmod>2026-03-08T11:50:36.557Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/graph-regularization-1/index.html</loc>
-    <lastmod>2026-03-01T15:54:32.022Z</lastmod>
-  </url>
-  <url>
-    <loc>https://steveya.github.io/posts/intercept invariance to adding centered features/index.html</loc>
-    <lastmod>2026-02-10T22:22:35.414Z</lastmod>
+    <loc>https://steveya.github.io/posts/volatility-forecasts-2/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.804Z</lastmod>
   </url>
   <url>
     <loc>https://steveya.github.io/posts/signature-method-4/index.html</loc>
-    <lastmod>2026-02-13T01:11:58.744Z</lastmod>
+    <lastmod>2026-03-07T19:06:37.824Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/graph-regularization-1/draft_backup.html</loc>
-    <lastmod>2026-02-27T04:21:09.124Z</lastmod>
+    <loc>https://steveya.github.io/posts/short-rate-models-3/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.826Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/volatility-forecast-4/draft.html</loc>
-    <lastmod>2026-03-03T16:45:15.497Z</lastmod>
+    <loc>https://steveya.github.io/posts/malaria-detection-1/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.827Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/mean-reversion-strategy-4/draft.html</loc>
-    <lastmod>2026-03-03T19:24:03.725Z</lastmod>
+    <loc>https://steveya.github.io/posts/volatility-forecasts-3/index.html</loc>
+    <lastmod>2026-03-09T14:40:39.932Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/mean-reversion-strategy-2/draft.html</loc>
-    <lastmod>2026-03-03T19:09:38.413Z</lastmod>
+    <loc>https://steveya.github.io/posts/volatility-forecasts-6/draft.html</loc>
+    <lastmod>2026-03-09T18:30:56.135Z</lastmod>
   </url>
   <url>
-    <loc>https://steveya.github.io/posts/mean-reversion-strategy-3/draft.html</loc>
-    <lastmod>2026-03-03T17:03:25.818Z</lastmod>
+    <loc>https://steveya.github.io/posts/graph-regularization-1/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.868Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/short-rate-models-1/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.826Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/malaria-detection-3/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.828Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/intercept invariance to adding centered features/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.874Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/mean-reversion-strategy-3/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.837Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/migration-log.html</loc>
+    <lastmod>2026-02-10T03:19:10.850Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/mean-reversion-strategy-2/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.833Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/mean-reversion-strategy-4/index.html</loc>
+    <lastmod>2026-03-08T11:39:30.483Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/malaria-detection-2/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.828Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/signature-method-1/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.809Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/malaria-detection-4/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.828Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/volatility-forecasts-1/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.804Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/mean-reversion-strategy-1/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.829Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/volatility-forecasts-4/index.html</loc>
+    <lastmod>2026-03-08T11:43:09.755Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/signature-method-3/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.810Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/short-rate-models-4/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.827Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/volatility-forecasts-5/draft.html</loc>
+    <lastmod>2026-03-09T16:33:17.190Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/forecast-comparison/draft.html</loc>
+    <lastmod>2026-03-10T01:14:50.760Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/signature-method-2/index.html</loc>
+    <lastmod>2026-03-07T19:06:37.809Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/index.html</loc>
+    <lastmod>2026-03-08T11:44:26.831Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/pages/notes.html</loc>
+    <lastmod>2026-03-08T11:43:24.767Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/pages/series.html</loc>
+    <lastmod>2026-03-08T11:43:24.766Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/pages/about.html</loc>
+    <lastmod>2026-02-04T20:35:06.517Z</lastmod>
+  </url>
+  <url>
+    <loc>https://steveya.github.io/posts/volatility-forecasts-4/draft.html</loc>
+    <lastmod>2026-03-09T21:59:31.001Z</lastmod>
   </url>
 </urlset>

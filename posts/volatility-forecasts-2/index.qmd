@@ -3,6 +3,11 @@ title: "Volatility Forecasts (Part 2 - XGBSTES Algorithm 1)"
 date: 2024-07-18
 description: "In the previous post, we replicated the Smooth Transition Exponential Smoothing (STES) model from (Taylor 2004) and (Liu, Taylor, Choo 2020)."
 categories: [Quantitative Finance, Volatility Modeling, Time Series]
+content-type: "series"
+series-id: "volatility-forecasting"
+series-title: "Volatility Forecasts"
+series-part: 2
+project-ids: [volatility-forecasting]
 ---
 (Code snippets for this post can be found in the [Github repository](https://github.com/steveya/volatility-forecast/blob/main/examples/volatility_forecast_2.py).)
 

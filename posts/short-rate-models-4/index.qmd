@@ -3,6 +3,11 @@ title: "Short Rate Models (Part 4: Simulating and Calibrating the Vasicek Model)
 date: 2024-09-16
 description: "In our previous post, we introduced the Vasicek model that used the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short rates."
 categories: [Quantitative Finance, Interest Rate Models, Stochastic Processes]
+content-type: "series"
+series-id: "short-rate-models"
+series-title: "Short Rate Models"
+series-part: 4
+project-ids: [short-rate-models]
 ---
 ## Recap
 

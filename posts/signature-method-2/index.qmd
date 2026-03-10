@@ -3,7 +3,11 @@ title: Signature Methods (Part 2 - Signature and Augmentation)
 date: 2025-12-21
 description: "Previously I provided some motivations for the use of signatures."
 categories: [Quantitative Finance, Signature Methods, Time Series]
-
+content-type: "series"
+series-id: "signature-methods"
+series-title: "Signature Methods"
+series-part: 2
+project-ids: [signature-methods]
 ---
 [Previously](../signature-method-1/) I provided some motivations for the use of signatures. In particular, I have always been interested in methods that encode information about time series in a way that can be used by downstream learning algorithms. In this note I start with the definition of signatures, and then illustrate the universal approximation property with a few examples. These examples will also demonstrate the importance of path construction, mentioned at the end of the last post. 
 

@@ -15,12 +15,14 @@ listing:
 page-layout: full
 title-block-banner: false
 sidebar:
-  title: "Series"
+  title: "Explore"
   style: "floating"
   position: right
   contents:
     - text: "All series"
       href: pages/series.qmd
+    - text: "All notes"
+      href: pages/notes.qmd
     - text: "Volatility Forecasts"
       href: posts/volatility-forecasts-1/index.qmd
     - text: "Signature Methods"

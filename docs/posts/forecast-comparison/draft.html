@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-03-04">
+<meta name="description" content="An introduction to the statistical tools for comparing forecast accuracy — the Diebold-Mariano test, the role of the loss function, and the Mincer-Zarnowitz regression as a calibration diagnostic.">
+
+<title>Forecasts Comparison – Steve Yang</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
+
+<header id="title-block-header">
+<h1 class="title">Forecasts Comparison</h1>
+
+<p class="date">2026-03-04</p>
+</header>
+
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#the-loss-function" id="toc-the-loss-function"><span class="header-section-number">2</span> 1. The Loss Function</a>
+  <ul>
+  <li><a href="#se-vs-qlike-interpretation-sensitivity-and-likelihood-connections" id="toc-se-vs-qlike-interpretation-sensitivity-and-likelihood-connections"><span class="header-section-number">2.1</span> SE vs QLIKE: interpretation, sensitivity, and likelihood connections</a></li>
+  <li><a href="#application-noisy-proxies-and-variance-forecasts" id="toc-application-noisy-proxies-and-variance-forecasts"><span class="header-section-number">2.2</span> Application: noisy proxies and variance forecasts</a></li>
+  </ul></li>
+  <li><a href="#the-diebold-mariano-test" id="toc-the-diebold-mariano-test"><span class="header-section-number">3</span> 2. The Diebold-Mariano Test</a>
+  <ul>
+  <li><a href="#setup" id="toc-setup"><span class="header-section-number">3.1</span> Setup</a></li>
+  <li><a href="#the-naive-approach-and-its-failure" id="toc-the-naive-approach-and-its-failure"><span class="header-section-number">3.2</span> The naive approach and its failure</a></li>
+  <li><a href="#hac-newey-west-variance" id="toc-hac-newey-west-variance"><span class="header-section-number">3.3</span> HAC (Newey-West) variance</a></li>
+  <li><a href="#power-depends-on-sample-size" id="toc-power-depends-on-sample-size"><span class="header-section-number">3.4</span> Power depends on sample size</a></li>
+  </ul></li>
+  <li><a href="#when-the-loss-function-reverses-the-ranking" id="toc-when-the-loss-function-reverses-the-ranking"><span class="header-section-number">4</span> 3. When the Loss Function Reverses the Ranking</a>
+  <ul>
+  <li><a href="#simulation-design" id="toc-simulation-design"><span class="header-section-number">4.1</span> Simulation design</a></li>
+  <li><a href="#interpretation" id="toc-interpretation"><span class="header-section-number">4.2</span> Interpretation</a></li>
+  </ul></li>
+  <li><a href="#the-mincer-zarnowitz-regression" id="toc-the-mincer-zarnowitz-regression"><span class="header-section-number">5</span> 4. The Mincer-Zarnowitz Regression</a>
+  <ul>
+  <li><a href="#setup-1" id="toc-setup-1"><span class="header-section-number">5.1</span> Setup</a></li>
+  <li><a href="#connecting-mz-to-the-dm-divergence" id="toc-connecting-mz-to-the-dm-divergence"><span class="header-section-number">5.2</span> Connecting MZ to the DM divergence</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary"><span class="header-section-number">6</span> Summary</a></li>
+  </ul>
+</nav>
+<h2 data-number="1" id="introduction" class="anchored"><span class="header-section-number">1</span> Introduction</h2>
+<p>Suppose we observe a sequence of realizations <span class="math inline">\{y_t\}_{t=1}^n</span> and two competing forecasts <span class="math inline">\{\hat{y}^A_t\}</span> and <span class="math inline">\{\hat{y}^B_t\}</span>. The goal is to determine which forecast is more accurate. A natural approach is to choose a loss function, compute the average loss for each forecast, and select the forecast with the lower average. This approach, while intuitive, raises two statistical issues.</p>
+<p><strong>Issue 1 (sampling variability).</strong> The difference in average loss is a random variable. A different out-of-sample period could produce a different ranking. We need a way to assess whether the observed difference is statistically significant.</p>
+<p><strong>Issue 2 (serial dependence).</strong> Forecast errors are often serially correlated, particularly when forecasts are produced from rolling or expanding estimation windows. This correlation inflates the variance of the average loss difference beyond what the standard independent and identically distributed (i.i.d.) formula would suggest.</p>
+<p>The <strong>Diebold-Mariano (DM) test</strong> addresses both issues. It tests whether the mean loss differential between two forecasts is significantly different from zero, using a heteroskedasticity-and-autocorrelation-consistent (HAC) variance estimator to account for serial dependence.</p>
+<p>A central theme of this post is that the DM test is only as informative as the loss function it operates on. Different loss functions penalize forecast errors in different ways, and changing the loss function can reverse the ranking of the same two forecasts. We illustrate this using squared error (SE) and quasi-likelihood (QLIKE) loss, two loss functions with very different weighting properties.</p>
+<p>We then introduce the <strong>Mincer-Zarnowitz (MZ) regression</strong>, which answers a complementary question: is the forecast well calibrated? That is, does a one-unit increase in the forecast correspond, on average, to a one-unit increase in the realization? The MZ regression is a diagnostic tool that helps explain <em>why</em> two forecasts differ, but it does not replace the need to choose an appropriate loss function.</p>
+<h2 data-number="2" id="the-loss-function" class="anchored"><span class="header-section-number">2</span> 1. The Loss Function</h2>
+<p>Before comparing forecasts, we must specify what “accuracy” means. This is the role of the loss function.</p>
+<p><strong>Definition.</strong> A <strong>loss function</strong> <span class="math inline">L(y_t, \hat{y}_t)</span> maps a realization <span class="math inline">y_t</span> and a forecast <span class="math inline">\hat{y}_t</span> to a non-negative real number. Lower values of <span class="math inline">L</span> correspond to more accurate forecasts. The choice of <span class="math inline">L</span> encodes which types of forecast errors we consider most costly.</p>
+<p>Three loss functions appear frequently in applied work:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 25%">
+<col style="width: 57%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Loss</th>
+<th>Formula</th>
+<th>Emphasis</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Squared Error (SE)</td>
+<td><span class="math inline">L_{\text{SE}} = (y_t - \hat{y}_t)^2</span></td>
+<td>Penalizes large absolute errors heavily. The squaring operation gives disproportionate weight to large deviations.</td>
+</tr>
+<tr class="even">
+<td>Absolute Error (AE)</td>
+<td><span class="math inline">L_{\text{AE}} = \lvert y_t - \hat{y}_t \rvert</span></td>
+<td>Penalizes absolute errors linearly, without the amplification from squaring.</td>
+</tr>
+<tr class="odd">
+<td>Quasi-Likelihood (QLIKE)</td>
+<td><span class="math inline">L_{\text{QLIKE}} = \dfrac{y_t}{\hat{y}_t} - \log\dfrac{y_t}{\hat{y}_t} - 1</span></td>
+<td>Penalizes based on the ratio <span class="math inline">y_t / \hat{y}_t</span>. It is especially useful for strictly positive targets and scale-sensitive forecasting problems.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Symmetry.</strong> SE and AE are symmetric loss functions: over-predicting by <span class="math inline">\delta</span> incurs the same loss as under-predicting by <span class="math inline">\delta</span>. QLIKE is asymmetric. To see this, fix <span class="math inline">y_t = 1</span>:</p>
+<ul>
+<li>If <span class="math inline">\hat{y}_t = 0.5</span> (under-prediction by 50%), then <span class="math inline">L_{\text{QLIKE}} \approx 0.307</span>.</li>
+<li>If <span class="math inline">\hat{y}_t = 2.0</span> (over-prediction by 100%), then <span class="math inline">L_{\text{QLIKE}} \approx 0.193</span>.</li>
+</ul>
+<p>Under-prediction is penalized more heavily. This asymmetry can be useful in applications where under-predicting a positive target is more consequential than over-predicting it. However, it also requires that forecasts remain strictly positive, since <span class="math inline">L_{\text{QLIKE}} \to \infty</span> as <span class="math inline">\hat{y}_t \to 0</span>.</p>
+<p>The following figure illustrates the loss surfaces of SE and QLIKE as functions of the forecast <span class="math inline">\hat{y}_t</span>, with the true value fixed at <span class="math inline">y_t = 1</span>:</p>
+<div id="cell-fig-loss-surfaces" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Plot: SE vs QLIKE loss surfaces</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>y_true <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>yhat <span class="op">=</span> np.linspace(<span class="fl">0.1</span>, <span class="fl">3.0</span>, <span class="dv">500</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>se_loss <span class="op">=</span> (y_true <span class="op">-</span> yhat) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>qlike_loss <span class="op">=</span> y_true <span class="op">/</span> yhat <span class="op">-</span> np.log(y_true <span class="op">/</span> yhat) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">4</span>))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>ax1.plot(yhat, se_loss, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">0</span>], linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>ax1.axvline(y_true, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">3</span>], linestyle<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, label<span class="op">=</span><span class="ss">f"$y_t = </span><span class="sc">{</span>y_true<span class="sc">}</span><span class="ss">$"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>ax1.set_xlabel(<span class="st">"Forecast $</span><span class="ch">\\</span><span class="st">hat</span><span class="sc">{y}</span><span class="st">_t$"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ax1.set_ylabel(<span class="st">"Loss"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"Squared Error Loss"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>ax1.set_ylim(<span class="op">-</span><span class="fl">0.05</span>, <span class="dv">4</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>ax1.legend()</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>ax2.plot(yhat, qlike_loss, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">1</span>], linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>ax2.axvline(y_true, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">3</span>], linestyle<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.6</span>, label<span class="op">=</span><span class="ss">f"$y_t = </span><span class="sc">{</span>y_true<span class="sc">}</span><span class="ss">$"</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>ax2.set_xlabel(<span class="st">"Forecast $</span><span class="ch">\\</span><span class="st">hat</span><span class="sc">{y}</span><span class="st">_t$"</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>ax2.set_ylabel(<span class="st">"Loss"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"QLIKE Loss"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ax2.set_ylim(<span class="op">-</span><span class="fl">0.05</span>, <span class="dv">4</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>ax2.legend()</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Mark asymmetry on QLIKE using the computed loss so labels cannot drift.</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>examples <span class="op">=</span> [(<span class="fl">0.5</span>, <span class="st">"under by 50%"</span>, <span class="st">"bottom"</span>), (<span class="fl">2.0</span>, <span class="st">"over by 100%"</span>, <span class="st">"bottom"</span>)]</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> y_hat_ex, descriptor, va <span class="kw">in</span> examples:</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    loss_val <span class="op">=</span> y_true <span class="op">/</span> y_hat_ex <span class="op">-</span> np.log(y_true <span class="op">/</span> y_hat_ex) <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    label <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>descriptor<span class="sc">}</span><span class="ch">\n</span><span class="ss">L=</span><span class="sc">{</span>loss_val<span class="sc">:.3f}</span><span class="ss">"</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    ax2.plot(y_hat_ex, loss_val, <span class="st">"o"</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">2</span>], markersize<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    ax2.annotate(label, (y_hat_ex, loss_val), textcoords<span class="op">=</span><span class="st">"offset points"</span>,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                 xytext<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">10</span>), ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span>va, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-loss-surfaces" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-loss-surfaces-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="draft_files/figure-html/fig-loss-surfaces-output-1.png" id="fig-loss-surfaces" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-loss-surfaces-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h3 data-number="2.1" id="se-vs-qlike-interpretation-sensitivity-and-likelihood-connections" class="anchored"><span class="header-section-number">2.1</span> SE vs QLIKE: interpretation, sensitivity, and likelihood connections</h3>
+<p>Both SE and QLIKE are <strong>consistent</strong> loss functions for the conditional mean: each is uniquely minimized in expectation when <span class="math inline">\hat{y}_t = \mathbb{E}[y_t \mid \mathcal{F}_{t-1}]</span>. We can verify this by computing the first-order condition. For SE, <span class="math inline">\frac{\partial}{\partial \hat{y}}\,\mathbb{E}[(y_t - \hat{y})^2] = -2\,\mathbb{E}[y_t - \hat{y}] = 0</span> gives <span class="math inline">\hat{y} = \mathbb{E}[y_t]</span>. For QLIKE, <span class="math inline">\frac{\partial}{\partial \hat{y}}\,\mathbb{E}\!\left[\frac{y_t}{\hat{y}} - \log\frac{y_t}{\hat{y}} - 1\right] = -\frac{\mathbb{E}[y_t]}{\hat{y}^2} + \frac{1}{\hat{y}} = 0</span> gives <span class="math inline">\hat{y} = \mathbb{E}[y_t]</span>. Both target the same object, but they weight forecast errors in fundamentally different ways.</p>
+<h4 data-number="2.1.1" id="what-each-loss-measures" class="anchored"><span class="header-section-number">2.1.1</span> What each loss measures</h4>
+<p><strong>SE measures absolute accuracy.</strong> The loss <span class="math inline">L_{\text{SE}} = (y_t - \hat{y}_t)^2</span> grows as the square of the absolute error. A miss of 1.0 receives 100 times more loss than a miss of 0.1, regardless of the scale of <span class="math inline">y_t</span>. The average SE across the evaluation sample is therefore dominated by observations where the absolute error is largest.</p>
+<p><strong>QLIKE measures proportional accuracy.</strong> The QLIKE loss can be written purely in terms of the ratio <span class="math inline">r = y_t / \hat{y}_t</span>:</p>
+<p><span class="math display">L_{\text{QLIKE}} = r - \log r - 1.</span></p>
+<p>This loss depends only on how far <span class="math inline">r</span> departs from 1 — that is, on the proportional discrepancy between forecast and realization. A 50% over-prediction (<span class="math inline">r = 0.5</span>) receives the same QLIKE loss whether <span class="math inline">y_t = 10^{-4}</span> or <span class="math inline">y_t = 10^{-1}</span>. The same 50% over-prediction creates vastly different SE losses at those two scales. In the code below I sometimes use the algebraically equivalent form <span class="math inline">\log \hat{y}_t + y_t/\hat{y}_t</span>, which differs from <span class="math inline">L_{\text{QLIKE}}</span> only by the observation-specific constants <span class="math inline">-\log y_t - 1</span> and therefore preserves forecast rankings and DM comparisons.</p>
+<h4 data-number="2.1.2" id="sensitivity-to-extreme-observations" class="anchored"><span class="header-section-number">2.1.2</span> Sensitivity to extreme observations</h4>
+<p>Neither loss function is robust in the classical statistical sense of having a bounded influence function.</p>
+<p><strong>SE has quadratic sensitivity.</strong> For a fixed forecast <span class="math inline">\hat{y}_t</span>, the SE loss grows as <span class="math inline">O(y_t^2)</span> when the realization is large. A single extreme observation can contribute more to the total SE than the rest of the sample combined. The influence of outliers is unbounded and grows faster than the outlier itself.</p>
+<p><strong>QLIKE has linear sensitivity.</strong> For a fixed forecast <span class="math inline">\hat{y}_t</span>, the QLIKE loss grows as <span class="math inline">O(y_t)</span> when <span class="math inline">y_t</span> is large, since the dominant term is <span class="math inline">y_t / \hat{y}_t</span>. This is still unbounded, so QLIKE is not robust in the Huber sense either. However, the growth rate is linear rather than quadratic, which makes QLIKE substantially less sensitive to extreme realizations than SE. In practice, when the forecast stays aligned with the scale of the target, the ratio <span class="math inline">y_t / \hat{y}_t</span> tends to stay moderate even on large observations, which further dampens the influence of extreme values.</p>
+<p><strong>QLIKE has its own vulnerability.</strong> While QLIKE is more stable for large <span class="math inline">y_t</span>, it is fragile when <span class="math inline">\hat{y}_t</span> is close to zero. The term <span class="math inline">\log \hat{y}_t \to -\infty</span> as <span class="math inline">\hat{y}_t \to 0</span>, so a forecast that severely underestimates a positive target incurs explosive QLIKE loss. Similarly, when <span class="math inline">y_t = 0</span>, the ratio <span class="math inline">y_t / \hat{y}_t = 0</span> and the <span class="math inline">\log</span> term <span class="math inline">-\log(y_t / \hat{y}_t)</span> is undefined. In practice, both cases require a small floor on <span class="math inline">y_t</span> and <span class="math inline">\hat{y}_t</span> to keep computations well-defined.</p>
+<p>This is the mirror image of SE’s outlier problem: SE is dominated by extreme realizations; QLIKE is dominated by near-zero forecasts or realizations.</p>
+<h4 data-number="2.1.3" id="likelihood-connections" class="anchored"><span class="header-section-number">2.1.3</span> Likelihood connections</h4>
+<p>Both SE and QLIKE arise naturally as negative log-likelihoods, but under different statistical models.</p>
+<p><strong>SE and the Gaussian level model.</strong> Suppose <span class="math inline">y_t = \hat{y}_t + \varepsilon_t</span> with <span class="math inline">\varepsilon_t \sim N(0, \sigma^2)</span> for some constant <span class="math inline">\sigma^2</span>. The log-likelihood for <span class="math inline">\hat{y}_t</span> given <span class="math inline">y_t</span> is, up to constants, <span class="math inline">\ell = -\frac{1}{2\sigma^2}(y_t - \hat{y}_t)^2</span>. Minimizing average SE is therefore equivalent to maximum likelihood estimation (MLE) of the conditional mean under homoskedastic Gaussian noise.</p>
+<p><strong>QLIKE and one important special case.</strong> One prominent use of QLIKE is variance forecasting. If <span class="math inline">r_t \mid \mathcal{F}_{t-1} \sim N(0, \sigma_t^2)</span>, then the log-likelihood for <span class="math inline">\sigma_t^2</span> given the observation <span class="math inline">r_t^2</span> is, up to constants,</p>
+<p><span class="math display">\ell(\sigma_t^2) = -\frac{1}{2}\left[\log \sigma_t^2 + \frac{r_t^2}{\sigma_t^2}\right].</span></p>
+<p>Minimizing the average QLIKE loss is equivalent to quasi-maximum likelihood estimation (QMLE) of the variance. This explains QLIKE’s proportional weighting: likelihood-based inference for the variance naturally standardizes by the model’s predicted scale, so a period of high variance is not automatically more influential than a period of low variance.</p>
+<p><strong>Remark.</strong> In short, SE is the MLE loss for the mean; QLIKE is the QMLE loss for the variance in this important special case. Neither is universally superior — each is the natural choice for a different estimation target.</p>
+<h4 data-number="2.1.4" id="summary-of-the-comparison" class="anchored"><span class="header-section-number">2.1.4</span> Summary of the comparison</h4>
+<table class="caption-top">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 19%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property</th>
+<th style="text-align: center;">SE</th>
+<th style="text-align: center;">QLIKE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Optimal forecast</td>
+<td style="text-align: center;"><span class="math inline">\mathbb{E}[y_t \mid \mathcal{F}_{t-1}]</span></td>
+<td style="text-align: center;"><span class="math inline">\mathbb{E}[y_t \mid \mathcal{F}_{t-1}]</span></td>
+</tr>
+<tr class="even">
+<td>Error concept</td>
+<td style="text-align: center;">Absolute: <span class="math inline">(y_t - \hat{y}_t)</span></td>
+<td style="text-align: center;">Proportional: <span class="math inline">y_t / \hat{y}_t</span></td>
+</tr>
+<tr class="odd">
+<td>Growth in <span class="math inline">y_t</span> (fixed <span class="math inline">\hat{y}_t</span>)</td>
+<td style="text-align: center;"><span class="math inline">O(y_t^2)</span> — quadratic</td>
+<td style="text-align: center;"><span class="math inline">O(y_t)</span> — linear</td>
+</tr>
+<tr class="even">
+<td>Main vulnerability</td>
+<td style="text-align: center;">Extreme realizations dominate</td>
+<td style="text-align: center;">Near-zero forecasts or realizations</td>
+</tr>
+<tr class="odd">
+<td>Likelihood connection</td>
+<td style="text-align: center;">MLE for the mean (Gaussian level model)</td>
+<td style="text-align: center;">QMLE for the variance in the Gaussian variance model</td>
+</tr>
+<tr class="even">
+<td>Implicit weighting</td>
+<td style="text-align: center;">High-variance observations get disproportionate weight</td>
+<td style="text-align: center;">All observations weighted by proportional accuracy</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example.</strong> The following simulation applies the same proportional forecast error to a target series with occasional spikes, and compares how SE and QLIKE distribute loss across observations:</p>
+<div id="cell-scale-dependence-demo" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Scale-dependence: which days drive the ranking?</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">123</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Target: mostly calm, with occasional spikes (like daily variance)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>is_spike <span class="op">=</span> np.zeros(n, dtype<span class="op">=</span><span class="bu">bool</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>is_spike[rng.choice(n, size<span class="op">=</span><span class="dv">30</span>, replace<span class="op">=</span><span class="va">False</span>)] <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.where(is_spike, <span class="fl">5e-3</span>, <span class="fl">1e-4</span>)  <span class="co"># spike days are 50x larger</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> y <span class="op">*</span> rng.lognormal(mean<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.05</span>, size<span class="op">=</span>n)  <span class="co"># slight noise</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># One forecast with 20% proportional noise (same % error on all days)</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> y <span class="op">*</span> rng.lognormal(mean<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.2</span>, size<span class="op">=</span>n)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute per-day SE and QLIKE</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>se <span class="op">=</span> (y <span class="op">-</span> forecast) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>eps <span class="op">=</span> <span class="fl">1e-20</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>ql <span class="op">=</span> np.log(np.maximum(forecast, eps)) <span class="op">+</span> y <span class="op">/</span> np.maximum(forecast, eps)  <span class="co"># MLE form; differs from y/ŷ − log(y/ŷ) − 1 by a constant</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># QLIKE above omits terms that are constant across forecasts for a given y_t.</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Those constants do not matter for ranking or DM comparisons.</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>se_spike_contribution <span class="op">=</span> se[is_spike].<span class="bu">sum</span>() <span class="op">/</span> se.<span class="bu">sum</span>() <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Since QLIKE contains observation-specific constants, compare centered magnitudes</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># rather than raw sums when discussing which days drive the picture.</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>ql_centered <span class="op">=</span> ql <span class="op">-</span> ql.mean()</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>ql_spike_contribution <span class="op">=</span> np.<span class="bu">abs</span>(ql_centered[is_spike]).<span class="bu">sum</span>() <span class="op">/</span> np.<span class="bu">abs</span>(ql_centered).<span class="bu">sum</span>() <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> blog_plot_context():</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">3.5</span>))</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Left: per-day SE</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[<span class="dv">0</span>]</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    ax.scatter(np.where(<span class="op">~</span>is_spike)[<span class="dv">0</span>], se[<span class="op">~</span>is_spike], s<span class="op">=</span><span class="dv">3</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">3</span>], label<span class="op">=</span><span class="st">"Calm days"</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    ax.scatter(np.where(is_spike)[<span class="dv">0</span>], se[is_spike], s<span class="op">=</span><span class="dv">20</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">1</span>], label<span class="op">=</span><span class="st">"Spike days"</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Squared Error"</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Day"</span>)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"SE: spike days = </span><span class="sc">{</span>se_spike_contribution<span class="sc">:.0f}</span><span class="ss">% of total loss"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    ax.legend(frameon<span class="op">=</span><span class="va">False</span>, fontsize<span class="op">=</span><span class="dv">8</span>, loc<span class="op">=</span><span class="st">"upper right"</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Right: per-day QLIKE</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[<span class="dv">1</span>]</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    ql_norm <span class="op">=</span> ql <span class="op">-</span> ql.<span class="bu">min</span>()  <span class="co"># Shift only for display.</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    ax.scatter(np.where(<span class="op">~</span>is_spike)[<span class="dv">0</span>], ql_norm[<span class="op">~</span>is_spike], s<span class="op">=</span><span class="dv">3</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">3</span>], label<span class="op">=</span><span class="st">"Calm days"</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    ax.scatter(np.where(is_spike)[<span class="dv">0</span>], ql_norm[is_spike], s<span class="op">=</span><span class="dv">20</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">1</span>], label<span class="op">=</span><span class="st">"Spike days"</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"QLIKE (shifted for display)"</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Day"</span>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"QLIKE: spike days are </span><span class="sc">{</span>is_spike<span class="sc">.</span><span class="bu">sum</span>()<span class="op">/</span>n<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">% of days"</span>, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    ax.legend(frameon<span class="op">=</span><span class="va">False</span>, fontsize<span class="op">=</span><span class="dv">8</span>, loc<span class="op">=</span><span class="st">"upper right"</span>)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Spike days are </span><span class="sc">{</span>is_spike<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>n<span class="sc">}</span><span class="ss"> = </span><span class="sc">{</span>is_spike<span class="sc">.</span><span class="bu">sum</span>()<span class="op">/</span>n<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">% of the sample"</span>)</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Under SE, they contribute </span><span class="sc">{</span>se_spike_contribution<span class="sc">:.0f}</span><span class="ss">% of total loss"</span>)</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Under centered QLIKE magnitudes, they contribute </span><span class="sc">{</span>ql_spike_contribution<span class="sc">:.0f}</span><span class="ss">% of total variation"</span>)</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Interpretation: SE is dominated by spike days, while QLIKE is much closer to weighting days by proportional error."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="scale-dependence-demo" class="quarto-figure quarto-figure-center anchored">
+<figure>
+<p><img src="draft_files/figure-html/scale-dependence-demo-output-1.png" class="img-fluid"></p>
+<figcaption>Spike days dominate SE rankings but not QLIKE</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Spike days are 30/2000 = 1.5% of the sample
+Under SE, they contribute 96% of total loss
+Under centered QLIKE magnitudes, they contribute 46% of total variation
+Interpretation: SE is dominated by spike days, while QLIKE is much closer to weighting days by proportional error.</code></pre>
+</div>
+</div>
+<h3 data-number="2.2" id="application-noisy-proxies-and-variance-forecasts" class="anchored"><span class="header-section-number">2.2</span> Application: noisy proxies and variance forecasts</h3>
+<p>So far the discussion has been general. One setting where these forecast-comparison issues become especially important is variance forecasting, where the object of interest is latent and must be evaluated through a noisy proxy.</p>
+<p>In many forecasting problems the true target is not directly observable. In volatility forecasting, the quantity of interest is the conditional variance <span class="math inline">\sigma_t^2</span>, which is latent. What we observe instead is a noisy proxy such as the squared return <span class="math inline">r_t^2</span>, which we decompose as</p>
+<p><span class="math display">r_t^2 = \sigma_t^2 + \eta_t</span></p>
+<p>for some noise term <span class="math inline">\eta_t</span> satisfying <span class="math inline">\mathbb{E}[\eta_t \mid \mathcal{F}_{t-1}] = 0</span>. The mean-zero condition is essential: it ensures that the proxy is unbiased for the true target conditional on the information set available at forecast time.</p>
+<p>This raises an important question: if Forecast A is genuinely better than Forecast B for predicting <span class="math inline">\sigma_t^2</span>, does that ranking survive when we evaluate the forecasts using the noisy proxy <span class="math inline">r_t^2</span>?</p>
+<p><strong>Definition.</strong> A loss function <span class="math inline">L</span> is called <strong>robust to noise</strong> (Patton, 2011) if the ranking of expected loss under the true target is preserved when the true target is replaced by an unbiased noisy proxy. Formally, if</p>
+<p><span class="math display">\mathbb{E}[L(\sigma_t^2, \hat{y}^A_t)] \leq \mathbb{E}[L(\sigma_t^2, \hat{y}^B_t)]</span></p>
+<p>then robustness requires</p>
+<p><span class="math display">\mathbb{E}[L(r_t^2, \hat{y}^A_t)] \leq \mathbb{E}[L(r_t^2, \hat{y}^B_t)].</span></p>
+<p>Both SE and QLIKE satisfy this robustness property, which is why both are widely used in the volatility-forecasting literature. However, robustness is an asymptotic statement about population rankings. In finite samples, the two loss functions can behave quite differently due to their different sensitivities to scale, as described above.</p>
+<p><strong>Remark.</strong> For variance forecasts evaluated against <span class="math inline">r_t^2</span>, it is good practice to report DM test results under both SE and QLIKE:</p>
+<div>
+<blockquote>
+<p><strong>Tip</strong></p>
+<ul>
+<li>If they agree, the conclusion is straightforward.</li>
+<li>If they disagree, QLIKE often deserves greater weight because it is less sensitive to a small number of extreme observations.</li>
+<li>The MZ regression (introduced in Section 4) can then help explain what kind of forecast difference is driving the divergence.</li>
+</ul>
+</blockquote>
+</div>
+<h2 data-number="3" id="the-diebold-mariano-test" class="anchored"><span class="header-section-number">3</span> 2. The Diebold-Mariano Test</h2>
+<h3 data-number="3.1" id="setup" class="anchored"><span class="header-section-number">3.1</span> Setup</h3>
+<p>Having chosen a loss function, we now formalize the question: is the difference in forecast accuracy statistically significant, or could it be attributable to sampling variability?</p>
+<p>Let <span class="math inline">n</span> denote the number of out-of-sample observations. At each time <span class="math inline">t</span>, Forecast A and Forecast B incur losses <span class="math inline">L_A(y_t, \hat{y}^A_t)</span> and <span class="math inline">L_B(y_t, \hat{y}^B_t)</span> respectively. Define the <strong>loss differential</strong>:</p>
+<p><span class="math display">d_t = L_A(y_t, \hat{y}^A_t) - L_B(y_t, \hat{y}^B_t).</span></p>
+<p>A positive value of <span class="math inline">d_t</span> indicates that Forecast A incurred greater loss at time <span class="math inline">t</span>, so Forecast B performed better. The DM test evaluates the null hypothesis</p>
+<p><span class="math display">H_0: \mathbb{E}[d_t] = 0 \quad \text{(equal predictive ability)}</span></p>
+<p>against the two-sided alternative <span class="math inline">H_1: \mathbb{E}[d_t] \neq 0</span>.</p>
+<p><strong>Remark (one-sided tests).</strong> In many applications we have a directional prior — for example, “is the new model better than the established benchmark?” In that case we test <span class="math inline">H_1: \mathbb{E}[d_t] &gt; 0</span> (Forecast B is better). Using the same finite-sample <span class="math inline">t_{n-1}</span> approximation as below, the corresponding one-sided <span class="math inline">p</span>-value is <span class="math inline">p = 1 - F_{t_{n-1}}(\text{DM})</span> instead of <span class="math inline">p = 2\,[1 - F_{t_{n-1}}(|\text{DM}|)]</span>. The choice between one-sided and two-sided testing should be made before seeing the data.</p>
+<h3 data-number="3.2" id="the-naive-approach-and-its-failure" class="anchored"><span class="header-section-number">3.2</span> The naive approach and its failure</h3>
+<p>A first attempt is to construct a standard <span class="math inline">t</span>-statistic. Compute the sample mean <span class="math inline">\bar{d} = \frac{1}{n}\sum_{t=1}^n d_t</span> and divide by the independent and identically distributed (i.i.d.) standard error <span class="math inline">s_d / \sqrt{n}</span>, where <span class="math inline">s_d^2 = \frac{1}{n-1}\sum_{t=1}^n (d_t - \bar{d})^2</span>.</p>
+<p>This procedure is valid when the loss differentials <span class="math inline">\{d_t\}</span> are independent. In practice, however, they are typically <strong>serially correlated</strong>. Forecasts constructed from rolling or expanding estimation windows share a large fraction of their training data from one period to the next, inducing persistence in forecast errors and, consequently, in the loss differential sequence.</p>
+<p>Serial correlation alters the variance of <span class="math inline">\bar{d}</span>. With positive autocorrelation, consecutive observations carry redundant information, so the effective sample size is smaller than <span class="math inline">n</span>. The naive i.i.d. formula understates the true variance of <span class="math inline">\bar{d}</span>, producing a test statistic that is too large in magnitude. The result is an inflated rejection rate — the test rejects <span class="math inline">H_0</span> too often, even when it is true.</p>
+<div id="cell-autocorrelation-inflation" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Generate autocorrelated loss differentials (AR(1)) ---</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>rho <span class="op">=</span> <span class="fl">0.5</span>  <span class="co"># AR(1) coefficient</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>d_iid <span class="op">=</span> RNG.normal(<span class="dv">0</span>, <span class="dv">1</span>, n)  <span class="co"># under H0, true mean = 0</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>d_ar <span class="op">=</span> np.empty(n)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>d_ar[<span class="dv">0</span>] <span class="op">=</span> d_iid[<span class="dv">0</span>]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n):</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    d_ar[t] <span class="op">=</span> rho <span class="op">*</span> d_ar[t <span class="op">-</span> <span class="dv">1</span>] <span class="op">+</span> d_iid[t]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive t-stat</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>naive_t_iid <span class="op">=</span> d_iid.mean() <span class="op">/</span> (d_iid.std(ddof<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> np.sqrt(n))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>naive_t_ar <span class="op">=</span> d_ar.mean() <span class="op">/</span> (d_ar.std(ddof<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> np.sqrt(n))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Monte Carlo: size under null H0 ---</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>n_sims <span class="op">=</span> <span class="dv">10_000</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>naive_rejections_iid <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>naive_rejections_ar <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_sims):</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    eps <span class="op">=</span> RNG.normal(<span class="dv">0</span>, <span class="dv">1</span>, n)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># IID case</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    t_stat <span class="op">=</span> eps.mean() <span class="op">/</span> (eps.std(ddof<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> np.sqrt(n))</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">abs</span>(t_stat) <span class="op">&gt;</span> <span class="fl">1.96</span>:</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        naive_rejections_iid <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># AR case</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> np.empty(n)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    d[<span class="dv">0</span>] <span class="op">=</span> eps[<span class="dv">0</span>]</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n):</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        d[t] <span class="op">=</span> rho <span class="op">*</span> d[t <span class="op">-</span> <span class="dv">1</span>] <span class="op">+</span> eps[t]</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    t_stat <span class="op">=</span> d.mean() <span class="op">/</span> (d.std(ddof<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> np.sqrt(n))</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">abs</span>(t_stat) <span class="op">&gt;</span> <span class="fl">1.96</span>:</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        naive_rejections_ar <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>size_iid <span class="op">=</span> naive_rejections_iid <span class="op">/</span> n_sims</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>size_ar <span class="op">=</span> naive_rejections_ar <span class="op">/</span> n_sims</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> blog_plot_context():</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="fl">3.5</span>))</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    bars <span class="op">=</span> ax.bar(</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"IID $d_t$"</span>, <span class="ss">f"AR(1) $d_t$</span><span class="ch">\n</span><span class="ss">($</span><span class="ch">\\</span><span class="ss">rho = </span><span class="sc">{</span>rho<span class="sc">}</span><span class="ss">$)"</span>],</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>        [size_iid <span class="op">*</span> <span class="dv">100</span>, size_ar <span class="op">*</span> <span class="dv">100</span>],</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>[BLOG_PALETTE[<span class="dv">3</span>], BLOG_PALETTE[<span class="dv">1</span>]],</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>        width<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>        edgecolor<span class="op">=</span><span class="st">"white"</span>,</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    ax.axhline(<span class="fl">5.0</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">2</span>], ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="fl">1.2</span>, label<span class="op">=</span><span class="st">"Nominal 5%"</span>)</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Empirical rejection rate (%)"</span>)</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"Naive t-test rejection rate under $H_0$ (10,000 simulations)"</span>)</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    ax.legend(frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> bar, val <span class="kw">in</span> <span class="bu">zip</span>(bars, [size_iid, size_ar]):</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>        ax.text(</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>            bar.get_x() <span class="op">+</span> bar.get_width() <span class="op">/</span> <span class="dv">2</span>,</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>            bar.get_height() <span class="op">+</span> <span class="fl">0.5</span>,</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"</span><span class="sc">{</span>val<span class="op">*</span><span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>,</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>            ha<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="dv">0</span>, <span class="bu">max</span>(size_iid, size_ar) <span class="op">*</span> <span class="dv">100</span> <span class="op">*</span> <span class="fl">1.3</span>)</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="autocorrelation-inflation" class="quarto-figure quarto-figure-center anchored">
+<figure>
+<p><img src="draft_files/figure-html/autocorrelation-inflation-output-1.png" class="img-fluid"></p>
+<figcaption>Serial correlation in the loss differential inflates the naive test statistic</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h3 data-number="3.3" id="hac-newey-west-variance" class="anchored"><span class="header-section-number">3.3</span> HAC (Newey-West) variance</h3>
+<p>Diebold and Mariano (1995) solve the serial-correlation problem by replacing the naive variance with a <strong>heteroskedasticity and autocorrelation consistent (HAC)</strong> estimator. The key idea is to estimate the variance of <span class="math inline">\bar{d}</span> while allowing for dependence between nearby observations.</p>
+<p><strong>Step 1: Sample autocovariances.</strong> Define the sample autocovariance of the loss differential at lag <span class="math inline">k</span>:</p>
+<p><span class="math display">\hat{\gamma}_k = \frac{1}{n} \sum_{t=k+1}^{n} (d_t - \bar{d})(d_{t-k} - \bar{d}).</span></p>
+<p><strong>Step 2: Bartlett kernel weighting.</strong> If the dependence structure dies off at higher lags, distant autocovariances should be downweighted. The Newey-West estimator achieves this through the Bartlett kernel:</p>
+<p><span class="math display">\widehat{\text{Var}}(\bar{d}) = \frac{1}{n}\left[\hat{\gamma}_0 + 2\sum_{k=1}^{M} \left(1 - \frac{k}{M+1}\right)\hat{\gamma}_k\right]</span></p>
+<p>where <span class="math inline">M</span> is the truncation lag (bandwidth). The Bartlett weights <span class="math inline">w_k = 1 - k/(M+1)</span> decrease linearly from 1 to 0 as <span class="math inline">k</span> increases from 1 to <span class="math inline">M</span>, and autocovariances beyond lag <span class="math inline">M</span> receive zero weight.</p>
+<p><strong>Step 3: Bandwidth selection.</strong> A common automatic rule for the truncation lag is</p>
+<p><span class="math display">M = \left\lfloor 4\left(\frac{n}{100}\right)^{2/9} \right\rfloor.</span></p>
+<p>This rule is a practical default that works well for the sample sizes encountered in out-of-sample forecast evaluation.</p>
+<p><strong>The DM statistic.</strong> The test statistic is</p>
+<p><span class="math display">\text{DM} = \frac{\bar{d}}{\sqrt{\widehat{\text{Var}}(\bar{d})}} \xrightarrow{d} N(0,1).</span></p>
+<p>Under the null hypothesis, DM is asymptotically standard normal. In finite samples, it is common to compare this statistic with the <span class="math inline">t_{n-1}</span> distribution. A positive and significant DM statistic indicates that Forecast A has higher average loss, hence Forecast B is preferred under the chosen loss function.</p>
+<p><strong>Remark (Harvey-Leybourne-Newbold correction).</strong> Harvey, Leybourne, and Newbold (1997) proposed a small-sample correction that improves the finite-sample size of the DM test. The corrected statistic is</p>
+<p><span class="math display">\text{DM}^* = \text{DM} \cdot \left[\frac{n + 1 - 2M + M(M-1)/n}{n}\right]^{1/2}</span></p>
+<p>and is compared with the <span class="math inline">t_{n-1}</span> distribution. The correction shrinks the statistic toward zero and matters most when <span class="math inline">n</span> is small relative to the bandwidth <span class="math inline">M</span>. In large samples, <span class="math inline">\text{DM}^* \approx \text{DM}</span>. For simplicity, the implementation below reports the uncorrected HAC DM statistic; the HLN adjustment is a useful finite-sample refinement rather than a requirement for the examples in this post.</p>
+<div id="dm-implementation" class="cell" data-execution_count="2">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dm_test_from_scratch(loss_a, loss_b, max_lag<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Minimal DM test with Newey-West HAC variance."""</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    d <span class="op">=</span> np.asarray(loss_a) <span class="op">-</span> np.asarray(loss_b)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(d)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    d_bar <span class="op">=</span> d.mean()</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Automatic bandwidth rule of thumb. We enforce at least one lag so the</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># function behaves sensibly in short samples.</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> max_lag <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        max_lag <span class="op">=</span> <span class="bu">int</span>(np.floor(<span class="dv">4</span> <span class="op">*</span> (n <span class="op">/</span> <span class="dv">100</span>) <span class="op">**</span> (<span class="dv">2</span> <span class="op">/</span> <span class="dv">9</span>)))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    max_lag <span class="op">=</span> <span class="bu">max</span>(<span class="dv">1</span>, max_lag)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sample autocovariances of the demeaned loss differential.</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    d_demean <span class="op">=</span> d <span class="op">-</span> d_bar</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    gamma <span class="op">=</span> np.array(</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        [np.dot(d_demean[k:], d_demean[: n <span class="op">-</span> k]) <span class="op">/</span> n <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(max_lag <span class="op">+</span> <span class="dv">1</span>)]</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Newey-West HAC variance using Bartlett weights.</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    var_d_bar <span class="op">=</span> (</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        gamma[<span class="dv">0</span>]</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> <span class="bu">sum</span>((<span class="dv">1</span> <span class="op">-</span> k <span class="op">/</span> (max_lag <span class="op">+</span> <span class="dv">1</span>)) <span class="op">*</span> gamma[k] <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, max_lag <span class="op">+</span> <span class="dv">1</span>))</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">/</span> n</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> var_d_bar <span class="op">&lt;=</span> <span class="dv">0</span>:</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">"dm_stat"</span>: np.nan, <span class="st">"p_value"</span>: np.nan, <span class="st">"max_lag"</span>: max_lag, <span class="st">"n"</span>: n}</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    dm_stat <span class="op">=</span> d_bar <span class="op">/</span> np.sqrt(var_d_bar)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    p_value <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> stats.t.sf(<span class="bu">abs</span>(dm_stat), df<span class="op">=</span>n <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"dm_stat"</span>: dm_stat, <span class="st">"p_value"</span>: p_value, <span class="st">"max_lag"</span>: max_lag, <span class="st">"n"</span>: n}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="dm-synthetic-demo" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Synthetic forecasting experiment ---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>sigma2_true <span class="op">=</span> np.exp(<span class="fl">0.5</span> <span class="op">*</span> np.cumsum(RNG.normal(<span class="dv">0</span>, <span class="fl">0.05</span>, n)))  <span class="co"># log-normal vol path</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> sigma2_true <span class="op">+</span> RNG.normal(<span class="dv">0</span>, <span class="fl">0.3</span>, n) <span class="op">*</span> np.sqrt(sigma2_true)  <span class="co"># noisy proxy</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast A: mildly biased, low noise (better)</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>yhat_a <span class="op">=</span> sigma2_true <span class="op">*</span> <span class="fl">1.0</span> <span class="op">+</span> RNG.normal(<span class="dv">0</span>, <span class="fl">0.1</span>, n) <span class="op">*</span> np.sqrt(sigma2_true)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast B: more biased, higher noise (worse)</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>yhat_b <span class="op">=</span> sigma2_true <span class="op">*</span> <span class="fl">1.15</span> <span class="op">+</span> RNG.normal(<span class="dv">0</span>, <span class="fl">0.2</span>, n) <span class="op">*</span> np.sqrt(sigma2_true)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute losses</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>se_a <span class="op">=</span> (y <span class="op">-</span> yhat_a) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>se_b <span class="op">=</span> (y <span class="op">-</span> yhat_b) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># DM test</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> dm_test_from_scratch(se_a, se_b)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Sample size:    n = </span><span class="sc">{</span>result[<span class="st">'n'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Bandwidth:      M = </span><span class="sc">{</span>result[<span class="st">'max_lag'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"DM statistic:   </span><span class="sc">{</span>result[<span class="st">'dm_stat'</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"p-value:        </span><span class="sc">{</span>result[<span class="st">'p_value'</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> result[<span class="st">"p_value"</span>] <span class="op">&lt;</span> <span class="fl">0.05</span>:</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    winner <span class="op">=</span> <span class="st">"B"</span> <span class="cf">if</span> result[<span class="st">"dm_stat"</span>] <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="st">"A"</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"→ Reject H₀ at 5%: Forecast </span><span class="sc">{</span>winner<span class="sc">}</span><span class="ss"> is significantly better."</span>)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"→ Cannot reject H₀: no significant difference at 5%."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sample size:    n = 500
+Bandwidth:      M = 5
+DM statistic:   -8.771
+p-value:        0.0000
+
+→ Reject H₀ at 5%: Forecast A is significantly better.</code></pre>
+</div>
+</div>
+<h3 data-number="3.4" id="power-depends-on-sample-size" class="anchored"><span class="header-section-number">3.4</span> Power depends on sample size</h3>
+<p>Even when one forecast is genuinely superior, the DM test may fail to reject <span class="math inline">H_0</span> if the evaluation sample is too short. This is the standard problem of statistical power: small samples make real effects difficult to detect.</p>
+<p>The following simulation holds the effect size fixed and varies the out-of-sample size <span class="math inline">n</span>. To isolate the role of sample size, we generate the loss differential <span class="math inline">d_t</span> directly from a first-order autoregressive [AR(1)] process with positive mean, rather than constructing two complete forecast-and-loss series.</p>
+<div id="cell-power-analysis" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sample_sizes <span class="op">=</span> [<span class="dv">100</span>, <span class="dv">250</span>, <span class="dv">500</span>, <span class="dv">750</span>, <span class="dv">1000</span>, <span class="dv">1500</span>, <span class="dv">2000</span>]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>n_sims <span class="op">=</span> <span class="dv">2_000</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>power <span class="op">=</span> []</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> sample_sizes:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    rejections <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_sims):</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Here we simulate the loss differential d_t directly rather than</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="co"># generating two separate non-negative loss series.</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        mu <span class="op">=</span> <span class="fl">0.15</span>  <span class="co"># innovation mean in the AR(1) loss-differential process</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        rho <span class="op">=</span> <span class="fl">0.3</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        eps <span class="op">=</span> RNG.normal(mu, <span class="dv">1</span>, n)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        d <span class="op">=</span> np.empty(n)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        d[<span class="dv">0</span>] <span class="op">=</span> eps[<span class="dv">0</span>]</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n):</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>            d[t] <span class="op">=</span> rho <span class="op">*</span> d[t <span class="op">-</span> <span class="dv">1</span>] <span class="op">+</span> eps[t]</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        loss_a <span class="op">=</span> d</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        loss_b <span class="op">=</span> np.zeros(n)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        res <span class="op">=</span> dm_test_from_scratch(loss_a, loss_b)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> np.isnan(res[<span class="st">"p_value"</span>]) <span class="kw">and</span> res[<span class="st">"p_value"</span>] <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="kw">and</span> res[<span class="st">"dm_stat"</span>] <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>            rejections <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    power.append(rejections <span class="op">/</span> n_sims)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> blog_plot_context():</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.5</span>))</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    ax.plot(sample_sizes, [p <span class="op">*</span> <span class="dv">100</span> <span class="cf">for</span> p <span class="kw">in</span> power], <span class="st">"o-"</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">0</span>], lw<span class="op">=</span><span class="dv">2</span>, markersize<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    ax.axhline(<span class="dv">5</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">3</span>], ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">"5</span><span class="sc">% r</span><span class="st">eference"</span>)</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    ax.axhline(<span class="dv">80</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">1</span>], ls<span class="op">=</span><span class="st">":"</span>, lw<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">"80% power target"</span>)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Out-of-sample size ($n$)"</span>)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Rejection rate (%)"</span>)</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"DM Test Power vs. Sample Size"</span>)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    ax.set_xticks(sample_sizes)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    ax.legend(frameon<span class="op">=</span><span class="va">False</span>, loc<span class="op">=</span><span class="st">"lower right"</span>)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="dv">0</span>, <span class="dv">105</span>)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="power-analysis" class="quarto-figure quarto-figure-center anchored">
+<figure>
+<p><img src="draft_files/figure-html/power-analysis-output-1.png" class="img-fluid"></p>
+<figcaption>DM test power increases with sample size</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h2 data-number="4" id="when-the-loss-function-reverses-the-ranking" class="anchored"><span class="header-section-number">4</span> 3. When the Loss Function Reverses the Ranking</h2>
+<p>We now combine the results of the preceding sections. Since different loss functions penalize different types of forecast errors, and the DM test compares forecasts under the chosen loss, it is possible for the same pair of forecasts to produce opposite DM conclusions under SE and QLIKE.</p>
+<h3 data-number="4.1" id="simulation-design" class="anchored"><span class="header-section-number">4.1</span> Simulation design</h3>
+<p>We simulate data from a GARCH(1,1) process and construct two forecasts of the conditional variance <span class="math inline">\sigma_t^2</span>. Both forecasts are centered on the true variance, but they introduce errors with different structures:</p>
+<ul>
+<li><p><strong>Forecast A (“proportional noise”)</strong>: <span class="math inline">\hat{y}^A_t = \sigma_t^2 M_t</span>, where <span class="math inline">M_t</span> is a mean-one lognormal multiplier independent of <span class="math inline">\sigma_t^2</span>. The forecast errors scale with the level of volatility: larger absolute errors on high-variance days, but relatively stable forecast-to-realization ratios across all scales.</p></li>
+<li><p><strong>Forecast B (“additive noise”)</strong>: <span class="math inline">\hat{y}^B_t = \sigma_t^2 + c\,\varepsilon_t</span>, where <span class="math inline">c &gt; 0</span> is a fixed constant and <span class="math inline">\varepsilon_t \sim N(0,1)</span>. The forecast errors have approximately constant absolute magnitude regardless of the variance level. This yields smaller absolute errors on high-variance days, but potentially large ratio distortions when the true variance is small.</p></li>
+</ul>
+<p><strong>Prior expectation.</strong> Based on the properties of SE and QLIKE established in Section 1:</p>
+<ul>
+<li>SE should favor Forecast B, because B produces smaller absolute errors on high-variance days, and SE gives disproportionate weight to those observations.</li>
+<li>QLIKE should favor Forecast A, because A maintains more stable forecast-to-realization ratios across all scales, which is what QLIKE rewards.</li>
+</ul>
+<p>The DM test results confirm this:</p>
+<div id="cell-loss-flip-simulation" class="cell" data-execution_count="9">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a local RNG so results are independent of upstream cells</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>rng_flip <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --- GARCH(1,1) DGP ---</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>omega_g, alpha_g, beta_g <span class="op">=</span> <span class="fl">0.00001</span>, <span class="fl">0.08</span>, <span class="fl">0.90</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>n_total <span class="op">=</span> <span class="dv">4000</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>n_burn <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> n_total <span class="op">-</span> n_burn</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="op">=</span> np.empty(n_total)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>garch_eps <span class="op">=</span> rng_flip.normal(size<span class="op">=</span>n_total)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>sigma2[<span class="dv">0</span>] <span class="op">=</span> omega_g <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> alpha_g <span class="op">-</span> beta_g)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_total):</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    sigma2[t] <span class="op">=</span> omega_g <span class="op">+</span> alpha_g <span class="op">*</span> garch_eps[t <span class="op">-</span> <span class="dv">1</span>] <span class="op">**</span> <span class="dv">2</span> <span class="op">*</span> sigma2[t <span class="op">-</span> <span class="dv">1</span>] <span class="op">+</span> beta_g <span class="op">*</span> sigma2[t <span class="op">-</span> <span class="dv">1</span>]</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>sigma2_os <span class="op">=</span> sigma2[n_burn:]</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>r2_os <span class="op">=</span> sigma2_os <span class="op">*</span> garch_eps[n_burn:] <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Two forecasts with different noise structures ---</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast A: proportional noise, mean-corrected so E[M_t] = 1.</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>sigma_a <span class="op">=</span> <span class="fl">0.35</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>yhat_a <span class="op">=</span> sigma2_os <span class="op">*</span> np.exp(sigma_a <span class="op">*</span> rng_flip.normal(size<span class="op">=</span>n) <span class="op">-</span> sigma_a<span class="op">**</span><span class="dv">2</span> <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>yhat_a <span class="op">=</span> np.maximum(yhat_a, <span class="fl">1e-12</span>)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Forecast B: additive noise with fixed scale.</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>noise_b_scale <span class="op">=</span> <span class="fl">0.20</span> <span class="op">*</span> np.sqrt(np.mean(sigma2_os<span class="op">**</span><span class="dv">2</span>))</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>yhat_b_raw <span class="op">=</span> sigma2_os <span class="op">+</span> noise_b_scale <span class="op">*</span> rng_flip.normal(size<span class="op">=</span>n)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>n_negative_b <span class="op">=</span> <span class="bu">int</span>((yhat_b_raw <span class="op">&lt;=</span> <span class="dv">0</span>).<span class="bu">sum</span>())</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>yhat_b <span class="op">=</span> np.maximum(yhat_b_raw, <span class="fl">1e-12</span>)</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Evaluate losses against the noisy proxy r^2 ---</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>se_a <span class="op">=</span> (r2_os <span class="op">-</span> yhat_a) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>se_b <span class="op">=</span> (r2_os <span class="op">-</span> yhat_b) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>r2_safe <span class="op">=</span> np.maximum(r2_os, <span class="fl">1e-20</span>)</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="co"># We drop the terms -log(r2_safe) - 1 from QLIKE because they are the same</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="co"># for both forecasts at a given time t, so they do not affect ranking or DM.</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>ql_a <span class="op">=</span> np.log(yhat_a) <span class="op">+</span> r2_safe <span class="op">/</span> yhat_a  <span class="co"># MLE form (ranking-equivalent)</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>ql_b <span class="op">=</span> np.log(yhat_b) <span class="op">+</span> r2_safe <span class="op">/</span> yhat_b</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="co"># --- DM tests ---</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>dm_se <span class="op">=</span> dm_test_from_scratch(se_a, se_b)</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>dm_ql <span class="op">=</span> dm_test_from_scratch(ql_a, ql_b)</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Forecast B produced </span><span class="sc">{</span>n_negative_b<span class="sc">}</span><span class="ss"> non-positive raw forecasts before flooring."</span>)</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"These are floored at 1e-12 because QLIKE is only defined for positive forecasts."</span>)</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"SE test:     DM = </span><span class="sc">{</span>dm_se[<span class="st">'dm_stat'</span>]<span class="sc">:.4f}</span><span class="ss">, p-value = </span><span class="sc">{</span>dm_se[<span class="st">'p_value'</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"QLIKE test:  DM = </span><span class="sc">{</span>dm_ql[<span class="st">'dm_stat'</span>]<span class="sc">:.4f}</span><span class="ss">, p-value = </span><span class="sc">{</span>dm_ql[<span class="st">'p_value'</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Results table</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Loss function"</span>: [<span class="st">"SE"</span>, <span class="st">"QLIKE"</span>],</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="st">"DM statistic"</span>: [dm_se[<span class="st">"dm_stat"</span>], dm_ql[<span class="st">"dm_stat"</span>]],</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    <span class="st">"p-value"</span>: [dm_se[<span class="st">"p_value"</span>], dm_ql[<span class="st">"p_value"</span>]],</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Better forecast"</span>: [</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>        <span class="st">"B (additive)"</span> <span class="cf">if</span> dm_se[<span class="st">"dm_stat"</span>] <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> dm_se[<span class="st">"p_value"</span>] <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> (<span class="st">"A (proportional)"</span> <span class="cf">if</span> dm_se[<span class="st">"dm_stat"</span>] <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">and</span> dm_se[<span class="st">"p_value"</span>] <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> <span class="st">"No sig. diff."</span>),</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>        <span class="st">"B (additive)"</span> <span class="cf">if</span> dm_ql[<span class="st">"dm_stat"</span>] <span class="op">&gt;</span> <span class="dv">0</span> <span class="kw">and</span> dm_ql[<span class="st">"p_value"</span>] <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> (<span class="st">"A (proportional)"</span> <span class="cf">if</span> dm_ql[<span class="st">"dm_stat"</span>] <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">and</span> dm_ql[<span class="st">"p_value"</span>] <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> <span class="st">"No sig. diff."</span>),</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>}).set_index(<span class="st">"Loss function"</span>)</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>style_results_table(results, precision<span class="op">=</span><span class="dv">4</span>, index_col<span class="op">=</span><span class="st">"Loss function"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Forecast B produced 11 non-positive raw forecasts before flooring.
+These are floored at 1e-12 because QLIKE is only defined for positive forecasts.
+SE test:     DM = 3.4616, p-value = 0.0005
+QLIKE test:  DM = -2.1822, p-value = 0.0292</code></pre>
+</div>
+<div id="loss-flip-simulation" class="cell-output cell-output-display" data-execution_count="9">
+<style type="text/css">
+#T_a6dfb table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#T_a6dfb thead th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+#T_a6dfb tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+#T_a6dfb tbody tr:nth-child(even) {
+  background-color: #f7f7f756;
+}
+</style>
+
+<table id="T_a6dfb" class="caption-top">
+<thead>
+<tr class="header">
+<th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th id="T_a6dfb_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">DM statistic</th>
+<th id="T_a6dfb_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">p-value</th>
+<th id="T_a6dfb_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">Better forecast</th>
+</tr>
+<tr class="even">
+<th class="index_name level0" data-quarto-table-cell-role="th">Loss function</th>
+<th class="blank col0" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col1" data-quarto-table-cell-role="th">&nbsp;</th>
+<th class="blank col2" data-quarto-table-cell-role="th">&nbsp;</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th id="T_a6dfb_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">SE</th>
+<td id="T_a6dfb_row0_col0" class="data row0 col0">3.4616</td>
+<td id="T_a6dfb_row0_col1" class="data row0 col1">0.0005</td>
+<td id="T_a6dfb_row0_col2" class="data row0 col2">B (additive)</td>
+</tr>
+<tr class="even">
+<th id="T_a6dfb_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">QLIKE</th>
+<td id="T_a6dfb_row1_col0" class="data row1 col0">-2.1822</td>
+<td id="T_a6dfb_row1_col1" class="data row1 col1">0.0292</td>
+<td id="T_a6dfb_row1_col2" class="data row1 col2">A (proportional)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="cell-loss-flip-plot" class="cell" data-execution_count="10">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> blog_plot_context():</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">3.5</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    d_se_raw <span class="op">=</span> se_a <span class="op">-</span> se_b</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    d_ql_raw <span class="op">=</span> ql_a <span class="op">-</span> ql_b</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Winsorize only for display. The DM test above used the raw differential.</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This keeps a few extreme QLIKE observations from dominating the plot scale.</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    lo, hi <span class="op">=</span> np.percentile(d_ql_raw, [<span class="dv">1</span>, <span class="dv">99</span>])</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    d_ql_clip <span class="op">=</span> np.clip(d_ql_raw, lo, hi)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    clip_share <span class="op">=</span> np.mean(d_ql_raw <span class="op">!=</span> d_ql_clip) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ax, d, title, dm_res <span class="kw">in</span> <span class="bu">zip</span>(</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        axes,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        [d_se_raw, d_ql_clip],</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"SE: cumulative $</span><span class="ch">\\</span><span class="st">sum d_t^</span><span class="sc">{SE}</span><span class="st">$"</span>, <span class="st">"QLIKE: cumulative $</span><span class="ch">\\</span><span class="st">sum d_t^</span><span class="sc">{QL}</span><span class="st">$ (winsorized for display)"</span>],</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        [dm_se, dm_ql],</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        cumsum <span class="op">=</span> np.cumsum(d)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        ax.plot(cumsum, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">0</span>], lw<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>        ax.axhline(<span class="dv">0</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">2</span>], ls<span class="op">=</span><span class="st">"--"</span>, lw<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>        ax.set_title(title, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>        ax.set_xlabel(<span class="st">"Observation"</span>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>        ax.set_ylabel(<span class="st">"Cumulative loss differential"</span>)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>        ax.fill_between(<span class="bu">range</span>(<span class="bu">len</span>(cumsum)), <span class="dv">0</span>, cumsum, alpha<span class="op">=</span><span class="fl">0.15</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">0</span>])</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>        sig <span class="op">=</span> <span class="st">"***"</span> <span class="cf">if</span> dm_res[<span class="st">"p_value"</span>] <span class="op">&lt;</span> <span class="fl">0.01</span> <span class="cf">else</span> (<span class="st">"**"</span> <span class="cf">if</span> dm_res[<span class="st">"p_value"</span>] <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> <span class="st">""</span>)</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>        winner <span class="op">=</span> <span class="st">"A (proportional)"</span> <span class="cf">if</span> dm_res[<span class="st">"dm_stat"</span>] <span class="op">&lt;</span> <span class="dv">0</span> <span class="cf">else</span> <span class="st">"B (additive)"</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>        ax.text(</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>            <span class="fl">0.02</span>, <span class="fl">0.95</span>,</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"DM = </span><span class="sc">{</span>dm_res[<span class="st">'dm_stat'</span>]<span class="sc">:.2f}{</span>sig<span class="sc">}</span><span class="ch">\n</span><span class="ss">Winner: </span><span class="sc">{</span>winner<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>            transform<span class="op">=</span>ax.transAxes,</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>            va<span class="op">=</span><span class="st">"top"</span>,</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="dv">9</span>,</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>            bbox<span class="op">=</span><span class="bu">dict</span>(boxstyle<span class="op">=</span><span class="st">"round,pad=0.3"</span>, fc<span class="op">=</span><span class="st">"white"</span>, ec<span class="op">=</span>BLOG_PALETTE[<span class="dv">3</span>], alpha<span class="op">=</span><span class="fl">0.8</span>),</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"For display, </span><span class="sc">{</span>clip_share<span class="sc">:.1f}</span><span class="ss">% of QLIKE differentials were winsorized at the 1st/99th percentiles."</span>)</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"The statistical test itself used the raw, unwinsorized QLIKE differential."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="loss-flip-plot" class="quarto-figure quarto-figure-center anchored">
+<figure>
+<p><img src="draft_files/figure-html/loss-flip-plot-output-1.png" class="img-fluid"></p>
+<figcaption>Cumulative loss differentials under SE and QLIKE - opposite trends</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>For display, 2.0% of QLIKE differentials were winsorized at the 1st/99th percentiles.
+The statistical test itself used the raw, unwinsorized QLIKE differential.</code></pre>
+</div>
+</div>
+<h3 data-number="4.2" id="interpretation" class="anchored"><span class="header-section-number">4.2</span> Interpretation</h3>
+<p>The reversal is a direct consequence of how SE and QLIKE weight forecast errors differently.</p>
+<p><strong>Forecast A (proportional noise)</strong> produces errors that grow with <span class="math inline">\sigma_t^2</span>. On high-variance days, its absolute errors are large, and since SE squares the absolute error, those days dominate the SE comparison. Hence A loses under SE.</p>
+<p><strong>Forecast B (additive noise)</strong> produces errors of roughly constant absolute size. On high-variance days, a fixed additive disturbance is small relative to the target, so B performs well under SE, yet on low-variance days the ratio <span class="math inline">\hat{y}_B / y_t</span> can become severely distorted. Since QLIKE evaluates accuracy through these ratios, B loses under QLIKE.</p>
+<p>The following table summarizes the mechanism:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 30%">
+<col style="width: 53%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">SE</th>
+<th style="text-align: center;">QLIKE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Primary emphasis</strong></td>
+<td style="text-align: center;">Absolute error magnitude</td>
+<td style="text-align: center;">Forecast-to-realization ratio</td>
+</tr>
+<tr class="even">
+<td><strong>Observations with greatest influence</strong></td>
+<td style="text-align: center;">High-variance days with large absolute misses</td>
+<td style="text-align: center;">Days with large proportional distortion</td>
+</tr>
+<tr class="odd">
+<td><strong>Winner in this simulation</strong></td>
+<td style="text-align: center;">B (smaller absolute errors on volatile days)</td>
+<td style="text-align: center;">A (more stable ratios across all scales)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Remark.</strong> Neither result is incorrect. The two loss functions answer different forecasting questions. This is why a DM test result is incomplete without specifying which loss function was used and why that loss function is appropriate for the application at hand.</p>
+<h2 data-number="5" id="the-mincer-zarnowitz-regression" class="anchored"><span class="header-section-number">5</span> 4. The Mincer-Zarnowitz Regression</h2>
+<p>The DM test determines which forecast has lower expected loss under a given criterion. It does <strong>not</strong> characterize the nature of the forecast errors. The <strong>Mincer-Zarnowitz (MZ) regression</strong> serves this complementary diagnostic purpose by examining forecast calibration.</p>
+<h3 data-number="5.1" id="setup-1" class="anchored"><span class="header-section-number">5.1</span> Setup</h3>
+<p><strong>Definition.</strong> The Mincer-Zarnowitz regression is the ordinary least squares (OLS) regression of the realized target on the forecast:</p>
+<p><span class="math display">y_t = \alpha + \beta\,\hat{y}_t + \varepsilon_t.</span></p>
+<p>The estimated coefficients <span class="math inline">(\hat{\alpha}, \hat{\beta})</span> and the coefficient of determination <span class="math inline">R^2</span> provide three diagnostic indicators:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 32%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th style="text-align: center;">Ideal value</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\alpha</span></td>
+<td style="text-align: center;">0</td>
+<td>No systematic level bias</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\beta</span></td>
+<td style="text-align: center;">1</td>
+<td>A one-unit increase in the forecast corresponds, on average, to a one-unit increase in the realization</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">R^2</span></td>
+<td style="text-align: center;">1</td>
+<td>The forecast explains all variation in the realized target</td>
+</tr>
+</tbody>
+</table>
+<p>These are diagnostic benchmarks, not binary pass/fail conditions. Common patterns of miscalibration include:</p>
+<ul>
+<li><strong><span class="math inline">\beta &gt; 1</span></strong>: the forecast <strong>under-reacts</strong>. Realized movements are larger than the forecast movements suggest.</li>
+<li><strong><span class="math inline">\beta &lt; 1</span></strong>: the forecast <strong>over-reacts</strong>. The forecast exhibits larger swings than the realizations warrant.</li>
+<li><strong><span class="math inline">\alpha \neq 0</span> with <span class="math inline">\beta \approx 1</span></strong>: the forecast has a <strong>level bias</strong> — it is systematically too high or too low.</li>
+<li><strong>Low <span class="math inline">R^2</span></strong>: the forecast may be directionally correct but explains little of the variation in the realized target.</li>
+</ul>
+<p><strong>Joint calibration test.</strong> Rather than inspecting <span class="math inline">\alpha</span> and <span class="math inline">\beta</span> individually, we can test them jointly with the null hypothesis <span class="math inline">H_0: (\alpha, \beta) = (0, 1)</span> using a standard Wald or <span class="math inline">F</span>-test. Rejection indicates that the forecast is miscalibrated in at least one dimension.</p>
+<p><strong>Remark (standard errors).</strong> The standard errors from classical OLS are valid only when the residuals <span class="math inline">\varepsilon_t</span> are serially uncorrelated and homoskedastic. In forecast evaluation, residuals are often autocorrelated — for example, overlapping forecast horizons guarantee it. In such cases, HAC (Newey-West) standard errors should be used for both the individual <span class="math inline">t</span>-tests and the joint Wald test.</p>
+<p>The MZ regression characterizes the <em>structure</em> of forecast errors. It is a calibration diagnostic, not a substitute for a loss-based forecast comparison.</p>
+<div id="cell-mz-demo" class="cell" data-execution_count="11">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mz_regression(y, yhat):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""OLS: y = alpha + beta * yhat + eps, with joint Wald test."""</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> np.column_stack([np.ones(<span class="bu">len</span>(yhat)), yhat])</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    beta, _, _, _ <span class="op">=</span> np.linalg.lstsq(X, y, rcond<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    y_pred <span class="op">=</span> X <span class="op">@</span> beta</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    ss_res <span class="op">=</span> np.<span class="bu">sum</span>((y <span class="op">-</span> y_pred) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    ss_tot <span class="op">=</span> np.<span class="bu">sum</span>((y <span class="op">-</span> y.mean()) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    r2 <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> ss_res <span class="op">/</span> ss_tot <span class="cf">if</span> ss_tot <span class="op">&gt;</span> <span class="dv">0</span> <span class="cf">else</span> np.nan</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    n_obs <span class="op">=</span> <span class="bu">len</span>(y)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    sigma2_hat <span class="op">=</span> ss_res <span class="op">/</span> (n_obs <span class="op">-</span> <span class="dv">2</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    cov_beta <span class="op">=</span> sigma2_hat <span class="op">*</span> np.linalg.inv(X.T <span class="op">@</span> X)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> np.sqrt(np.diag(cov_beta))</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    t_stats <span class="op">=</span> beta <span class="op">/</span> se</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Joint Wald test: H0: (alpha, beta) = (0, 1)</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> beta <span class="op">-</span> np.array([<span class="fl">0.0</span>, <span class="fl">1.0</span>])  <span class="co"># deviation from null</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    wald_stat <span class="op">=</span> r <span class="op">@</span> np.linalg.inv(cov_beta) <span class="op">@</span> r</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    wald_p <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> stats.chi2.cdf(wald_stat, df<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"alpha"</span>: beta[<span class="dv">0</span>],</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"beta"</span>: beta[<span class="dv">1</span>],</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>        <span class="st">"se_alpha"</span>: se[<span class="dv">0</span>],</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">"se_beta"</span>: se[<span class="dv">1</span>],</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>        <span class="st">"t_alpha"</span>: t_stats[<span class="dv">0</span>],</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">"t_beta"</span>: t_stats[<span class="dv">1</span>],</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">"r2"</span>: r2,</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">"wald_stat"</span>: wald_stat,</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">"wald_p"</span>: wald_p,</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"y_pred"</span>: y_pred,</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Use r2_os (proxy), yhat_a, yhat_b from Section 3</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>mz_a <span class="op">=</span> mz_regression(r2_os, yhat_a)</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>mz_b <span class="op">=</span> mz_regression(r2_os, yhat_b)</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Print MZ results</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> label, mz <span class="kw">in</span> [(<span class="st">"Forecast A"</span>, mz_a), (<span class="st">"Forecast B"</span>, mz_b)]:</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">:  α = </span><span class="sc">{</span>mz[<span class="st">'alpha'</span>]<span class="sc">:.2e}</span><span class="ss">,  β = </span><span class="sc">{</span>mz[<span class="st">'beta'</span>]<span class="sc">:.3f}</span><span class="ss">,  R² = </span><span class="sc">{</span>mz[<span class="st">'r2'</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Joint Wald test H₀: (α,β)=(0,1):  χ² = </span><span class="sc">{</span>mz[<span class="st">'wald_stat'</span>]<span class="sc">:.2f}</span><span class="ss">,  p = </span><span class="sc">{</span>mz[<span class="st">'wald_p'</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Note: standard errors are classical OLS (not HAC-robust)."</span>)</span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> blog_plot_context():</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>), sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ax, yhat, mz, label, color <span class="kw">in</span> <span class="bu">zip</span>(</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>        axes, [yhat_a, yhat_b], [mz_a, mz_b],</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"A (proportional noise)"</span>, <span class="st">"B (additive noise)"</span>],</span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>        [BLOG_PALETTE[<span class="dv">0</span>], BLOG_PALETTE[<span class="dv">1</span>]],</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>        ax.scatter(yhat, r2_os, alpha<span class="op">=</span><span class="fl">0.1</span>, s<span class="op">=</span><span class="dv">6</span>, color<span class="op">=</span>color, rasterized<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>        <span class="co"># MZ fit line</span></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a>        x_range <span class="op">=</span> np.linspace(<span class="bu">max</span>(yhat.<span class="bu">min</span>(), <span class="dv">0</span>), np.percentile(yhat, <span class="dv">99</span>), <span class="dv">100</span>)</span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>        ax.plot(x_range, mz[<span class="st">"alpha"</span>] <span class="op">+</span> mz[<span class="st">"beta"</span>] <span class="op">*</span> x_range, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">2</span>], lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">"MZ fit"</span>)</span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 45-degree line = perfect calibration benchmark</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a>        lim <span class="op">=</span> np.percentile(np.concatenate([yhat, r2_os]), <span class="dv">99</span>) <span class="op">*</span> <span class="fl">1.1</span></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a>        ax.plot([<span class="dv">0</span>, lim], [<span class="dv">0</span>, lim], <span class="st">"--"</span>, color<span class="op">=</span>BLOG_PALETTE[<span class="dv">3</span>], lw<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">"45-degree line"</span>)</span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a>        ax.set_title(label, fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a>        ax.set_xlabel(<span class="st">"Forecast $</span><span class="ch">\\</span><span class="st">hat</span><span class="sc">{y}</span><span class="st">_t$"</span>)</span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a>        ax.set_xlim(<span class="dv">0</span>, lim)</span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a>        ax.set_ylim(<span class="dv">0</span>, lim)</span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a>        ax.text(</span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a>            <span class="fl">0.03</span>, <span class="fl">0.97</span>,</span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"α = </span><span class="sc">{</span>mz[<span class="st">'alpha'</span>]<span class="sc">:.2e}</span><span class="ch">\n</span><span class="ss">β = </span><span class="sc">{</span>mz[<span class="st">'beta'</span>]<span class="sc">:.3f}</span><span class="ch">\n</span><span class="ss">R² = </span><span class="sc">{</span>mz[<span class="st">'r2'</span>]<span class="sc">:.3f}</span><span class="ch">\n</span><span class="ss">Wald p = </span><span class="sc">{</span>mz[<span class="st">'wald_p'</span>]<span class="sc">:.3f}</span><span class="ss">"</span>,</span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a>            transform<span class="op">=</span>ax.transAxes,</span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a>            va<span class="op">=</span><span class="st">"top"</span>,</span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="dv">9</span>,</span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a>            bbox<span class="op">=</span><span class="bu">dict</span>(boxstyle<span class="op">=</span><span class="st">"round,pad=0.3"</span>, fc<span class="op">=</span><span class="st">"white"</span>, ec<span class="op">=</span>color, alpha<span class="op">=</span><span class="fl">0.8</span>),</span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a>        ax.legend(frameon<span class="op">=</span><span class="va">False</span>, loc<span class="op">=</span><span class="st">"lower right"</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Realized $r_t^2$"</span>)</span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Forecast A:  α = 2.39e-04,  β = 0.501,  R² = 0.042
+  Joint Wald test H₀: (α,β)=(0,1):  χ² = 153.34,  p = 0.0000
+Forecast B:  α = 1.42e-04,  β = 0.706,  R² = 0.059
+  Joint Wald test H₀: (α,β)=(0,1):  χ² = 37.91,  p = 0.0000
+
+Note: standard errors are classical OLS (not HAC-robust).</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div id="mz-demo" class="quarto-figure quarto-figure-center anchored">
+<figure>
+<p><img src="draft_files/figure-html/mz-demo-output-2.png" class="img-fluid"></p>
+<figcaption>MZ regression for the two forecasts from Section 3</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h3 data-number="5.2" id="connecting-mz-to-the-dm-divergence" class="anchored"><span class="header-section-number">5.2</span> Connecting MZ to the DM divergence</h3>
+<p>The MZ regression helps explain <em>what kind of forecast errors</em> produced the divergent DM results in Section 3. However, it does not determine which loss function is appropriate for the application.</p>
+<ul>
+<li><p><strong>Forecast B</strong> (additive noise) has a higher <span class="math inline">\beta</span> and higher <span class="math inline">R^2</span>. In terms of calibration, it tracks large realized movements more closely. This is consistent with the SE result: SE rewards small absolute errors on high-variance days, precisely where Forecast B excels.</p></li>
+<li><p><strong>Forecast A</strong> (proportional noise) has a lower <span class="math inline">\beta</span> and lower <span class="math inline">R^2</span> because its absolute errors are larger. However, its forecast-to-realization ratios are more stable across scales, which is the property that QLIKE rewards.</p></li>
+</ul>
+<p>The MZ regression thus provides a structural explanation for the DM disagreement. The two diagnostics are complementary: MZ describes the calibration properties of each forecast, while DM evaluates overall accuracy under a specific loss criterion.</p>
+<div>
+<blockquote>
+<p><strong>Note</strong></p>
+<p><strong>Recommended workflow for forecast evaluation:</strong></p>
+<ol type="1">
+<li>Choose the loss function based on the application requirements, not based on which forecast you expect to win.</li>
+<li>Run the DM test under that loss function (applying the HLN correction if <span class="math inline">n</span> is small).</li>
+<li>If SE and QLIKE disagree, report both results rather than selectively reporting the favorable one.</li>
+<li>Use the MZ regression — including the joint test <span class="math inline">H_0: (\alpha, \beta) = (0,1)</span> with HAC standard errors — to diagnose whether the disagreement arises from bias, reaction strength, or residual noise.</li>
+<li>Present the full set of evidence: DM(SE), DM(QLIKE), and the MZ parameters.</li>
+</ol>
+</blockquote>
+</div>
+<h2 data-number="6" id="summary" class="anchored"><span class="header-section-number">6</span> Summary</h2>
+<p>The main results of this post are as follows.</p>
+<ol type="1">
+<li><p><strong>The loss function is a modeling choice.</strong> SE and QLIKE are both consistent for the conditional mean, but they measure different properties of forecast accuracy. SE emphasizes absolute accuracy and gives disproportionate weight to large-scale observations. QLIKE emphasizes proportional accuracy across all scales. Both have likelihood connections, and changing the loss function can change the DM winner because it changes the definition of what constitutes a costly forecast error.</p></li>
+<li><p><strong>The DM test requires HAC standard errors.</strong> Loss differentials are typically serially correlated when forecasts are built from rolling or expanding windows. The naive i.i.d. standard error understates the true uncertainty, inflating the rejection rate. The Newey-West HAC estimator corrects for this dependence, and the Harvey-Leybourne-Newbold correction further improves finite-sample behavior.</p></li>
+<li><p><strong>QLIKE is often informative for positive, scale-sensitive targets.</strong> When the target variable spans several orders of magnitude, SE can be dominated by a small number of extreme observations. QLIKE provides a more balanced evaluation by weighting observations through proportional accuracy rather than absolute error magnitude. Variance forecasting is one important example of this setting.</p></li>
+<li><p><strong>The MZ regression characterizes forecast calibration, not the preferred loss function.</strong> The MZ parameters (<span class="math inline">\alpha</span>, <span class="math inline">\beta</span>, <span class="math inline">R^2</span>) and the joint test of <span class="math inline">H_0: (\alpha, \beta) = (0, 1)</span> describe the systematic relationship between forecasts and realizations. They are useful for diagnosing <em>why</em> two forecasts differ, but they do not determine which forecast is more accurate — that requires a loss-based comparison. When using MZ in a forecasting context, HAC standard errors should replace the classical OLS ones.</p></li>
+<li><p><strong>A thorough forecast comparison reports multiple diagnostics.</strong> The recommended practice is to choose a loss function appropriate for the application, run the DM test, and use the MZ regression to understand the mechanism behind the result. When SE and QLIKE disagree, reporting both results provides useful information about the nature of the forecast differences.</p></li>
+</ol>
+<p>For a worked example applying these tools to a volatility-forecasting setting, see the companion post on <a href="../volatility-forecasts-4/index.html">volatility forecasting with XGBSTES</a>.</p>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/steveya\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -5,8 +5,13 @@ This site is now built with [Quarto](https://quarto.org/) and deployed to GitHub
 ## Local preview
 
 ```bash
+python scripts/generate_indexes.py
 quarto preview
 ```
+
+The generated navigation pages live in `pages/series.qmd`, `pages/notes.qmd`,
+`pages/projects.qmd`, and `pages/categories.qmd`. They are built from post
+frontmatter plus `data/projects.yml`.
 
 ## Migration
 

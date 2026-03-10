@@ -1,0 +1,1106 @@
+[
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 1,
+    "chunks": [
+      {
+        "topics": [
+          "inflation",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "The economic outlook is uncertain, and the Committee is attentive to the risks to both sides of its dual mandate.",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2025-01-29",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2025-01-29"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 1,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "The Committee is attentive to the risks to both sides of its dual mandate.",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2025-03-19",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2025-03-19"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 1,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "Uncertainty about the economic outlook has increased further.",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2025-05-07",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2025-05-07"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 1,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "The Committee will continue to monitor the implications of incoming information for the economic outlook.",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2025-06-18",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2025-06-18"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 0,
+    "chunks": [
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2025-07-30",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2025-07-30"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 0,
+    "chunks": [
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2025-08-22",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2025-08-22"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 1,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "The Committee will continue to monitor the implications of incoming information for the economic outlook.",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2025-09-17",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2025-09-17"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 1,
+    "chunks": [
+      {
+        "topics": [
+          "inflation",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "Uncertainty about the economic outlook remains elevated.",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2025-10-29",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2025-10-29"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 1,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "Uncertainty about the economic outlook remains elevated.",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2025-12-10",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2025-12-10"
+  },
+  {
+    "doc_stance": -0.25,
+    "n_chunks": 11,
+    "n_relevant": 4,
+    "chunks": [
+      {
+        "topics": [
+          "supply_shock",
+          "inflation_expectations"
+        ],
+        "stance": "HAWKISH",
+        "confidence": "MEDIUM",
+        "key_quote": "These jolts can create substantial inflation, undermining growth in the medium term by forcing central banks to raise interest rates.",
+        "numeric_stance": 1
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "Regulations can also distort investment decisions across sectors or impede innovation, leading to an economy-wide misallocation of resources.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "supply_shock",
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "DOVISH",
+        "confidence": "MEDIUM",
+        "key_quote": "On net, this supports a more accommodative stance of monetary policy.",
+        "numeric_stance": -1
+      },
+      {
+        "topics": [
+          "supply_shock",
+          "inflation_expectations"
+        ],
+        "stance": "DOVISH",
+        "confidence": "MEDIUM",
+        "key_quote": "If monetary policy ignores the deflationary effects of deregulation, then we risk causing an unnecessary contraction in the economy.",
+        "numeric_stance": -1
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-01-14",
+    "speaker": "Regulations, the Supply Side, and Monetary Policy",
+    "title": "Miran, Regulations, the Supply Side, and Monetary Policy"
+  },
+  {
+    "doc_stance": -0.5,
+    "n_chunks": 7,
+    "n_relevant": 2,
+    "chunks": [
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "inflation remains somewhat elevated from our 2 percent goal.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "DOVISH",
+        "confidence": "MEDIUM",
+        "key_quote": "I expect to see inflation return to a sustainable path back to our 2 percent target.",
+        "numeric_stance": -1
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-01-16",
+    "speaker": "Economic Outlook and Monetary Policy Implementation",
+    "title": "Jefferson, Economic Outlook and Monetary Policy Implementation"
+  },
+  {
+    "doc_stance": -0.4,
+    "n_chunks": 9,
+    "n_relevant": 5,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "DOVISH",
+        "confidence": "MEDIUM",
+        "key_quote": "These decisions were intended to proactively limit the risk of greater and more persistent damage to the labor market.",
+        "numeric_stance": -1
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "I did not assume that changes in trade or immigration policy would necessarily lead to persistent inflationary pressures.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "I remain concerned about signs of fragility in the labor market.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock"
+        ],
+        "stance": "DOVISH",
+        "confidence": "MEDIUM",
+        "key_quote": "considering that still-elevated inflation mostly reflects tariff effects that I expect will fade this year.",
+        "numeric_stance": -1
+      },
+      {
+        "topics": [
+          "energy",
+          "oil",
+          "supply_shock",
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "the outlook is subject to risks on both sides of our mandate, and those risks are not symmetric.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-01-16",
+    "speaker": "Outlook for the Economy and Monetary Policy",
+    "title": "Bowman, Outlook for the Economy and Monetary Policy"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 1,
+    "n_relevant": 1,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "Uncertainty about the economic outlook remains elevated.",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-01-28",
+    "speaker": "FOMC",
+    "title": "FOMC Statement 2026-01-28"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 4,
+    "n_relevant": 2,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "I am also reluctant to take meaningful signal from the latest data releases given the statistical noise introduced by the government shutdown.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "I expect that the supply-side policies that I just mentioned, along with strength in AI-related investment, will continue to boost productivity gains.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-01-30",
+    "speaker": "Outlook for the Economy and Monetary Policy",
+    "title": "Bowman, Outlook for the Economy and Monetary Policy"
+  },
+  {
+    "doc_stance": -1.0,
+    "n_chunks": 1,
+    "n_relevant": 1,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock",
+          "look_through"
+        ],
+        "stance": "DOVISH",
+        "confidence": "MEDIUM",
+        "key_quote": "appropriate monetary policy is to 'look through' these effects as long as inflation expectations are anchored, which they are.",
+        "numeric_stance": -1
+      }
+    ],
+    "date": "2026-01-30",
+    "speaker": "Statement by Governor Christopher J. Waller",
+    "title": "Waller, Statement by Governor Christopher J. Waller"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 6,
+    "n_relevant": 3,
+    "chunks": [
+      {
+        "topics": [
+          "inflation",
+          "supply_shock"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "Inflation appears to have stalled stubbornly above our 2 percent goal, while at the same time the labor market appears to have stabilized in recent months.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation",
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "But they do not, in my view, reveal a signal about increased slack that we can tackle with our typical demand-side monetary policy.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "Overall, uncertainty about the outlook remains elevated, although I believe the labor market will continue to be supported by the three rate cuts last year.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-02-04",
+    "speaker": "Economic Outlook",
+    "title": "Cook, Economic Outlook"
+  },
+  {
+    "doc_stance": -0.18181818181818182,
+    "n_chunks": 7,
+    "n_relevant": 6,
+    "chunks": [
+      {
+        "topics": [
+          "supply_shock"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "I will turn to the subject matter of this conference and discuss supply-side inflation dynamics.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation",
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "The stall in the disinflationary process is mainly because of tariffs on some goods.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "energy",
+          "supply_shock",
+          "inflation_expectations"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "The disruptions caused by the pandemic have receded, and inflation has come down sharply since earlier in the decade.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "Should we expect the pickup in productivity to affect inflation? The answer likely depends on how the balance between supply and demand is affected over time.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock"
+        ],
+        "stance": "DOVISH",
+        "confidence": "MEDIUM",
+        "key_quote": "I continue to see it as a reasonable base case that the effect on inflation will not be long-lasting and will amount to a one-time shift in the price level.",
+        "numeric_stance": -1
+      },
+      {
+        "topics": [
+          "supply_shock",
+          "inflation_expectations",
+          "uncertainty"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "Our understanding of supply-side developments and their effect on inflation has grown rapidly in recent years.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-02-06",
+    "speaker": "Economic Outlook and Supply-Side (Dis)Inflation Dynamics",
+    "title": "Jefferson, Economic Outlook and Supply-Side (Dis)Inflation Dynamics"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 5,
+    "n_relevant": 0,
+    "chunks": [
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-02-16",
+    "speaker": "Revitalizing Bank Mortgage Lending, One Step with Basel",
+    "title": "Bowman, Revitalizing Bank Mortgage Lending, One Step with Basel"
+  },
+  {
+    "doc_stance": 1.0,
+    "n_chunks": 13,
+    "n_relevant": 2,
+    "chunks": [
+      {
+        "topics": [
+          "inflation",
+          "supply_shock",
+          "uncertainty"
+        ],
+        "stance": "HAWKISH",
+        "confidence": "MEDIUM",
+        "key_quote": "I see the risk of persistent inflation above our 2 percent target as significant, which means we need to remain vigilant.",
+        "numeric_stance": 1
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "energy",
+          "supply_shock",
+          "inflation_expectations"
+        ],
+        "stance": "HAWKISH",
+        "confidence": "MEDIUM",
+        "key_quote": "in the short term, investment in AI could be inflationary\u00e2\u0080\u0094for example, if electricity supply constraints from inefficiencies in the power grid collide with strong energy demand.",
+        "numeric_stance": 1
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-02-17",
+    "speaker": "What Will Artificial Intelligence Mean for the Labor Market and the Economy?",
+    "title": "Barr, What Will Artificial Intelligence Mean for the Labor Market and the Economy?"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 4,
+    "n_relevant": 0,
+    "chunks": [
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-02-19",
+    "speaker": "Opening Remarks",
+    "title": "Bowman, Opening Remarks"
+  },
+  {
+    "doc_stance": -0.6666666666666666,
+    "n_chunks": 7,
+    "n_relevant": 3,
+    "chunks": [
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock"
+        ],
+        "stance": "DOVISH",
+        "confidence": "MEDIUM",
+        "key_quote": "I felt that the risk of a substantial downturn in the labor market combined with a limited risk of higher inflation warranted another cut.",
+        "numeric_stance": -1
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "energy",
+          "inflation_expectations",
+          "supply_shock"
+        ],
+        "stance": "NEUTRAL",
+        "confidence": "MEDIUM",
+        "key_quote": "Headline consumer price index (CPI) inflation came in below expectations for January, in part due to lower energy prices.",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [
+          "inflation_expectations",
+          "supply_shock",
+          "look_through"
+        ],
+        "stance": "DOVISH",
+        "confidence": "MEDIUM",
+        "key_quote": "Traditional central bank wisdom suggests that we should 'look through' tariffs.",
+        "numeric_stance": -1
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-02-23",
+    "speaker": "Labor Market Data: Signal or Noise?",
+    "title": "Waller, Labor Market Data: Signal or Noise?"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 4,
+    "n_relevant": 0,
+    "chunks": [
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-02-24",
+    "speaker": "Opening Remarks for the \u00e2\u0080\u009cAI and Productivity across the Economy\u00e2\u0080\u009d Panel",
+    "title": "Cook, Opening Remarks for the \u201cAI and Productivity across the Economy\u201d Panel"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 7,
+    "n_relevant": 0,
+    "chunks": [
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-02-24",
+    "speaker": "Operationalizing AI at the Federal Reserve",
+    "title": "Waller, Operationalizing AI at the Federal Reserve"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 6,
+    "n_relevant": 0,
+    "chunks": [
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-02-25",
+    "speaker": "Supervision and Regulation",
+    "title": "Bowman, Supervision and Regulation"
+  },
+  {
+    "doc_stance": 0.0,
+    "n_chunks": 3,
+    "n_relevant": 0,
+    "chunks": [
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      },
+      {
+        "topics": [],
+        "stance": "NEUTRAL",
+        "confidence": "LOW",
+        "key_quote": "",
+        "numeric_stance": 0
+      }
+    ],
+    "date": "2026-03-03",
+    "speaker": "Liquidity Resiliency, Financial Stability, and the Role of the Federal Reserve",
+    "title": "Bowman, Liquidity Resiliency, Financial Stability, and the Role of the Federal Reserve"
+  }
+]

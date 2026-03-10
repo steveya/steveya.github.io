@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-03-03">
+<meta name="description" content="How does parameter estimation error affect the Sharpe ratio of a mean-reversion strategy?">
+
+<title>Expected Performance of a Mean-Reversion Trading Strategy — Part 4 – Steve Yang</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-html-eb71d4f0124c4d5ff63526840ab633f6.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+
+<nav class="site-nav">
+  <a href="../../">Home</a>
+  <a href="../../pages/series.html">Series</a>
+  <a href="../../pages/projects.html">Projects</a>
+  <a href="../../pages/categories.html">Categories</a>
+  <a href="../../pages/about.html">About</a>
+
+  <span class="site-nav-spacer"></span>
+  <a href="../../pages/search.html">Search</a>
+</nav>
+
+<header id="title-block-header">
+<h1 class="title">Expected Performance of a Mean-Reversion Trading Strategy — Part 4</h1>
+
+<p class="date">2026-03-03</p>
+</header>
+
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#maximum-likelihood-estimation-for-the-ou-process" id="toc-maximum-likelihood-estimation-for-the-ou-process"><span class="header-section-number">1</span> Maximum Likelihood Estimation for the OU Process</a></li>
+  <li><a href="#the-estimation-penalty-on-sharpe-ratio" id="toc-the-estimation-penalty-on-sharpe-ratio"><span class="header-section-number">2</span> The Estimation Penalty on Sharpe Ratio</a>
+  <ul>
+  <li><a href="#setup-one-shot-estimation-then-trading" id="toc-setup-one-shot-estimation-then-trading"><span class="header-section-number">2.1</span> Setup: one-shot estimation then trading</a></li>
+  <li><a href="#variance-of-hatmu" id="toc-variance-of-hatmu"><span class="header-section-number">2.2</span> Variance of <span class="math inline">\hat\mu</span></a></li>
+  <li><a href="#the-penalty-formula" id="toc-the-penalty-formula"><span class="header-section-number">2.3</span> The penalty formula</a></li>
+  </ul></li>
+  <li><a href="#the-correlation-channel-is-transient" id="toc-the-correlation-channel-is-transient"><span class="header-section-number">3</span> The Correlation Channel is Transient</a></li>
+  <li><a href="#rolling-estimation" id="toc-rolling-estimation"><span class="header-section-number">4</span> Rolling Estimation</a></li>
+  <li><a href="#bias-in-hattheta" id="toc-bias-in-hattheta"><span class="header-section-number">5</span> Bias in <span class="math inline">\hat\theta</span></a></li>
+  <li><a href="#discussion" id="toc-discussion"><span class="header-section-number">6</span> Discussion</a></li>
+  </ul>
+</nav>
+<p>In <a href="../../posts/mean-reversion-strategy-1/index.html">Part 1</a> we derived the asymptotic Sharpe ratio <span class="math inline">\mathrm{SR}_\infty = \sqrt{\theta/2}</span> of a mean-reversion strategy under the assumption that the mispricing follows an Ornstein-Ulenbeck process and the trader knows its parameters exactly. <a href="../mean-reversion-strategy-2/">Part 2</a> showed that a constant bias <span class="math inline">M</span> in the fair-value estimate incurs a multiplicative penalty <span class="math inline">(1 + 2\theta M^2/\sigma^2)^{-1/2}</span>, and <a href="../mean-reversion-strategy-3/">Part 3</a> extended this to correlated bias, establishing that any trailing estimator of the fair value using past log prices degrades both expected PnL and risk.</p>
+<p>All three parts treated the OU parameters <span class="math inline">\theta</span> and <span class="math inline">\sigma</span> as known. In practice, these must be estimated from a finite calibration sample, and estimation error feeds directly into the trader’s fair-value estimate. In this post we close the loop by quantifying how parameter estimation error affects the realised Sharpe ratio.</p>
+<p>We look at the effect of the two estimates separately. The first is the mean estimation error (<span class="math inline">\hat\mu \neq \mu</span>): the estimated long-run mean acts as a constant bias in the Part 2 sense, with variance <span class="math inline">\mathrm{Var}(\hat\mu) \approx \sigma^2/(\theta^2 T_{\mathrm{est}})</span>, yielding a penalty <span class="math inline">(1 + 2/(\theta T_{\mathrm{est}}))^{-1/2}</span> governed entirely by the number of mean-reversion timescales in the calibration window. The second is speed estimation error (<span class="math inline">\hat\theta \neq \theta</span>): the well-known <a href="../../posts/short-rate-models-4/index.html">finite-sample bias in <span class="math inline">\hat\theta</span></a> does not degrade realised SR — which is scale-invariant in position size — yet creates systematic overconfidence, as the trader predicts a higher SR than is actually achieved, leading to misallocated capital and underestimated drawdowns.</p>
+<h1 data-number="1" id="maximum-likelihood-estimation-for-the-ou-process"><span class="header-section-number">1</span> Maximum Likelihood Estimation for the OU Process</h1>
+<p>We work with the same centred OU model as Parts 1–3:</p>
+<p><span class="math display">dX_t = -\theta\,(X_t - \mu)\,dt + \sigma\,dW_t, \qquad X_0 = \mu.</span></p>
+<p>For the trading strategy, <span class="math inline">X_t</span> represents the mispricing — the deviation from fair value <span class="math inline">v</span>, with <span class="math inline">\mu = v</span> denoting the true long-run mean. The trader must estimate the parameter triple <span class="math inline">(\theta, \mu, \sigma)</span> from a calibration sample of length <span class="math inline">T_{\mathrm{est}}</span>.</p>
+<p>As derived in a <a href="../../posts/short-rate-models-4/index.html">previous post in our short-rate model series</a>, the exact discretisation of this process is</p>
+<p><span class="math display">X_{i+1} \mid X_i \;\sim\; \mathcal{N}\!\big(\underbrace{X_i\,e^{-\theta\Delta t} + \mu(1 - e^{-\theta\Delta t})}_{\text{conditional mean}},\;\; \underbrace{\tfrac{\sigma^2}{2\theta}(1 - e^{-2\theta\Delta t})}_{\text{conditional variance}}\big),</span></p>
+<p>which takes the form of a Gaussian AR(1) model <span class="math inline">X_{i+1} = a X_i + b + \varepsilon_i</span> with <span class="math inline">a = e^{-\theta\Delta t}</span> and <span class="math inline">b = \mu(1-a)</span>. Maximum likelihood estimation therefore reduces to OLS regression, and the OU parameters are recovered by inverting:</p>
+<p><span class="math display">\hat\theta = -\frac{\log\hat{a}}{\Delta t}, \qquad \hat\mu = \frac{\hat{b}}{1-\hat{a}}, \qquad \hat\sigma^2 = \frac{2\hat\theta\,\hat{s}^2_\varepsilon}{1-\hat{a}^2}.</span></p>
+<p>Three finite-sample difficulties plague this estimator. First, when <span class="math inline">\theta</span> is small, <span class="math inline">a \approx 1</span> and the process resembles a random walk; since the intercept takes the form <span class="math inline">\mu(1-a)</span>, the estimates <span class="math inline">\hat\mu</span> and <span class="math inline">\hat\theta</span> become strongly negatively correlated — a slight change in one can be compensated by the other, creating an identification problem. Second, the MLE <span class="math inline">\hat\theta</span> is upward-biased in finite samples: small-sample variability causes <span class="math inline">\hat{a}</span> to be pulled below <span class="math inline">e^{-\theta\Delta t}</span>, which inflates <span class="math inline">\hat\theta</span>. Third, all three estimators exhibit high variance when <span class="math inline">\theta T_{\mathrm{est}}</span> is small, reflecting the fact that the process has not completed enough mean-reversion cycles to reveal its parameters reliably.</p>
+<p><a href="#fig-mle-bias" class="quarto-xref">Figure&nbsp;1</a> illustrates these effects across calibration windows of 2, 5, 10, and 20 years. The top row shows the distribution of <span class="math inline">\hat\theta</span>: the median exceeds the true value at short windows and converges from above as more data is observed. The bottom row shows <span class="math inline">\hat\mu</span>: the distribution is centred at the true mean in all cases, but its standard deviation shrinks only as <span class="math inline">\sigma/(\theta\sqrt{T_{\mathrm{est}}})</span>, confirming the slow convergence rate inherent to autocorrelated processes.</p>
+<div id="cell-fig-mle-bias" class="cell" data-execution_count="14">
+<details class="code-fold">
+<summary>Show simulation code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Finite-sample bias in MLE estimates ---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>theta_true, sigma_true, mu_true <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> <span class="dv">252</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n_mc <span class="op">=</span> <span class="dv">3000</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>T_est_values <span class="op">=</span> [<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="bu">len</span>(T_est_values), figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">8</span>), sharex<span class="op">=</span><span class="st">'row'</span>, sharey<span class="op">=</span><span class="st">'row'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, T_est <span class="kw">in</span> <span class="bu">enumerate</span>(T_est_values):</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    theta_hats, mu_hats <span class="op">=</span> [], []</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_mc):</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> simulate_ou(theta_true, sigma_true, T_est, dt, <span class="dv">1</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                        mu<span class="op">=</span>mu_true, rng<span class="op">=</span>np.random.default_rng(<span class="dv">1000</span> <span class="op">*</span> j <span class="op">+</span> i))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        th, mh, sh <span class="op">=</span> mle_ou(X[<span class="dv">0</span>], dt)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        theta_hats.append(th)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        mu_hats.append(mh)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    theta_hats <span class="op">=</span> np.array(theta_hats)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    mu_hats <span class="op">=</span> np.array(mu_hats)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># theta histogram</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[<span class="dv">0</span>, j]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    ax.hist(theta_hats, bins<span class="op">=</span><span class="dv">60</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">'steelblue'</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    ax.axvline(theta_true, color<span class="op">=</span><span class="st">'black'</span>, ls<span class="op">=</span><span class="st">'--'</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f'true θ = </span><span class="sc">{</span>theta_true<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    ax.axvline(np.median(theta_hats), color<span class="op">=</span><span class="st">'crimson'</span>, ls<span class="op">=</span><span class="st">'--'</span>, lw<span class="op">=</span><span class="fl">1.5</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>               label<span class="op">=</span><span class="ss">f'median = </span><span class="sc">{</span>np<span class="sc">.</span>median(theta_hats)<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f'$T_</span><span class="ch">{{\\</span><span class="ss">mathrm</span><span class="ch">{{</span><span class="ss">est</span><span class="ch">}}}}</span><span class="ss">$ = </span><span class="sc">{</span>T_est<span class="sc">}</span><span class="ss"> yr'</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        ax.set_ylabel(<span class="st">'density'</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># mu histogram</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[<span class="dv">1</span>, j]</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    ax.hist(mu_hats, bins<span class="op">=</span><span class="dv">60</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">'darkorange'</span>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    ax.axvline(mu_true, color<span class="op">=</span><span class="st">'black'</span>, ls<span class="op">=</span><span class="st">'--'</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f'true μ = </span><span class="sc">{</span>mu_true<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    ax.axvline(np.median(mu_hats), color<span class="op">=</span><span class="st">'crimson'</span>, ls<span class="op">=</span><span class="st">'--'</span>, lw<span class="op">=</span><span class="fl">1.5</span>,</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>               label<span class="op">=</span><span class="ss">f'median = </span><span class="sc">{</span>np<span class="sc">.</span>median(mu_hats)<span class="sc">:.2f}</span><span class="ss">'</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    std_mu <span class="op">=</span> np.std(mu_hats)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f'std($</span><span class="ch">\\</span><span class="ss">hat</span><span class="ch">\\</span><span class="ss">mu$) = </span><span class="sc">{</span>std_mu<span class="sc">:.3f}</span><span class="ss">'</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        ax.set_ylabel(<span class="st">'density'</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_xlim(<span class="dv">0</span>, <span class="dv">4</span>)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_xlim(<span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="vs">r'MLE estimates from finite OU samples </span><span class="kw">(</span><span class="dv">$</span><span class="ch">\t</span><span class="vs">heta=1, </span><span class="dv">\s</span><span class="vs">igma=1, </span><span class="dv">\m</span><span class="vs">u=0</span><span class="dv">$</span><span class="kw">)</span><span class="vs">'</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Print summary table</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'T_est'</span><span class="sc">:&gt;6}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'median θ̂'</span><span class="sc">:&gt;10}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'mean θ̂'</span><span class="sc">:&gt;10}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'std θ̂'</span><span class="sc">:&gt;10}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'std μ̂'</span><span class="sc">:&gt;10}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'theory std μ̂'</span><span class="sc">:&gt;14}</span><span class="ss">"</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">70</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, T_est <span class="kw">in</span> <span class="bu">enumerate</span>(T_est_values):</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    theta_hats, mu_hats <span class="op">=</span> [], []</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_mc):</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>        X <span class="op">=</span> simulate_ou(theta_true, sigma_true, T_est, dt, <span class="dv">1</span>,</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>                        mu<span class="op">=</span>mu_true, rng<span class="op">=</span>np.random.default_rng(<span class="dv">1000</span> <span class="op">*</span> j <span class="op">+</span> i))</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>        th, mh, sh <span class="op">=</span> mle_ou(X[<span class="dv">0</span>], dt)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        theta_hats.append(th)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>        mu_hats.append(mh)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    theta_hats <span class="op">=</span> np.array(theta_hats)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    mu_hats <span class="op">=</span> np.array(mu_hats)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    theory_std <span class="op">=</span> sigma_true <span class="op">/</span> (theta_true <span class="op">*</span> np.sqrt(T_est))</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>T_est<span class="sc">:&gt;6}</span><span class="ss"> | </span><span class="sc">{</span>np<span class="sc">.</span>median(theta_hats)<span class="sc">:&gt;10.3f}</span><span class="ss"> | </span><span class="sc">{</span>np<span class="sc">.</span>mean(theta_hats)<span class="sc">:&gt;10.3f}</span><span class="ss"> | "</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"</span><span class="sc">{</span>np<span class="sc">.</span>std(theta_hats)<span class="sc">:&gt;10.3f}</span><span class="ss"> | </span><span class="sc">{</span>np<span class="sc">.</span>std(mu_hats)<span class="sc">:&gt;10.3f}</span><span class="ss"> | </span><span class="sc">{</span>theory_std<span class="sc">:&gt;14.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-mle-bias" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-mle-bias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-mle-bias-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mle-bias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Finite-sample distributions of MLE estimates <span class="math inline">\\hat\\theta</span> (top) and <span class="math inline">\\hat\\mu</span> (bottom) for calibration windows of 2, 5, 10, and 20 years (<span class="math inline">\\theta=1, \\sigma=1, \\mu=0</span>). The upward bias in <span class="math inline">\\hat\\theta</span> and the high variance of <span class="math inline">\\hat\\mu</span> diminish as the calibration window lengthens.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code> T_est |  median θ̂ |    mean θ̂ |     std θ̂ |     std μ̂ |  theory std μ̂
+----------------------------------------------------------------------
+     2 |      3.058 |      3.594 |      2.399 |      1.105 |          0.707
+     5 |      1.748 |      1.956 |      1.087 |      0.473 |          0.447
+    10 |      1.337 |      1.442 |      0.621 |      0.317 |          0.316
+    20 |      1.153 |      1.207 |      0.380 |      0.226 |          0.224</code></pre>
+</div>
+</div>
+<h1 data-number="2" id="the-estimation-penalty-on-sharpe-ratio"><span class="header-section-number">2</span> The Estimation Penalty on Sharpe Ratio</h1>
+<h2 data-number="2.1" id="setup-one-shot-estimation-then-trading" class="anchored"><span class="header-section-number">2.1</span> Setup: one-shot estimation then trading</h2>
+<p>The trader observes the OU process on a calibration window <span class="math inline">[0, T_{\mathrm{est}}]</span>, estimates <span class="math inline">(\hat\theta, \hat\mu, \hat\sigma)</span> via MLE, then trades on <span class="math inline">[T_{\mathrm{est}}, T_{\mathrm{est}} + T_{\mathrm{trade}}]</span> using <span class="math inline">\hat\mu</span> as the fair-value estimate.</p>
+<p>From Part 2, the asymptotic Sharpe ratio when the trader operates with a constant bias <span class="math inline">M</span> is</p>
+<p><span class="math display">\mathrm{SR}_\infty = \sqrt{\frac{\theta}{2}} \cdot \frac{1}{\sqrt{1 + \dfrac{2\theta M^2}{\sigma^2}}}.</span></p>
+<p>Part 2 also demonstrated that expected PnL is unaffected by a constant bias — the degradation acts purely through increased variance. During the trading window, the estimation error in <span class="math inline">\hat\mu</span> behaves exactly as a Part 2 constant bias: it is fixed at the moment calibration ends and is independent of the future Brownian increments on <span class="math inline">[T_{\mathrm{est}}, T_{\mathrm{est}} + T_{\mathrm{trade}}]</span>.</p>
+<h2 data-number="2.2" id="variance-of-hatmu" class="anchored"><span class="header-section-number">2.2</span> Variance of <span class="math inline">\hat\mu</span></h2>
+<p>For a stationary OU process with mean <span class="math inline">\mu</span>, the sample mean <span class="math inline">\bar{X} = \frac{1}{T}\int_0^T X_t\,dt</span> satisfies</p>
+<p><span class="math display">\mathrm{Var}(\bar{X}) = \frac{1}{T^2}\int_0^T\!\int_0^T \mathrm{Cov}(X_s, X_t)\,ds\,dt = \frac{\sigma^2}{\theta^2 T}\left(1 - \frac{1 - e^{-\theta T}}{\theta T}\right).</span></p>
+<p>When <span class="math inline">\theta T</span> is large (many half-lives), <span class="math inline">\mathrm{Var}(\bar{X}) \approx \sigma^2/(\theta^2 T)</span>. The MLE <span class="math inline">\hat\mu</span> coincides with <span class="math inline">\bar{X}</span> asymptotically, giving</p>
+<p><span class="math display">\mathbb{E}[\hat\mu^2] = \mathrm{Var}(\hat\mu) \approx \frac{\sigma^2}{\theta^2 T_{\mathrm{est}}}.</span></p>
+<h2 data-number="2.3" id="the-penalty-formula" class="anchored"><span class="header-section-number">2.3</span> The penalty formula</h2>
+<p>Substituting <span class="math inline">M^2 \to \mathbb{E}[\hat\mu^2]</span> into the Part 2 formula — just as we substituted <span class="math inline">M^2 \to \sigma_M^2</span> for a random independent bias in Part 3 — yields</p>
+<p><span class="math display">\boxed{\mathrm{SR}_\infty = \sqrt{\frac{\theta}{2}} \cdot \frac{1}{\sqrt{1 + \dfrac{2}{\theta\, T_{\mathrm{est}}}}}.}</span></p>
+<p>The penalty factor <span class="math inline">\left(1 + 2/(\theta T_{\mathrm{est}})\right)^{-1/2}</span> depends only on the dimensionless product <span class="math inline">\theta T_{\mathrm{est}}</span> — the number of mean-reversion timescales observed during calibration. To achieve a penalty smaller than <span class="math inline">1/\sqrt{2} \approx 0.71</span>, we need <span class="math inline">\theta T_{\mathrm{est}} &gt; 2</span>, meaning the trader must observe at least two full mean-reversion timescales. <a href="#tbl-estimation-penalty" class="quarto-xref">Table&nbsp;1</a> shows the penalty across a range of calibration lengths.</p>
+<div id="tbl-estimation-penalty" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-estimation-penalty-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Estimation penalty as a function of calibration length <span class="math inline">\theta T_{\mathrm{est}}</span>.
+</figcaption>
+<div aria-describedby="tbl-estimation-penalty-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: center;"><span class="math inline">\theta T_{\mathrm{est}}</span></th>
+<th style="text-align: center;">Penalty</th>
+<th style="text-align: center;">Half-lives observed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0.577</td>
+<td style="text-align: center;">1.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0.707</td>
+<td style="text-align: center;">2.9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">0.845</td>
+<td style="text-align: center;">7.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">0.913</td>
+<td style="text-align: center;">14.4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">20</td>
+<td style="text-align: center;">0.953</td>
+<td style="text-align: center;">28.9</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="cell-fig-sr-estimation" class="cell" data-execution_count="15">
+<details class="code-fold">
+<summary>Show simulation code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- SR vs estimation window: theory + MC ---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>theta_true, sigma_true, mu_true <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> <span class="dv">252</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>T_trade <span class="op">=</span> <span class="dv">100</span>         <span class="co"># long trading window for asymptotic SR</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>n_mc <span class="op">=</span> <span class="dv">2000</span>           <span class="co"># MC paths for estimation</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>T_est_grid <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>])</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>sr_theory <span class="op">=</span> np.sqrt(theta_true <span class="op">/</span> <span class="dv">2</span>) <span class="op">/</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">/</span> (theta_true <span class="op">*</span> T_est_grid))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>sr_mc <span class="op">=</span> []</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> T_est <span class="kw">in</span> T_est_grid:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    pnl_per_year <span class="op">=</span> []</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    qvY_per_year <span class="op">=</span> []</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_mc):</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        seed_est <span class="op">=</span> <span class="bu">int</span>(<span class="dv">10000</span> <span class="op">*</span> T_est <span class="op">+</span> i)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        X_full <span class="op">=</span> simulate_ou(theta_true, sigma_true, T_est <span class="op">+</span> T_trade, dt, <span class="dv">1</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                             mu<span class="op">=</span>mu_true, rng<span class="op">=</span>np.random.default_rng(seed_est))</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        n_est_steps <span class="op">=</span> <span class="bu">int</span>(T_est <span class="op">/</span> dt)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        X_cal <span class="op">=</span> X_full[<span class="dv">0</span>, :n_est_steps <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        X_trade <span class="op">=</span> X_full[:, n_est_steps:]  <span class="co"># keep 2D</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        _, mu_hat, _ <span class="op">=</span> mle_ou(X_cal, dt)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># PnL and QV of Y (not X)</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        Y <span class="op">=</span> pnl_paths(X_trade, mu_hat, dt)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        pnl_per_year.append(Y[<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>] <span class="op">/</span> T_trade)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        dX_tr <span class="op">=</span> np.diff(X_trade, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        dY <span class="op">=</span> <span class="op">-</span>(X_trade[:, :<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> mu_hat) <span class="op">*</span> dX_tr</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        qvY <span class="op">=</span> np.<span class="bu">sum</span>(dY<span class="op">**</span><span class="dv">2</span>, axis<span class="op">=</span><span class="dv">1</span>)[<span class="dv">0</span>]</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        qvY_per_year.append(qvY <span class="op">/</span> T_trade)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    mean_pnl <span class="op">=</span> np.mean(pnl_per_year)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    mean_qvY <span class="op">=</span> np.mean(qvY_per_year)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    sr_mc.append(mean_pnl <span class="op">/</span> np.sqrt(mean_qvY))</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>sr_mc <span class="op">=</span> np.array(sr_mc)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Plot: SR penalty vs theta * T_est ---</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">5</span>))</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>theta_T_fine <span class="op">=</span> np.linspace(<span class="fl">0.5</span>, <span class="dv">25</span>, <span class="dv">200</span>)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>penalty_theory <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">/</span> theta_T_fine)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(theta_T_fine, penalty_theory, <span class="st">'k--'</span>, lw<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>             label<span class="op">=</span><span class="st">'Theory: $(1 + 2/</span><span class="ch">\\</span><span class="st">theta T_{</span><span class="ch">\\</span><span class="st">mathrm</span><span class="sc">{est}</span><span class="st">})^{-1/2}$'</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>penalty_mc <span class="op">=</span> sr_mc <span class="op">/</span> np.sqrt(theta_true <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].scatter(theta_true <span class="op">*</span> T_est_grid, penalty_mc, s<span class="op">=</span><span class="dv">80</span>, c<span class="op">=</span><span class="st">'steelblue'</span>,</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>                zorder<span class="op">=</span><span class="dv">5</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>, label<span class="op">=</span><span class="st">'Monte Carlo'</span>)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="vs">r'</span><span class="dv">$</span><span class="ch">\t</span><span class="vs">heta </span><span class="ch">\,</span><span class="vs"> T_{</span><span class="dv">\m</span><span class="vs">athrm{est}}</span><span class="dv">$</span><span class="vs">'</span>)</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">'Penalty factor'</span>)</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">'Estimation penalty on Sharpe ratio'</span>)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend()</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylim(<span class="fl">0.3</span>, <span class="fl">1.05</span>)</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>sr_fine <span class="op">=</span> np.sqrt(theta_true <span class="op">/</span> <span class="dv">2</span>) <span class="op">*</span> penalty_theory</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(theta_T_fine, sr_fine, <span class="st">'k--'</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="vs">r'Theory'</span>)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(theta_true <span class="op">*</span> T_est_grid, sr_mc, s<span class="op">=</span><span class="dv">80</span>, c<span class="op">=</span><span class="st">'darkorange'</span>,</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>                zorder<span class="op">=</span><span class="dv">5</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>, label<span class="op">=</span><span class="st">'Monte Carlo'</span>)</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(np.sqrt(theta_true <span class="op">/</span> <span class="dv">2</span>), color<span class="op">=</span><span class="st">'gray'</span>, ls<span class="op">=</span><span class="st">':'</span>, lw<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>                label<span class="op">=</span><span class="vs">r'</span><span class="dv">$\m</span><span class="vs">athrm{SR}_</span><span class="er">\</span><span class="vs">infty = </span><span class="dv">\s</span><span class="vs">qrt{</span><span class="ch">\t</span><span class="vs">heta/2}</span><span class="dv">$</span><span class="vs"> </span><span class="kw">(</span><span class="vs">no error</span><span class="kw">)</span><span class="vs">'</span>)</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="vs">r'</span><span class="dv">$</span><span class="ch">\t</span><span class="vs">heta </span><span class="ch">\,</span><span class="vs"> T_{</span><span class="dv">\m</span><span class="vs">athrm{est}}</span><span class="dv">$</span><span class="vs">'</span>)</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="vs">r'</span><span class="dv">$\m</span><span class="vs">athrm{SR}_</span><span class="er">\</span><span class="vs">infty</span><span class="dv">$</span><span class="vs">'</span>)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">'Asymptotic Sharpe ratio with estimation error'</span>)</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"SR_∞ (no error): </span><span class="sc">{</span>np<span class="sc">.</span>sqrt(theta_true<span class="op">/</span><span class="dv">2</span>)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> T_est, sr <span class="kw">in</span> <span class="bu">zip</span>(T_est_grid, sr_mc):</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  T_est=</span><span class="sc">{</span>T_est<span class="sc">:&gt;2d}</span><span class="ss">yr  θT=</span><span class="sc">{</span>theta_true<span class="op">*</span>T_est<span class="sc">:&gt;5.1f}</span><span class="ss">  SR_mc=</span><span class="sc">{</span>sr<span class="sc">:.4f}</span><span class="ss">  "</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"SR_theory=</span><span class="sc">{</span>np<span class="sc">.</span>sqrt(theta_true<span class="op">/</span><span class="dv">2</span>)<span class="op">/</span>np<span class="sc">.</span>sqrt(<span class="dv">1</span><span class="op">+</span><span class="dv">2</span><span class="op">/</span>(theta_true<span class="op">*</span>T_est))<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-sr-estimation" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-sr-estimation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-sr-estimation-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sr-estimation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Estimation penalty on Sharpe ratio vs calibration length <span class="math inline">\\theta T_{\\mathrm{est}}</span>. Left: penalty factor. Right: absolute SR. Monte Carlo dots closely track the theoretical curve <span class="math inline">(1 + 2/\\theta T_{\\mathrm{est}})^{-1/2}</span>.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SR_∞ (no error): 0.7071
+  T_est= 1yr  θT=  1.0  SR_mc=0.3790  SR_theory=0.4082
+  T_est= 2yr  θT=  2.0  SR_mc=0.4774  SR_theory=0.5000
+  T_est= 3yr  θT=  3.0  SR_mc=0.5471  SR_theory=0.5477
+  T_est= 5yr  θT=  5.0  SR_mc=0.5990  SR_theory=0.5976
+  T_est= 7yr  θT=  7.0  SR_mc=0.6151  SR_theory=0.6236
+  T_est=10yr  θT= 10.0  SR_mc=0.6393  SR_theory=0.6455
+  T_est=15yr  θT= 15.0  SR_mc=0.6649  SR_theory=0.6642
+  T_est=20yr  θT= 20.0  SR_mc=0.6748  SR_theory=0.6742</code></pre>
+</div>
+</div>
+<h1 data-number="3" id="the-correlation-channel-is-transient"><span class="header-section-number">3</span> The Correlation Channel is Transient</h1>
+<p>In Part 3, a correlated bias was shown to degrade expected PnL via <span class="math inline">-\theta\int_0^t \mathrm{Cov}(M_u, X_u)\,du</span>, not just risk. A natural concern is whether the one-shot estimator <span class="math inline">\hat\mu</span> — computed from the calibration window — introduces this additional penalty.</p>
+<p>Asymptotically, it does not. Note that <span class="math inline">X_t</span> for <span class="math inline">t &gt; T_{\mathrm{est}}</span> depends on the calibration window only through <span class="math inline">X_{T_{\mathrm{est}}}</span>. Since <span class="math inline">\hat\mu</span> is a function of <span class="math inline">\{X_s : s \leq T_{\mathrm{est}}\}</span>, the covariance decays exponentially as the trading window progresses:</p>
+<p><span class="math display">\mathrm{Cov}(\hat\mu, X_t) \;=\; \mathrm{Cov}\big(\hat\mu, X_{T_{\mathrm{est}}}\big) \cdot e^{-\theta(t - T_{\mathrm{est}})}, \qquad t &gt; T_{\mathrm{est}}.</span></p>
+<p>The cumulative PnL degradation from the Part 3 covariance channel is therefore</p>
+<p><span class="math display">\frac{\theta}{T_{\mathrm{trade}}}\int_{T_{\mathrm{est}}}^{T_{\mathrm{est}}+T_{\mathrm{trade}}} \mathrm{Cov}(\hat\mu, X_t)\,dt \;=\; \mathrm{Cov}(\hat\mu, X_{T_{\mathrm{est}}})\cdot\frac{1 - e^{-\theta T_{\mathrm{trade}}}}{T_{\mathrm{trade}}} \;\to\; 0</span></p>
+<p>as <span class="math inline">T_{\mathrm{trade}} \to \infty</span>. The correlation effect is washed out by the long trading horizon.</p>
+<p>For one-shot estimation, the entire SR penalty therefore comes from the Part 2 variance channel: <span class="math inline">\hat\mu</span> acts as a random constant bias with <span class="math inline">\mathbb{E}[\hat\mu^2] \approx \sigma^2/(\theta^2 T_{\mathrm{est}})</span>, yielding the clean formula <span class="math inline">(1 + 2/(\theta T_{\mathrm{est}}))^{-1/2}</span>. <a href="#fig-sr-estimation" class="quarto-xref">Figure&nbsp;2</a> confirms this result with Monte Carlo simulation.</p>
+<h1 data-number="4" id="rolling-estimation"><span class="header-section-number">4</span> Rolling Estimation</h1>
+<p>In practice, traders do not estimate <span class="math inline">\hat\mu</span> once and trade indefinitely — in the simplest setting, they re-estimate continuously using a rolling window of length <span class="math inline">W</span>. At each time <span class="math inline">t</span>, the fair-value estimate is the trailing sample mean</p>
+<p><span class="math display">M_t = \frac{1}{W}\int_{t-W}^{t} X_s\,ds,</span></p>
+<p>which is a simple moving average (SMA), a trailing estimator of the kind analyzed in Part 3. The weighting kernel <span class="math inline">w(s) = \mathbf{1}_{[0,W]}(s)/W</span> is non-negative and integrates to one, so Part 3’s general theorem guarantees <span class="math inline">\mathrm{Cov}(M_t, X_t) &gt; 0</span> at all times. Rolling re-estimation therefore creates the persistent correlated-bias penalty that the one-shot estimator avoids.</p>
+<p>The SMA with window <span class="math inline">W</span> has a characteristic timescale of <span class="math inline">W/2</span>, analogous to an EMA with decay rate <span class="math inline">\lambda \approx 2/W</span>. Substituting into Part 3’s EMA Sharpe formula gives</p>
+<p><span class="math display">\mathrm{SR}_\infty = \frac{\theta}{\sqrt{2(\theta + \lambda)}} = \frac{\theta}{\sqrt{2(\theta + 2/W)}} = \sqrt{\frac{\theta}{2}} \cdot \frac{1}{\sqrt{1 + \dfrac{2}{\theta W}}}.</span></p>
+<p>This is the same functional form as the one-shot penalty, with the rolling window <span class="math inline">W</span> replacing <span class="math inline">T_{\mathrm{est}}</span>. The unification is satisfying, yet it conceals a crucial asymmetry summarised in <a href="#tbl-oneshot-vs-rolling" class="quarto-xref">Table&nbsp;2</a>.</p>
+<div id="tbl-oneshot-vs-rolling" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-oneshot-vs-rolling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Penalty source comparison for one-shot vs rolling estimation.
+</figcaption>
+<div aria-describedby="tbl-oneshot-vs-rolling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 38%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Method</th>
+<th style="text-align: center;">Penalty</th>
+<th style="text-align: left;">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">One-shot (calibrate then trade)</td>
+<td style="text-align: center;"><span class="math inline">(1 + 2/(\theta T_{\mathrm{est}}))^{-1/2}</span></td>
+<td style="text-align: left;">Part 2 variance channel only</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rolling window <span class="math inline">W</span></td>
+<td style="text-align: center;"><span class="math inline">(1 + 2/(\theta W))^{-1/2}</span></td>
+<td style="text-align: left;">Part 3 covariance channel (dominant)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The one-shot penalty vanishes as <span class="math inline">T_{\mathrm{trade}} \to \infty</span> (for fixed <span class="math inline">T_{\mathrm{est}}</span>), whereas the rolling penalty persists at all horizons — it is a structural cost of continuous re-estimation. <a href="#fig-rolling-estimation" class="quarto-xref">Figure&nbsp;3</a> confirms this unification via Monte Carlo.</p>
+<div id="cell-fig-rolling-estimation" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>Show simulation code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Rolling estimation: SMA bias simulation ---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>theta_true, sigma_true <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">1.0</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> <span class="dv">252</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> <span class="dv">50</span>                 <span class="co"># total simulation length</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>n_paths <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>W_values <span class="op">=</span> [<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>sr_rolling_mc <span class="op">=</span> []</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> W <span class="kw">in</span> W_values:</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    W_steps <span class="op">=</span> <span class="bu">int</span>(W <span class="op">/</span> dt)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> simulate_ou(theta_true, sigma_true, T, dt, n_paths,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                    rng<span class="op">=</span>np.random.default_rng(<span class="dv">123</span>))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute rolling SMA bias: M_t = (1/W) * integral_{t-W}^{t} X_s ds</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    cumX <span class="op">=</span> np.cumsum(X, axis<span class="op">=</span><span class="dv">1</span>) <span class="op">*</span> dt</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> np.zeros_like(X)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(W_steps, X.shape[<span class="dv">1</span>]):</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        M[:, k] <span class="op">=</span> (cumX[:, k] <span class="op">-</span> cumX[:, k <span class="op">-</span> W_steps]) <span class="op">/</span> W</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Only measure SR after the window is fully populated</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    burn <span class="op">=</span> W_steps <span class="op">+</span> <span class="bu">int</span>(<span class="dv">5</span> <span class="op">/</span> dt)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> burn <span class="op">&gt;=</span> X.shape[<span class="dv">1</span>] <span class="op">-</span> <span class="bu">int</span>(<span class="dv">5</span> <span class="op">/</span> dt):</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        burn <span class="op">=</span> W_steps</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    X_eval <span class="op">=</span> X[:, burn:]</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    M_eval <span class="op">=</span> M[:, burn:]</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    T_eval <span class="op">=</span> (X_eval.shape[<span class="dv">1</span>] <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> dt</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># SR = mean(annualised PnL) / sqrt(mean(annualised QV_Y))</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    Y <span class="op">=</span> pnl_paths(X_eval, M_eval, dt)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    mean_pnl <span class="op">=</span> np.mean(Y[:, <span class="op">-</span><span class="dv">1</span>] <span class="op">/</span> T_eval)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    dX_eval <span class="op">=</span> np.diff(X_eval, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    dY <span class="op">=</span> <span class="op">-</span>(X_eval[:, :<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> M_eval[:, :<span class="op">-</span><span class="dv">1</span>]) <span class="op">*</span> dX_eval</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    qvY <span class="op">=</span> np.<span class="bu">sum</span>(dY<span class="op">**</span><span class="dv">2</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    mean_qvY <span class="op">=</span> np.mean(qvY <span class="op">/</span> T_eval)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    sr_rolling_mc.append(mean_pnl <span class="op">/</span> np.sqrt(mean_qvY))</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>sr_rolling_mc <span class="op">=</span> np.array(sr_rolling_mc)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Plot: rolling SR vs window ---</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">5</span>))</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Left: penalty factor vs theta*W</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>W_fine <span class="op">=</span> np.linspace(<span class="fl">0.3</span>, <span class="dv">25</span>, <span class="dv">200</span>)</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>penalty_fine <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">/</span> (theta_true <span class="op">*</span> W_fine))</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(theta_true <span class="op">*</span> W_fine, penalty_fine, <span class="st">'k--'</span>, lw<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>             label<span class="op">=</span><span class="vs">r'Theory: </span><span class="dv">$</span><span class="kw">(</span><span class="vs">1 </span><span class="op">+</span><span class="vs"> 2/</span><span class="ch">\t</span><span class="vs">heta W</span><span class="kw">)</span><span class="dv">^</span><span class="vs">{-1/2}</span><span class="dv">$</span><span class="vs">'</span>)</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>penalty_rolling <span class="op">=</span> sr_rolling_mc <span class="op">/</span> np.sqrt(theta_true <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].scatter(theta_true <span class="op">*</span> np.array(W_values), penalty_rolling, s<span class="op">=</span><span class="dv">80</span>,</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>                c<span class="op">=</span><span class="st">'forestgreen'</span>, zorder<span class="op">=</span><span class="dv">5</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>, label<span class="op">=</span><span class="st">'MC (rolling SMA)'</span>)</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="vs">r'</span><span class="dv">$</span><span class="ch">\t</span><span class="vs">heta </span><span class="ch">\,</span><span class="vs"> W</span><span class="dv">$</span><span class="vs">'</span>)</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">'Penalty factor'</span>)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">'Rolling estimation penalty'</span>)</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend()</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylim(<span class="fl">0.3</span>, <span class="fl">1.05</span>)</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Right: compare one-shot vs rolling</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(theta_true <span class="op">*</span> W_fine, penalty_fine, <span class="st">'k--'</span>, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'Rolling SMA (theory)'</span>)</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Overlay one-shot results from previous cell</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(theta_true <span class="op">*</span> T_est_grid, sr_mc <span class="op">/</span> np.sqrt(theta_true <span class="op">/</span> <span class="dv">2</span>),</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>                s<span class="op">=</span><span class="dv">80</span>, c<span class="op">=</span><span class="st">'steelblue'</span>, zorder<span class="op">=</span><span class="dv">5</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>,</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>                marker<span class="op">=</span><span class="st">'s'</span>, label<span class="op">=</span><span class="st">'One-shot (MC)'</span>)</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(theta_true <span class="op">*</span> np.array(W_values), penalty_rolling, s<span class="op">=</span><span class="dv">80</span>,</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>                c<span class="op">=</span><span class="st">'forestgreen'</span>, zorder<span class="op">=</span><span class="dv">5</span>, edgecolors<span class="op">=</span><span class="st">'black'</span>,</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>                marker<span class="op">=</span><span class="st">'o'</span>, label<span class="op">=</span><span class="st">'Rolling SMA (MC)'</span>)</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="vs">r'</span><span class="dv">$</span><span class="ch">\t</span><span class="vs">heta </span><span class="ch">\t</span><span class="vs">imes</span><span class="dv">$</span><span class="vs"> </span><span class="kw">(</span><span class="vs">window length</span><span class="kw">)</span><span class="vs">'</span>)</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">'Penalty factor'</span>)</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">'One-shot vs rolling: same penalty curve'</span>)</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylim(<span class="fl">0.3</span>, <span class="fl">1.05</span>)</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> W, sr <span class="kw">in</span> <span class="bu">zip</span>(W_values, sr_rolling_mc):</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>    th_penalty <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">/</span> (theta_true <span class="op">*</span> W))</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  W=</span><span class="sc">{</span>W<span class="sc">:&gt;5.1f}</span><span class="ss">yr  θW=</span><span class="sc">{</span>theta_true<span class="op">*</span>W<span class="sc">:&gt;5.1f}</span><span class="ss">  SR_mc=</span><span class="sc">{</span>sr<span class="sc">:.4f}</span><span class="ss">  "</span></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"penalty_mc=</span><span class="sc">{</span>sr<span class="op">/</span>np<span class="sc">.</span>sqrt(theta_true<span class="op">/</span><span class="dv">2</span>)<span class="sc">:.3f}</span><span class="ss">  penalty_theory=</span><span class="sc">{</span>th_penalty<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-rolling-estimation" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-rolling-estimation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-rolling-estimation-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rolling-estimation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Rolling SMA penalty vs window length. Left: MC penalty factor for rolling SMA against the theoretical curve <span class="math inline">(1+2/\\theta W)^{-1/2}</span>. Right: one-shot and rolling penalties overlaid on the same curve, confirming they share identical functional form.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  W=  0.5yr  θW=  0.5  SR_mc=0.2871  penalty_mc=0.406  penalty_theory=0.447
+  W=  1.0yr  θW=  1.0  SR_mc=0.3777  penalty_mc=0.534  penalty_theory=0.577
+  W=  2.0yr  θW=  2.0  SR_mc=0.4769  penalty_mc=0.674  penalty_theory=0.707
+  W=  5.0yr  θW=  5.0  SR_mc=0.5890  penalty_mc=0.833  penalty_theory=0.845
+  W= 10.0yr  θW= 10.0  SR_mc=0.6405  penalty_mc=0.906  penalty_theory=0.913
+  W= 20.0yr  θW= 20.0  SR_mc=0.6721  penalty_mc=0.950  penalty_theory=0.953</code></pre>
+</div>
+</div>
+<h1 data-number="5" id="bias-in-hattheta"><span class="header-section-number">5</span> Bias in <span class="math inline">\hat\theta</span></h1>
+<p>It is well known that the MLE overestimates <span class="math inline">\theta</span> in finite samples: the median <span class="math inline">\hat\theta</span> exceeds the true value, as shown in <a href="#fig-mle-bias" class="quarto-xref">Figure&nbsp;1</a>. A natural question is whether this bias can degrade the realised Sharpe ratio in practice.</p>
+<p>It turns out that it does not, at least not directly. The realised SR, defined as <span class="math inline">Y_T / \sqrt{[Y]_T}</span>, depends only on the actual mispricing process and the trader’s fair-value estimate. Using <span class="math inline">\hat\theta</span> instead of the true <span class="math inline">\theta</span> for position sizing simply scales all positions uniformly, and this common factor cancels in the ratio.</p>
+<p>However, a trader who computes the predicted Sharpe ratio <span class="math inline">\mathrm{SR}_\infty = \sqrt{\hat\theta/2}</span> will arrive at a systematic overestimate, since <span class="math inline">\hat\theta</span> is upward-biased. The resulting overconfidence distorts capital allocation: more capital or higher leverage is deployed than the strategy’s actual risk–reward profile warrants. Risk budgets calibrated to the inflated SR become too tight, raising the probability of premature stop-outs during normal drawdowns. In a multi-strategy portfolio, the allocation problem is compounded — the strategy with the shortest calibration window appears most attractive precisely because its <span class="math inline">\hat\theta</span> is the most inflated. <a href="#fig-overconfidence" class="quarto-xref">Figure&nbsp;4</a> quantifies this gap between predicted and realised SR for calibration windows of 2–20 years.</p>
+<div id="cell-fig-overconfidence" class="cell" data-execution_count="17">
+<details class="code-fold">
+<summary>Show simulation code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Overconfidence: predicted vs realised SR ---</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>theta_true, sigma_true <span class="op">=</span> <span class="fl">1.0</span>, <span class="fl">1.0</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>dt <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> <span class="dv">252</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>T_trade <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>n_mc <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>T_est_values <span class="op">=</span> [<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="bu">len</span>(T_est_values), figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="fl">4.5</span>), sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, T_est <span class="kw">in</span> <span class="bu">enumerate</span>(T_est_values):</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    theta_hats <span class="op">=</span> []</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    pnl_ann_list <span class="op">=</span> []</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    qvY_ann_list <span class="op">=</span> []</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_mc):</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        seed <span class="op">=</span> <span class="bu">int</span>(<span class="dv">50000</span> <span class="op">*</span> j <span class="op">+</span> i)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        X_full <span class="op">=</span> simulate_ou(theta_true, sigma_true, T_est <span class="op">+</span> T_trade, dt, <span class="dv">1</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>                             rng<span class="op">=</span>np.random.default_rng(seed))</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        n_est <span class="op">=</span> <span class="bu">int</span>(T_est <span class="op">/</span> dt)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        X_cal <span class="op">=</span> X_full[<span class="dv">0</span>, :n_est <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        X_trade <span class="op">=</span> X_full[:, n_est:]</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        th_hat, mu_hat, _ <span class="op">=</span> mle_ou(X_cal, dt)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>        theta_hats.append(th_hat)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Realised PnL and QV_Y for cross-path SR</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        Y <span class="op">=</span> pnl_paths(X_trade, mu_hat, dt)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        pnl_ann_list.append(Y[<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>] <span class="op">/</span> T_trade)</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        dX_tr <span class="op">=</span> np.diff(X_trade, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        dY <span class="op">=</span> <span class="op">-</span>(X_trade[:, :<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> mu_hat) <span class="op">*</span> dX_tr</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>        qvY_ann_list.append(np.<span class="bu">sum</span>(dY<span class="op">**</span><span class="dv">2</span>, axis<span class="op">=</span><span class="dv">1</span>)[<span class="dv">0</span>] <span class="op">/</span> T_trade)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    theta_hats <span class="op">=</span> np.array(theta_hats)</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    predicted_srs <span class="op">=</span> np.sqrt(theta_hats <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    realized_sr <span class="op">=</span> np.mean(pnl_ann_list) <span class="op">/</span> np.sqrt(np.mean(qvY_ann_list))</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    theory_sr <span class="op">=</span> np.sqrt(theta_true <span class="op">/</span> <span class="dv">2</span>) <span class="op">/</span> np.sqrt(<span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">/</span> (theta_true <span class="op">*</span> T_est))</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[j]</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    ax.hist(predicted_srs, bins<span class="op">=</span><span class="dv">50</span>, density<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span><span class="st">'steelblue'</span>,</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>            label<span class="op">=</span><span class="ss">f'predicted $</span><span class="ch">\\</span><span class="ss">sqrt</span><span class="ch">{{\\</span><span class="ss">hat</span><span class="ch">\\</span><span class="ss">theta/2</span><span class="ch">}}</span><span class="ss">$'</span>)</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    ax.axvline(np.sqrt(theta_true <span class="op">/</span> <span class="dv">2</span>), color<span class="op">=</span><span class="st">'black'</span>, ls<span class="op">=</span><span class="st">'--'</span>, lw<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>               label<span class="op">=</span><span class="ss">f'true SR = </span><span class="sc">{</span>np<span class="sc">.</span>sqrt(theta_true<span class="op">/</span><span class="dv">2</span>)<span class="sc">:.3f}</span><span class="ss">'</span>)</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    ax.axvline(realized_sr, color<span class="op">=</span><span class="st">'crimson'</span>, ls<span class="op">=</span><span class="st">':'</span>, lw<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>               label<span class="op">=</span><span class="ss">f'realised = </span><span class="sc">{</span>realized_sr<span class="sc">:.3f}</span><span class="ss">'</span>)</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    ax.axvline(np.median(predicted_srs), color<span class="op">=</span><span class="st">'steelblue'</span>, ls<span class="op">=</span><span class="st">'--'</span>, lw<span class="op">=</span><span class="fl">1.5</span>,</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>               label<span class="op">=</span><span class="ss">f'pred median = </span><span class="sc">{</span>np<span class="sc">.</span>median(predicted_srs)<span class="sc">:.3f}</span><span class="ss">'</span>)</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f'$T_</span><span class="ch">{{\\</span><span class="ss">mathrm</span><span class="ch">{{</span><span class="ss">est</span><span class="ch">}}}}</span><span class="ss">$ = </span><span class="sc">{</span>T_est<span class="sc">}</span><span class="ss"> yr'</span>)</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="vs">r'Sharpe ratio'</span>)</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> j <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>        ax.set_ylabel(<span class="st">'density'</span>)</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    ax.legend(fontsize<span class="op">=</span><span class="fl">7.5</span>, loc<span class="op">=</span><span class="st">'upper right'</span>)</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(<span class="dv">0</span>, <span class="fl">2.5</span>)</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="vs">r'Overconfidence: predicted SR vs true and realised SR </span><span class="kw">(</span><span class="dv">$</span><span class="ch">\t</span><span class="vs">heta=1, </span><span class="dv">\s</span><span class="vs">igma=1</span><span class="dv">$</span><span class="kw">)</span><span class="vs">'</span>,</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>             fontsize<span class="op">=</span><span class="dv">13</span>)</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary table</span></span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'T_est'</span><span class="sc">:&gt;6}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'median predicted'</span><span class="sc">:&gt;16}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'true SR'</span><span class="sc">:&gt;10}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'realised SR'</span><span class="sc">:&gt;12}</span><span class="ss"> | </span><span class="sc">{</span><span class="st">'overconfidence'</span><span class="sc">:&gt;15}</span><span class="ss">"</span>)</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">70</span>)</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, T_est <span class="kw">in</span> <span class="bu">enumerate</span>(T_est_values):</span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>    theta_hats <span class="op">=</span> []</span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>    pnl_ann, qvY_ann <span class="op">=</span> [], []</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_mc):</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>        seed <span class="op">=</span> <span class="bu">int</span>(<span class="dv">50000</span> <span class="op">*</span> j <span class="op">+</span> i)</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>        X_full <span class="op">=</span> simulate_ou(theta_true, sigma_true, T_est <span class="op">+</span> T_trade, dt, <span class="dv">1</span>,</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a>                             rng<span class="op">=</span>np.random.default_rng(seed))</span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>        n_est <span class="op">=</span> <span class="bu">int</span>(T_est <span class="op">/</span> dt)</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>        X_cal <span class="op">=</span> X_full[<span class="dv">0</span>, :n_est <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>        X_trade <span class="op">=</span> X_full[:, n_est:]</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a>        th_hat, mu_hat, _ <span class="op">=</span> mle_ou(X_cal, dt)</span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>        theta_hats.append(th_hat)</span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a>        Y <span class="op">=</span> pnl_paths(X_trade, mu_hat, dt)</span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>        pnl_ann.append(Y[<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>] <span class="op">/</span> T_trade)</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a>        dX_tr <span class="op">=</span> np.diff(X_trade, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a>        dY <span class="op">=</span> <span class="op">-</span>(X_trade[:, :<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> mu_hat) <span class="op">*</span> dX_tr</span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a>        qvY_ann.append(np.<span class="bu">sum</span>(dY<span class="op">**</span><span class="dv">2</span>, axis<span class="op">=</span><span class="dv">1</span>)[<span class="dv">0</span>] <span class="op">/</span> T_trade)</span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>    pred_median <span class="op">=</span> np.median(np.sqrt(np.array(theta_hats) <span class="op">/</span> <span class="dv">2</span>))</span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>    real_sr <span class="op">=</span> np.mean(pnl_ann) <span class="op">/</span> np.sqrt(np.mean(qvY_ann))</span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>    true_sr <span class="op">=</span> np.sqrt(theta_true <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>T_est<span class="sc">:&gt;6}</span><span class="ss"> | </span><span class="sc">{</span>pred_median<span class="sc">:&gt;16.4f}</span><span class="ss"> | </span><span class="sc">{</span>true_sr<span class="sc">:&gt;10.4f}</span><span class="ss"> | </span><span class="sc">{</span>real_sr<span class="sc">:&gt;12.4f}</span><span class="ss"> | </span><span class="sc">{</span>pred_median <span class="op">-</span> real_sr<span class="sc">:&gt;15.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-overconfidence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-overconfidence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-overconfidence-output-1.png" class="img-fluid">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-overconfidence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Distribution of predicted SR <span class="math inline">\\sqrt{\\hat\\theta/2}</span> vs true and realised SR for calibration lengths of 2, 5, 10, and 20 years. The median prediction systematically exceeds realised SR, with the gap narrowing as the calibration window lengthens.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code> T_est | median predicted |    true SR |  realised SR |  overconfidence
+----------------------------------------------------------------------
+     2 |           1.2413 |     0.7071 |       0.3486 |          0.8927
+     5 |           0.9465 |     0.7071 |       0.5990 |          0.3475
+    10 |           0.8098 |     0.7071 |       0.6393 |          0.1705
+    20 |           0.7642 |     0.7071 |       0.6758 |          0.0884</code></pre>
+</div>
+</div>
+<h1 data-number="6" id="discussion"><span class="header-section-number">6</span> Discussion</h1>
+<p>The central result of this post is a closed-form expression for the estimation penalty on Sharpe ratio. When a trader calibrates the OU process on a window of length <span class="math inline">T_{\mathrm{est}}</span> and then trades with the estimated fair value, the asymptotic Sharpe ratio is <span class="math inline">\mathrm{SR}_\infty = \sqrt{\theta/2}\,(1 + 2/(\theta T_{\mathrm{est}}))^{-1/2}</span>, as confirmed by Monte Carlo in <a href="#fig-sr-estimation" class="quarto-xref">Figure&nbsp;2</a> and tabulated in <a href="#tbl-estimation-penalty" class="quarto-xref">Table&nbsp;1</a>. The penalty depends entirely on <span class="math inline">\theta T_{\mathrm{est}}</span>, the number of mean-reversion timescales observed during calibration. Slow mean reversion (small <span class="math inline">\theta</span>) demands proportionally longer calibration to achieve the same penalty level.</p>
+<p>A key structural distinction separates one-shot estimation from rolling re-estimation. The one-shot estimator <span class="math inline">\hat\mu</span> is fixed at the end of calibration and is independent of subsequent Brownian increments, so it enters as a Part 2 constant bias whose correlation with the trading-window process decays exponentially. For long trading horizons, the Part 3 covariance channel washes out entirely and only the variance penalty remains. The rolling estimator, by contrast, continuously updates <span class="math inline">\hat\mu</span> using a trailing window of length <span class="math inline">W</span>, creating a permanent positive correlation between the bias and the mispricing. Although the resulting penalty <span class="math inline">(1 + 2/(\theta W))^{-1/2}</span> has the same functional form as the one-shot case, it persists at all trading horizons — a structural cost of continuous re-estimation (<a href="#fig-rolling-estimation" class="quarto-xref">Figure&nbsp;3</a>, <a href="#tbl-oneshot-vs-rolling" class="quarto-xref">Table&nbsp;2</a>).</p>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/steveya\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

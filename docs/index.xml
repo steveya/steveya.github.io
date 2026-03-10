@@ -10,7 +10,37 @@
 <atom:link href="https://steveya.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Updates on quantitative analysis, data science, and ML education.</description>
 <generator>quarto-1.8.27</generator>
-<lastBuildDate>Sat, 14 Feb 2026 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 03 Mar 2026 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Expected Performance of a Mean-Reversion Trading Strategy — Part 4</title>
+  <link>https://steveya.github.io/posts/mean-reversion-strategy-4/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Quantitative Finance</category>
+  <category>Trading Strategies</category>
+  <category>Stochastic Processes</category>
+  <guid>https://steveya.github.io/posts/mean-reversion-strategy-4/</guid>
+  <pubDate>Tue, 03 Mar 2026 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Expected Performance of a Mean-Reversion Trading Strategy - Part 3</title>
+  <link>https://steveya.github.io/posts/mean-reversion-strategy-3/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Quantitative Finance</category>
+  <category>Trading Strategies</category>
+  <category>Stochastic Processes</category>
+  <guid>https://steveya.github.io/posts/mean-reversion-strategy-3/</guid>
+  <pubDate>Mon, 02 Mar 2026 05:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Expected Performance of a Mean-Reversion Trading Strategy - Part 2</title>
+  <link>https://steveya.github.io/posts/mean-reversion-strategy-2/</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>Quantitative Finance</category>
+  <category>Trading Strategies</category>
+  <category>Stochastic Processes</category>
+  <guid>https://steveya.github.io/posts/mean-reversion-strategy-2/</guid>
+  <pubDate>Sun, 01 Mar 2026 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Graph-Regularized Low-Rank Models (Part 1: JGB Curve)</title>
   <link>https://steveya.github.io/posts/graph-regularization-1/</link>
@@ -188,16 +218,6 @@
   <category>Stochastic Processes</category>
   <guid>https://steveya.github.io/posts/mean-reversion-strategy-1/</guid>
   <pubDate>Thu, 01 Sep 2022 04:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Volatility Forecasts (Part 1 - STES Model)</title>
-  <link>https://steveya.github.io/posts/volatility-forecasts-1/</link>
-  <description><![CDATA[ undefined ]]></description>
-  <category>Quantitative Finance</category>
-  <category>Volatility Modeling</category>
-  <category>Time Series</category>
-  <guid>https://steveya.github.io/posts/volatility-forecasts-1/</guid>
-  <pubDate>Tue, 07 Sep 2021 04:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>

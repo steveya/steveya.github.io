@@ -3,6 +3,11 @@ title: "Malaria Detection (Part 4: Finetuning VGG16 with LoRA)"
 date: 2024-08-20
 description: "In the previous post, we built a finetuned VGG16-based model (Model 4) to detect malaria from cell images."
 categories: [Machine Learning, Computer Vision, Deep Learning, Healthcare AI]
+content-type: "series"
+series-id: "malaria-detection"
+series-title: "Malaria Detection"
+series-part: 4
+project-ids: [malaria-detection]
 ---
 In the [previous post](../malaria-detection-2/), we built a finetuned VGG16-based model (Model 4) to detect malaria from cell images. We finetuned the VGG16 model by taking part of the trained VGG16 model, and append 2 more CNN layers followed by 2 ANN layers and retrain the 4 layers on our malaria dataset. In this post, I am trying a different approach to finetuning the VGG16 model using Low Rank Adaptation (LoRA). I will be using the LoRA method to adapt the weights of the trained VGG16 model to the malaria dataset.
 

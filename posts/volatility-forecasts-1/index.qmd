@@ -3,6 +3,11 @@ title: "Volatility Forecasts (Part 1 - STES Model)"
 date: 2021-09-07
 description: "Exponential smoothing (ES) is a simple yet widely used approach to volatility forecasting in finance and economics."
 categories: [Quantitative Finance, Volatility Modeling, Time Series]
+content-type: "series"
+series-id: "volatility-forecasting"
+series-title: "Volatility Forecasts"
+series-part: 1
+project-ids: [volatility-forecasting]
 ---
 #### Updates
 20260113: This post is updated with more mathematical analysis

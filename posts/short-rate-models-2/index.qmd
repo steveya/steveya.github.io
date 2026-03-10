@@ -3,6 +3,11 @@ title: "Short Rate Models (Part 2: Simulating and Calibrating the Merton Model)"
 date: 2024-05-19
 description: "Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the previous post."
 categories: [Quantitative Finance, Interest Rate Models, Stochastic Processes]
+content-type: "series"
+series-id: "short-rate-models"
+series-title: "Short Rate Models"
+series-part: 2
+project-ids: [short-rate-models]
 ---
 ## Introduction
 Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the [previous post](../short-rate-models-1/). In this post, we will show how to simulate short rates from the Merton model and how to calibrate its parameters to market-observed short rates. Whereas the previous post deals with the mathematical aspects, this post deals with the computational ones. 
