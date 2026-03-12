@@ -38,7 +38,7 @@ For each time step $t$, the forecasted variance $\sigma_t^2$ is a weighted combi
 
 ## Brief Introduction to ``XGBoost``
 
-``XGBoost`` is a general-purpose engine for functional gradient descent. At its core, it optimizes an objective function by iteratively adding functions $f_j(x)$ (regression trees) to an ensemble. For example, the model at step $j$ is $F_j(x) = \sum_{k=1}^j f_k(x)$.
+``XGBoost`` is a general-purpose engine for functional gradient descent. At its core, it optimizes an objective function by iteratively adding base learners $f_j(x)$ to an ensemble. The model at step $j$ is $F_j(x) = \sum_{k=1}^j f_k(x)$. Each base learner can be either a regression tree (``gbtree``) or a linear model (``gblinear``).
 
 ``XGBoost`` does not optimize the loss directly. Instead, at each step $j$, it approximates the loss using a second-order Taylor expansion around the current prediction $z_i^{(j-1)}$. If we wish to minimize a loss $\mathcal{L} = \sum_i \ell(y_i, z_i)$, ``XGBoost`` solves for the term $f_j(x_i)$ that minimizes:
 
@@ -46,9 +46,15 @@ $$
 \mathcal{L}^{(j)} \approx \sum_{i=1}^N \left[ \ell(y_i, z_i^{(j-1)}) + g_i f_j(x_i) + \frac{1}{2}h_i f_j^2(x_i) \right] + \Omega(f_j)
 $$
 
-where $g_i = \partial \ell / \partial z_i$ is the gradient and $h_i = \partial^2 \ell / \partial z_i^2$ is the Hessian. The term $\Omega(f_j)$ penalizes the complexity of the tree. We minimize this loss function with respect to $f_j$, and the term $\ell(y_i, z_i^{(j-1)})$ depends only on the previous trees and is a constant that can be dropped from this step.
+where $g_i = \partial \ell / \partial z_i$ is the gradient and $h_i = \partial^2 \ell / \partial z_i^2$ is the Hessian. The term $\Omega(f_j)$ penalizes the complexity of $f_j$. We minimize this loss function with respect to $f_j$, and the term $\ell(y_i, z_i^{(j-1)})$ depends only on the previous rounds and is a constant that can be dropped from this step.
 
-In XGBoost, the function $f_j$ is a regression tree. A regression tree maps a data point $x_i$ to a leaf node $m$ and assign it a score $w_m$. i.e. 
+This formulation means that to adapt ``XGBoost`` to any problem, we only need to provide two arrays: the gradient vector $g$ and the Hessian vector $h$. How the library *uses* these arrays to update the ensemble depends on which base learner we choose. We describe both options below; for ``XGBSTES`` we use the linear booster (``gblinear``).
+
+### Base Learner: Regression Trees (``gbtree``)
+
+We include the tree derivation for completeness. It illustrates how ``XGBoost`` uses $g$ and $h$ to build each round and motivates the regularization mechanics that reappear in the scaling discussion later.
+
+In ``gbtree`` mode, the function $f_j$ is a regression tree. A regression tree maps a data point $x_i$ to a leaf node $m$ and assigns it a score $w_m$. i.e. 
 
 $$
 f_j(x_i) = w_{m(x_i)}
@@ -84,14 +90,41 @@ $$
 
 ``XGBoost`` then calculates the "Gain" of a split, it drops the negative sign (to convert Loss to Gain) and compares ``Score(Left) + Score(Right) - Score(Parent)``. ``XGBoost`` creates a split if the Gain is above a certain threshold, and $\gamma$ acts to reduce the gain from each split 
 
-This formulation reveals that to adapt ``XGBoost`` to any problem, we only need to provide two arrays: the gradient vector $g$ and the Hessian "vector" $h$. The library handles the tree construction, which involves finding splits that maximize the reduction in this regularized quadratic loss. Specifically, for a leaf node $m$ containing a set of instance indices $I_m$, the optimal weight $w_m$ and the resulting structure score are derived from the sums $G_m = \sum_{i \in I_m} g_i$ and $H_m = \sum_{i \in I_m} h_i$:
+The library handles the tree construction, finding splits that maximize the reduction in this regularized quadratic loss. The interaction between the magnitude of our derivatives ($G, H$) and the regularization parameters ($\lambda, \gamma$) becomes critical when we discuss the scaling problem later.
+
+### Base Learner: Linear Model (``gblinear``)
+
+In ``gblinear`` mode, the ensemble collapses to a single linear model:
 
 $$
-w_m^* = -\frac{G_m}{H_m + \lambda}, \quad \text{Score}_m = -\frac{1}{2} \frac{G_m^2}{H_m + \lambda} + \gamma
+F(x) = w^\top x + b
 $$
 
-Here, $\lambda$ acts as an L2 regularizer on the leaf weights, and $\gamma$ acts as a threshold for creating new leaves. A split is only accepted if the difference between the child scores and the parent score (the gain) exceeds $\gamma$. This interaction between the magnitude of our derivatives ($G, H$) and the regularization parameters ($\lambda, \gamma$) becomes critical when we apply this model to volatility forecasting later.
+Rather than building trees, ``XGBoost`` updates the weight vector $w$ directly using coordinate descent. At each boosting round, for each feature $j$, the library computes the aggregate gradient and curvature along that feature:
 
+$$
+G_j = \sum_{i=1}^N g_i \, x_{ij}, \quad H_j = \sum_{i=1}^N h_i \, x_{ij}^2
+$$
+
+and updates the weight:
+
+$$
+w_j \leftarrow w_j - \eta \frac{G_j + \lambda w_j}{H_j + \lambda}
+$$
+
+where $\eta$ is the learning rate. The regularization term is an elastic net penalty:
+
+$$
+\Omega(w) = \frac{1}{2}\lambda \|w\|_2^2 + \alpha_{\mathrm{reg}} \|w\|_1
+$$
+
+controlled by `reg_lambda` ($\lambda$) and `reg_alpha` ($\alpha_{\mathrm{reg}}$). Tree-specific hyperparameters (`max_depth`, `min_child_weight`, `gamma`) do not apply to ``gblinear``; the relevant controls are `reg_lambda`, `reg_alpha`, and `learning_rate`.
+
+Note that the coordinate descent update has the same $G/(H + \lambda)$ structure as the optimal leaf weight in ``gbtree``. The regularization mechanics are analogous: when $\lambda$ dominates the denominator, the gradient signal is suppressed.
+
+#### Why ``gblinear`` for ``XGBSTES``
+
+In ``XGBSTES``, the gate $\alpha_t = \text{sigmoid}(\mathcal{F}(X_t))$ maps a scalar model output through a sigmoid. A linear model $\mathcal{F}(X_t) = w^\top X_t + b$ is a natural choice here: each feature's contribution to the gate is directly readable from its weight, and coordinate descent converges faster than tree construction. We use the configuration `booster="gblinear"`, `updater="coord_descent"`, `reg_lambda=1.0` for all ``XGBSTES`` results in this post and subsequent posts in the series.
 
 > Why is the Hessian a vector in ``XGBoost``
 >
@@ -124,7 +157,7 @@ Indeed this brittleness is the cause of our model underperforming ``STES``. The 
 
 ![Figure 1. $\alpha_t^*$ vs fitted alpha](/assets/img/post_assets/volatility-forecasts-3/synth_xgb_alpha_diag.png)
 
-The realized variance are extremely noisy, pushing the implied $\alpha^*$ to either $0$ or $1$ after clipping most of the time, and is undefined when $v_t = r_t^2$. The real variance process obviously do not follow the simple recursive relationship. As a result, our tree model learns an $\alpha$ process that is roughly around $0.4$. The constant ``ES`` fit has $\alpha_{ES} = 0.101$. 
+The realized variance are extremely noisy, pushing the implied $\alpha^*$ to either $0$ or $1$ after clipping most of the time, and is undefined when $v_t = r_t^2$. The real variance process obviously do not follow the simple recursive relationship. As a result, our model learns an $\alpha$ process that is roughly around $0.4$. The constant ``ES`` fit has $\alpha_{ES} = 0.101$. 
 
 ### Revised Method: End-to-End Optimization
 
@@ -194,20 +227,22 @@ In our recursive model like ``STES``, the off-diagonal terms (e.g., $\frac{\part
 
 #### The Scaling Problem
 
-When we initially ran the End-to-End method, we found that the model refused to learn. The tree ensemble would not make any splits, effectively outputting a constant prediction. The root cause lay in the interaction between the scale of our data and the regularization mechanics of XGBoost.
+When we initially ran the End-to-End method, we found that the model refused to learn. The linear model would not update its weights, effectively outputting a constant prediction. The root cause lay in the interaction between the scale of our data and the regularization mechanics of XGBoost.
 
 Financial returns are small numbers; a daily return of 1% is $0.01$, and a squared return is $10^{-4}$. Consequently, the prediction errors ($r_{t+1}^2 - v_{t+1}$) are of order $10^{-4}$, and the sensitivities $(r_t^2 - v_t)$ are also of order $10^{-4}$. The gradient $g_t$, being the product of these terms, falls to the order of $10^{-8}$.
 
-Recall the ``XGBoost`` structure score formula:
+Recall the ``gblinear`` coordinate descent update:
 
 $$
-\text{Score} = -\frac{1}{2} \frac{G^2}{H + \lambda}
+w_j \leftarrow w_j - \eta \frac{G_j + \lambda w_j}{H_j + \lambda}
 $$
 
-where $G \approx 10^{-8}$ and $H \approx 10^{-8}$ (the Gauss-Newton Hessian squares the Jacobian, which is of the same order as the sensitivity), and the default regularization parameter $\lambda = 1$, the denominator is dominated by $\lambda$. The resulting score is roughly $G^2/\lambda \approx 10^{-16}$, which is numerically indistinguishable from zero. Furthermore, we initially ran with the default `min_child_weight` parameter, which requires the sum of Hessians in a leaf to exceed 1. Our Hessians at $10^{-8}$ are just on a different scale.
+where $G_j \approx 10^{-8}$ and $H_j \approx 10^{-8}$ (the Gauss-Newton Hessian squares the Jacobian, which is of the same order as the sensitivity), and the default regularization parameter $\lambda = 1$, the denominator is dominated by $\lambda$. The gradient term $G_j$ is negligible relative to $\lambda$, so the update reduces to $\Delta w_j \approx -\eta w_j$ — the model only shrinks existing weights toward zero and the gradient signal vanishes entirely. The same issue arises in ``gbtree`` mode: the structure score $G^2/(H + \lambda)$ falls to $\approx 10^{-16}$, and splits are never accepted.
 
 This is analogous to the scaling issues found in Lasso or Ridge regression, where unstandardized features can lead to disproportionate penalization. Here, the "feature" is the gradient signal itself. To fix this, we multiply returns by 100 before squaring them. This scales the variance targets by $10,000$. The gradient, which is quadratic in the scale of returns, increases by a factor of $10^8$, bringing it to order $O(1)$. With this adjustment, the standard ``XGBoost`` hyperparameters function as intended.
 
+> **Note:** The `min_child_weight` parameter discussed below applies only to the ``gbtree`` booster. The ``gblinear`` booster used in ``XGBSTES`` does not use `min_child_weight`; its regularization is controlled entirely by `reg_lambda` and `reg_alpha`.
+>
 > The `min_child_weight` relates to the Hessian and measures the quantity of the curvature or the number of samples in a leaf. A split is only allowed if $H_L \ge \text{min\_child\_weight}$ and $H_R \ge \text{min\_child\_weight}$. In second order optimization, the curvature measures the steepness of the surface. When curvature is high, a small change in prediction changes the error massively. The model has a strong motivation to split here. On the other hand, when the curvature is small, the loss function is a flat plain. The optimizaer can change the prediction wildly and the error barely changes. The model would have no strong incentive to split here.
 >
 > To see how the quantity of curvature relates to the number of sample, we only need to look at the mean squared error objective function. 
@@ -261,7 +296,7 @@ This ensures that our cross-validation scores accurately reflect the model's abi
 
 ## Results and Discussion
 
-We evaluated both the Alternating (Algorithm 1) and End-to-End (Algorithm 2) implementations on SPY returns from 2000 to 2023. We also added the cross-validation to Algorithm 1 for comparison so the number might be different from the last post.
+We evaluated both the Alternating (Algorithm 1) and End-to-End (Algorithm 2) implementations on SPY returns from 2000 to 2023. Both ``XGBSTES`` variants use the ``gblinear`` booster with coordinate descent (`updater="coord_descent"`, `reg_lambda=1.0`). We also added the cross-validation to Algorithm 1 for comparison so the number might be different from the last post.
 
 | Model | IS RMSE | OS RMSE |
 | :--- | :--- | :--- |
