@@ -1,0 +1,146 @@
+---
+title: "Short Rate Models (Part 6: Affine Term Structure Models II)"
+date: 2026-03-17
+description: "We implement the affine bridge as a state-space scaffold that preserves the old short-rate APIs while preparing the package for richer term-structure models."
+categories: [Quantitative Finance, Interest Rate Models, Stochastic Processes]
+content-type: "series"
+series-id: "short-rate-models"
+series-title: "Short Rate Models"
+series-part: 6
+project-ids: [short-rate-models]
+---
+## Introduction
+
+In [Part 5](../short-rate-models-5/), we derived the affine term structure model in a way that made the Merton and Vasicek models look like two different parameterizations of the same underlying architecture. This post translates that architecture into code. The aim is not to build the full Kim-Wright or macro-finance stack in one step. The aim is to create a clean scaffold that can carry those later models without forcing us to rewrite the package from scratch every time the state vector changes.
+
+The main design constraint is backward compatibility. The early posts already use `MertonModel` and `VasicekModel` directly, and their pricing formulas are part of the series narrative. A useful refactor cannot break those examples. At the same time, a serious affine package needs more than scalar `drift()` and `diffusion()` methods. It needs an explicit state vector, a transition equation, a pricing measure, and an observation equation for the yield curve.
+
+## Design
+
+The refactor therefore adds a second layer rather than replacing the first one outright. The original `BaseModel` becomes a latent-state interface with `state_dimension`, `initial_state`, `transition_system`, and measure-aware `drift` and `diffusion`. On top of that, a new `BaseAffineModel` implements affine pricing through `affine_coefficients`, `bond_price`, `yield_curve`, and `observation_system`.
+
+This separation matters because it mirrors the mathematics from the previous post. The transition equation is a statement about the law of motion of the state. The observation equation is a statement about how yields load on the state. The pricing formula is a statement about $Q$, not $P$. When those three responsibilities live in different methods, later models can change one part without destroying the others.
+
+## Transitions
+
+For the current package, both Merton and Vasicek are still one-factor models. Their transition systems now return the exact discrete-time Gaussian law in matrix form. For the Vasicek model, the new interface exposes
+
+```python
+from short_rate_models import VasicekModel
+
+model = VasicekModel(
+    kappa=0.25,
+    theta=0.04,
+    sigma=0.01,
+    r0=0.03,
+    lam=0.5,
+)
+
+transition_matrix, transition_offset, transition_covariance = model.transition_system(
+    dt=1 / 12,
+    measure="P",
+)
+```
+
+The returned objects describe
+
+$$
+x_{t + \Delta t} = F x_t + c + \eta_{t + \Delta t}
+$$
+
+where $\eta_{t + \Delta t}$ is Gaussian with covariance matrix $Q$. For Merton, $F = 1$ and the offset is the drift times $\Delta t$. For Vasicek, $F = e^{-\kappa \Delta t}$ and the offset pulls the state toward the long-run mean. This is a small change in code, but it is a large change conceptually because it makes the discrete-time state-space representation first-class.
+
+## Measures
+
+The current scaffold also forces the package to name the measure being used. The Merton model now stores a physical drift and a risk-neutral drift, while the Vasicek model stores physical and risk-neutral mean-reversion parameters. The user can query either law of motion explicitly:
+
+```python
+from short_rate_models import MertonModel
+
+model = MertonModel(mu=0.02, sigma=0.02, lam=0.5, r0=0.03)
+
+physical_drift = model.drift(measure="P")
+risk_neutral_drift = model.drift(measure="Q")
+```
+
+This is exactly the distinction that was hidden in the first four posts. There, the simulations were physical and the pricing formulas were risk-neutral, but the interface did not say so. The new design makes that choice explicit and therefore easier to extend when later papers introduce richer market prices of risk.
+
+## Yields
+
+The next step is the observation equation. Since the affine framework implies
+
+$$
+y_t(\tau) = a(\tau) + b(\tau)^\top x_t
+$$
+
+the package now exposes the intercept and loading vectors directly:
+
+```python
+intercepts, loadings = model.observation_system(
+    maturities=[1.0, 2.0, 5.0, 10.0],
+    t=0.0,
+    measure="Q",
+)
+```
+
+This is one of the most important additions in the refactor. Earlier posts priced one bond at a time. Later papers will estimate the entire yield curve jointly. To do that well, we need the yield curve written as a linear observation on the latent state. Once we have that, Kalman-filter-based estimation is a direct extension rather than a separate coding project.
+
+## Filtering
+
+To support that workflow, the package now includes a minimal linear Gaussian Kalman filter. Its role is deliberately narrow. It does not claim to solve every identification problem in the later literature. It only provides a reusable state estimator for the Gaussian affine setting. A basic example looks like
+
+```python
+import numpy as np
+
+from short_rate_models import LinearGaussianKalmanFilter, VasicekModel
+
+model = VasicekModel(kappa=0.25, theta=0.04, sigma=0.01, r0=0.03)
+F, c, Q = model.transition_system(dt=1 / 12, measure="P")
+intercepts, loadings = model.observation_system(maturities=[1.0, 2.0, 5.0], measure="Q")
+
+kalman = LinearGaussianKalmanFilter(
+    transition_matrix=F,
+    transition_offset=c,
+    transition_covariance=Q,
+)
+
+results = kalman.filter(
+    observations=np.array([[0.031, 0.033, 0.036]]),
+    observation_matrix=loadings,
+    observation_offset=intercepts,
+    observation_covariance=np.eye(3) * 1e-4,
+    initial_mean=np.array([0.03]),
+    initial_covariance=np.array([[0.05]]),
+)
+```
+
+This is enough to support synthetic experiments immediately. It is also the right level of abstraction for the later Gaussian affine papers, where the model-specific work should be in the transition and observation equations rather than in repeated filter boilerplate.
+
+## Compatibility
+
+Backward compatibility is preserved in two ways. First, the historical import paths under `short_rate_models.model` still work. Second, the classical pricing calls remain valid. For example,
+
+```python
+price = model.bond_price(t=0.0, T=5.0, r=0.03)
+yield_5y = model.bond_yield(t=0.0, T=5.0, r=0.03)
+```
+
+still behave as expected. The difference is that we can now also write the same object in state-space language:
+
+```python
+curve = model.yield_curve(t=0.0, maturities=[1.0, 2.0, 5.0], state=[0.03])
+```
+
+This dual interface is important for the series. It lets the early pedagogical examples remain simple while giving later posts a richer vocabulary.
+
+## Limitations
+
+This scaffold is intentionally modest. It does not yet contain a general multi-factor affine solver, a nonlinear filter, or a macro-data ingestion pipeline. The Gaussian state-space layer is also still deliberately transparent rather than heavily abstracted. That is a feature at this stage. The package is meant to teach and to grow with the series, not to hide every mathematical idea behind a deep object hierarchy.
+
+Even so, the design already changes what can be built on top of the library. The later posts no longer need to ask whether the package can represent a latent factor, a yield observation equation, or a measure split. Those pieces now exist. The remaining work is model-specific rather than structural.
+
+## Wrapping Up
+
+This post turned the affine bridge from [Part 5](../short-rate-models-5/) into a usable package layer. We introduced explicit latent states, exact transition systems, affine yield observations, and a minimal Kalman filter, while preserving the original Merton and Vasicek APIs. That completes the first implementation milestone for the expanded series.
+
+In the next cluster, we will use this scaffold to study long-run expectations. The mathematical work there will be richer than in the classical one-factor models, but the code will not need a new conceptual foundation. That is the whole point of doing this refactor first.

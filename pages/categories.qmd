@@ -9,6 +9,10 @@ title-block-banner: false
 A generated topic index built from published post metadata.
 
 ## Quantitative Finance
+- [Volatility Forecasts (Part 6: Structured PGARCH Feature Allocation)](../posts/volatility-forecasts-6/) (2026-03-17): Part 6 tests whether richer predictors help once they are allocated across the level, persistence, and innovation-share channels of PGARCH, and finds an informative intermediate result rather than a finished benchmark win.
+- [Short Rate Models (Part 6: Affine Term Structure Models II)](../posts/short-rate-models-6/) (2026-03-17): We implement the affine bridge as a state-space scaffold that preserves the old short-rate APIs while preparing the package for richer term-structure models.
+- [Short Rate Models (Part 5: Affine Term Structure Models I)](../posts/short-rate-models-5/) (2026-03-17): We step from individual short-rate models to the affine term structure framework that contains Merton and Vasicek as special cases.
+- [Volatility Forecasts (Part 5 — PGARCH: Structure-Aware Variance Forecasting)](../posts/volatility-forecasts-5/) (2026-03-10): GARCH(1,1) outperformed flexible gate models under QLIKE because it separates level, persistence, and innovation share. We introduce PGARCH — a predictor-driven GARCH decomposition — and benchmark Linear PGARCH and XGB-g-PGARCH against the seven models from Part 4.
 - [Volatility Forecasts (Part 4 — RMSE Benchmarks and QLIKE Training)](../posts/volatility-forecasts-4/) (2026-03-03): We keep RMSE for benchmark comparability, then refit STES and XGBSTES under QLIKE to see how the training loss changes out-of-sample ranking and calibration.
 - [Expected Performance of a Mean-Reversion Trading Strategy — Part 4](../posts/mean-reversion-strategy-4/) (2026-03-03): How does parameter estimation error affect the Sharpe ratio of a mean-reversion strategy?
 - [Expected Performance of a Mean-Reversion Trading Strategy - Part 3](../posts/mean-reversion-strategy-3/) (2026-03-02): How does a correlated bias in the fair-value estimate affect the Sharpe ratio of a mean-reversion strategy?
@@ -28,6 +32,8 @@ A generated topic index built from published post metadata.
 - [Volatility Forecasts (Part 1 - STES Model)](../posts/volatility-forecasts-1/) (2021-09-07): Exponential smoothing (ES) is a simple yet widely used approach to volatility forecasting in finance and economics.
 
 ## Volatility Modeling
+- [Volatility Forecasts (Part 6: Structured PGARCH Feature Allocation)](../posts/volatility-forecasts-6/) (2026-03-17): Part 6 tests whether richer predictors help once they are allocated across the level, persistence, and innovation-share channels of PGARCH, and finds an informative intermediate result rather than a finished benchmark win.
+- [Volatility Forecasts (Part 5 — PGARCH: Structure-Aware Variance Forecasting)](../posts/volatility-forecasts-5/) (2026-03-10): GARCH(1,1) outperformed flexible gate models under QLIKE because it separates level, persistence, and innovation share. We introduce PGARCH — a predictor-driven GARCH decomposition — and benchmark Linear PGARCH and XGB-g-PGARCH against the seven models from Part 4.
 - [Volatility Forecasts (Part 4 — RMSE Benchmarks and QLIKE Training)](../posts/volatility-forecasts-4/) (2026-03-03): We keep RMSE for benchmark comparability, then refit STES and XGBSTES under QLIKE to see how the training loss changes out-of-sample ranking and calibration.
 - [Signature Methods (Part 4 — Rolling Signatures in Volatility Forecasts)](../posts/signature-method-4/) (2026-02-06): We augment STES and XGBoost-STES volatility models with rolling signature features computed from SPY return paths. After careful feature selection, regularization tuning, and multi-channel augmentation, we conclude that the results are negative but instructive.
 - [Volatility Forecasts (Part 3 - XGBSTES Algorithm 2)](../posts/volatility-forecasts-3/) (2026-01-24): We extend STES by replacing its linear component with XGBoost, then dig into why RMSE can underperform and propose a more stable end-to-end fitting algorithm.
@@ -35,6 +41,8 @@ A generated topic index built from published post metadata.
 - [Volatility Forecasts (Part 1 - STES Model)](../posts/volatility-forecasts-1/) (2021-09-07): Exponential smoothing (ES) is a simple yet widely used approach to volatility forecasting in finance and economics.
 
 ## Time Series
+- [Volatility Forecasts (Part 6: Structured PGARCH Feature Allocation)](../posts/volatility-forecasts-6/) (2026-03-17): Part 6 tests whether richer predictors help once they are allocated across the level, persistence, and innovation-share channels of PGARCH, and finds an informative intermediate result rather than a finished benchmark win.
+- [Volatility Forecasts (Part 5 — PGARCH: Structure-Aware Variance Forecasting)](../posts/volatility-forecasts-5/) (2026-03-10): GARCH(1,1) outperformed flexible gate models under QLIKE because it separates level, persistence, and innovation share. We introduce PGARCH — a predictor-driven GARCH decomposition — and benchmark Linear PGARCH and XGB-g-PGARCH against the seven models from Part 4.
 - [Forecasts Comparison](../posts/forecast-comparison/) (2026-03-04): An introduction to the statistical tools for comparing forecast accuracy — the Diebold-Mariano test, the role of the loss function, and the Mincer-Zarnowitz regression as a calibration diagnostic.
 - [Volatility Forecasts (Part 4 — RMSE Benchmarks and QLIKE Training)](../posts/volatility-forecasts-4/) (2026-03-03): We keep RMSE for benchmark comparability, then refit STES and XGBSTES under QLIKE to see how the training loss changes out-of-sample ranking and calibration.
 - [Signature Methods (Part 4 — Rolling Signatures in Volatility Forecasts)](../posts/signature-method-4/) (2026-02-06): We augment STES and XGBoost-STES volatility models with rolling signature features computed from SPY return paths. After careful feature selection, regularization tuning, and multi-channel augmentation, we conclude that the results are negative but instructive.
@@ -46,12 +54,16 @@ A generated topic index built from published post metadata.
 - [Volatility Forecasts (Part 1 - STES Model)](../posts/volatility-forecasts-1/) (2021-09-07): Exponential smoothing (ES) is a simple yet widely used approach to volatility forecasting in finance and economics.
 
 ## Interest Rate Models
+- [Short Rate Models (Part 6: Affine Term Structure Models II)](../posts/short-rate-models-6/) (2026-03-17): We implement the affine bridge as a state-space scaffold that preserves the old short-rate APIs while preparing the package for richer term-structure models.
+- [Short Rate Models (Part 5: Affine Term Structure Models I)](../posts/short-rate-models-5/) (2026-03-17): We step from individual short-rate models to the affine term structure framework that contains Merton and Vasicek as special cases.
 - [Short Rate Models (Part 4: Simulating and Calibrating the Vasicek Model)](../posts/short-rate-models-4/) (2024-09-16): In our previous post, we introduced the Vasicek model that used the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short rates.
 - [Short Rate Models (Part 3: Introducing Vasicek Model)](../posts/short-rate-models-3/) (2024-08-10): We continue our refresher series on the short-rate models. In the previous post, I introduced the Merton model and the Euler-Maruyama method to simulate it.
 - [Short Rate Models (Part 2: Simulating and Calibrating the Merton Model)](../posts/short-rate-models-2/) (2024-05-19): Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the previous post.
 - [Short Rate Models (Part 1: Introducing Merton's Model)](../posts/short-rate-models-1/) (2024-05-10): Welcome to my refresher series on short-rate models, dear reader! These mathematical marvels are not just academic curiosities but crucial tools in finance.
 
 ## Stochastic Processes
+- [Short Rate Models (Part 6: Affine Term Structure Models II)](../posts/short-rate-models-6/) (2026-03-17): We implement the affine bridge as a state-space scaffold that preserves the old short-rate APIs while preparing the package for richer term-structure models.
+- [Short Rate Models (Part 5: Affine Term Structure Models I)](../posts/short-rate-models-5/) (2026-03-17): We step from individual short-rate models to the affine term structure framework that contains Merton and Vasicek as special cases.
 - [Expected Performance of a Mean-Reversion Trading Strategy — Part 4](../posts/mean-reversion-strategy-4/) (2026-03-03): How does parameter estimation error affect the Sharpe ratio of a mean-reversion strategy?
 - [Expected Performance of a Mean-Reversion Trading Strategy - Part 3](../posts/mean-reversion-strategy-3/) (2026-03-02): How does a correlated bias in the fair-value estimate affect the Sharpe ratio of a mean-reversion strategy?
 - [Expected Performance of a Mean-Reversion Trading Strategy - Part 2](../posts/mean-reversion-strategy-2/) (2026-03-01): What happens to the performance of a mean-reversion strategy when the fair value is estimated with a constant bias?

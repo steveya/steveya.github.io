@@ -3,6 +3,8 @@ drafts/
 posts/**/draft.ipynb
 posts/**/_draft.ipynb
 posts/**/.ipynb_checkpoints/
+posts/**/calibration_*.ipynb
+posts/**/_checks/
 
 # Local-only artifacts
 .DS_Store

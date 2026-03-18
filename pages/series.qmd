@@ -15,6 +15,8 @@ My work on volatility forecasting. How far can we go by extending a simple expon
 - [Volatility Forecasts (Part 2 - XGBSTES Algorithm 1)](../posts/volatility-forecasts-2/): In the previous post, we replicated the Smooth Transition Exponential Smoothing (STES) model from (Taylor 2004) and (Liu, Taylor, Choo 2020).
 - [Volatility Forecasts (Part 3 - XGBSTES Algorithm 2)](../posts/volatility-forecasts-3/): We extend STES by replacing its linear component with XGBoost, then dig into why RMSE can underperform and propose a more stable end-to-end fitting algorithm.
 - [Volatility Forecasts (Part 4 — RMSE Benchmarks and QLIKE Training)](../posts/volatility-forecasts-4/): We keep RMSE for benchmark comparability, then refit STES and XGBSTES under QLIKE to see how the training loss changes out-of-sample ranking and calibration.
+- [Volatility Forecasts (Part 5 — PGARCH: Structure-Aware Variance Forecasting)](../posts/volatility-forecasts-5/): GARCH(1,1) outperformed flexible gate models under QLIKE because it separates level, persistence, and innovation share. We introduce PGARCH — a predictor-driven GARCH decomposition — and benchmark Linear PGARCH and XGB-g-PGARCH against the seven models from Part 4.
+- [Volatility Forecasts (Part 6: Structured PGARCH Feature Allocation)](../posts/volatility-forecasts-6/): Part 6 tests whether richer predictors help once they are allocated across the level, persistence, and innovation-share channels of PGARCH, and finds an informative intermediate result rather than a finished benchmark win.
 
 ## Signature Methods
 My study notes on the signature method.
@@ -31,6 +33,8 @@ A long-running refresher series on short-rate and term-structure models.
 - [Short Rate Models (Part 2: Simulating and Calibrating the Merton Model)](../posts/short-rate-models-2/): Let us continue our refresher series on short-rate models. We introduced the Merton short rate model in the previous post.
 - [Short Rate Models (Part 3: Introducing Vasicek Model)](../posts/short-rate-models-3/): We continue our refresher series on the short-rate models. In the previous post, I introduced the Merton model and the Euler-Maruyama method to simulate it.
 - [Short Rate Models (Part 4: Simulating and Calibrating the Vasicek Model)](../posts/short-rate-models-4/): In our previous post, we introduced the Vasicek model that used the Ornstein-Uhlenbeck (OU) process to model the dynamics of the short rates.
+- [Short Rate Models (Part 5: Affine Term Structure Models I)](../posts/short-rate-models-5/): We step from individual short-rate models to the affine term structure framework that contains Merton and Vasicek as special cases.
+- [Short Rate Models (Part 6: Affine Term Structure Models II)](../posts/short-rate-models-6/): We implement the affine bridge as a state-space scaffold that preserves the old short-rate APIs while preparing the package for richer term-structure models.
 
 ## Expected Performance of a Mean-Reversion Trading Strategy
 Analytical notes on the expected performance of mean-reversion trading strategies under progressively more realistic assumptions.

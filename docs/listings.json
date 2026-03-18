@@ -23,6 +23,10 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/short-rate-models-5/index.html",
+      "/posts/short-rate-models-6/index.html",
+      "/posts/volatility-forecasts-6/index.html",
+      "/posts/volatility-forecasts-5/index.html",
       "/posts/forecast-comparison/index.html",
       "/posts/mean-reversion-strategy-4/index.html",
       "/posts/volatility-forecasts-4/index.html",

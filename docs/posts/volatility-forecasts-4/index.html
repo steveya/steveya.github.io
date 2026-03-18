@@ -182,8 +182,8 @@ window.Quarto = {
   </ul>
 </nav>
 <h2 data-number="1" id="introduction" class="anchored"><span class="header-section-number">1</span> Introduction</h2>
-<p>In <a href="../volatility-forecasts-3/">Part 3</a> we showed that replacing the fixed smoothing coefficient in exponential smoothing with a learned gate improves one-step-ahead volatility forecasts. The best model in that post was <strong>XGBSTES</strong>, where the gate is learned by a gradient-boosted linear model rather than a single logistic regression. Every result so far has been trained and scored under RMSE, following the benchmark paper from <a href="../volatility-forecasts-1/">Part 1</a> (<a href="https://doi.org/10.1002/for.2648">Liu, Taylor &amp; Choo, 2020</a>).</p>
-<p>Before adding new covariates, we want to settle a more basic modeling choice: <strong>what loss function should train the model?</strong> RMSE has to stay in the notebook so that we keep a like-for-like comparison against the benchmark, but for variance forecasts the more natural objective is often <strong>QLIKE</strong>.</p>
+<p>In <a href="../volatility-forecasts-3/">Part 3</a> we showed that replacing the fixed smoothing coefficient in exponential smoothing with a learned gate improves one-step-ahead volatility forecasts. The best model in that post was <strong>XGBSTES</strong>, where the gate is learned by a gradient-boosted linear model rather than a single logistic regression. Every result so far has been trained and scored under RMSE, following the paper from <a href="../volatility-forecasts-1/">Part 1</a> (<a href="https://doi.org/10.1002/for.2648">Liu, Taylor &amp; Choo, 2020</a>).</p>
+<p>Before adding new covariates, we want to settle a more basic modeling choice: <strong>what loss function should train the model?</strong> RMSE is a common choice for forecasting task in general, but for variance forecasts the more natural objective is often <strong>QLIKE</strong>.</p>
 <p>The case for QLIKE rests on two properties established in the forecast-evaluation literature. First, <a href="https://doi.org/10.1016/j.jeconom.2010.07.008">Patton (2011)</a> showed that QLIKE belongs to the class of loss functions that are <em>robust</em> to noise in the volatility proxy — it ranks forecasts consistently even when realized variance is measured with error. Second, <a href="https://doi.org/10.1198/073500105000000063">Hansen and Lunde (2005)</a> demonstrated that QLIKE provides a <em>consistent</em> ranking function for conditional-variance models, meaning the best forecast under the population criterion wins in large samples regardless of the proxy used.</p>
 <p>Practically, the difference matters because RMSE is level-sensitive: a few large volatility spikes dominate the score. QLIKE evaluates forecasts proportionally, so it is more informative about whether the model is systematically too high or too low as a <em>variance</em> forecast, not just whether it tracks large episodes in absolute magnitude. A model can look strong under RMSE by following big moves, yet score poorly under QLIKE because it is miscalibrated on a proportional basis. Rather than choosing one metric by convention, this post compares both directly.</p>
 <p>The questions are:</p>
@@ -192,10 +192,10 @@ window.Quarto = {
 <li><strong>What changes when we retrain each model family under QLIKE, keeping the same features and split?</strong></li>
 <li><strong>Do MSE and QLIKE lead to different out-of-sample rankings or calibration judgments?</strong></li>
 </ol>
-<p>We keep the same SPY sample spanning January 2000 through December 2023. As in Part 3, we discard the first 200 observations as warm-up, use observations 201 through 4,000 for estimation, and reserve the remainder for out-of-sample evaluation. The target remains next-day squared return. The scope of this post is limited to the QLIKE loss-function question. We derive the QLIKE gradient for STES, show how it enters the XGBSTES custom objective, and compare all seven model variants empirically. Regularization and feature expansion are deferred to <a href="../volatility-forecasts-5/">Part 5</a>.</p>
+<p>We keep the same SPY sample spanning January 2000 through December 2023. As in Part 3, we use the first 200 observations as warm-up, use observations 201 through 4,000 for estimation, and reserve the remainder for out-of-sample evaluation. The target remains next-day squared return. The scope of this post is limited to the QLIKE loss-function question. We derive the QLIKE gradient for STES, show how it enters the XGBSTES custom objective, and compare all seven model variants empirically. Regularization and feature expansion are deferred to <a href="../volatility-forecasts-5/">Part 5</a>.</p>
 <h2 data-number="2" id="methodology-same-models-different-training-objectives" class="anchored"><span class="header-section-number">2</span> Methodology: Same Models, Different Training Objectives</h2>
 <h3 data-number="2.1" id="model-inventory" class="anchored"><span class="header-section-number">2.1</span> Model inventory</h3>
-<p>We compare four baseline architectures on the same fixed split. Let <span class="math inline">y_{t+1} = r_{t+1}^2</span> denote next-day realized variance and let <span class="math inline">\hat v_{t+1|t}</span> denote the one-step-ahead forecast formed at time <span class="math inline">t</span>.</p>
+<p>We compare four baseline architectures on the same fixed split. Let <span class="math inline">y_{t+1} = r_{t+1}^2</span> denote next-day realized variance and let <span class="math inline">\hat v_{t+1 \vert t}</span> denote the one-step-ahead forecast formed at time <span class="math inline">t</span>.</p>
 <ul>
 <li><strong>GARCH(1,1)</strong>: the standard parametric conditional-variance benchmark fit by maximum likelihood.</li>
 <li><strong>ES</strong>: exponential smoothing with a fixed coefficient.</li>
@@ -204,19 +204,19 @@ window.Quarto = {
 </ul>
 <p>The <strong>feature set stays fixed</strong> throughout this post. Every STES and XGBSTES model uses the same three return-based inputs from Part 3 — lagged return, lagged absolute return, and lagged squared return. The only thing that changes is the training objective.</p>
 <h3 data-number="2.2" id="two-training-objectives" class="anchored"><span class="header-section-number">2.2</span> Two training objectives</h3>
-<p>To make the comparison fair, we train every model under both MSE and QLIKE where possible. ES, STES, and XGBSTES each appear twice — once trained under squared error, once under QLIKE. That gives us six model–loss variants, plus GARCH.</p>
+<p>To make the comparison fair, we train every model under both RMSE and QLIKE where possible. ES, STES, and XGBSTES each appear twice — once trained under squared error, once under QLIKE. That gives us six model–loss variants, plus GARCH.</p>
 <p><strong>GARCH is already QLIKE-trained.</strong> As the <a href="#appendix-garch11-model-recap-and-mle">appendix</a> shows, GARCH’s Gaussian MLE objective is mathematically equivalent to the QLIKE loss — the two produce exactly the same parameter estimates. GARCH therefore naturally sits on the QLIKE side of the comparison. We keep it as a single MLE-fitted model, giving us <strong>seven model variants</strong> in total.</p>
 <h3 data-number="2.3" id="the-qlike-objective" class="anchored"><span class="header-section-number">2.3</span> The QLIKE objective</h3>
 <p>For a variance forecast <span class="math inline">\hat v_{t+1|t}(\theta)</span>, the per-observation QLIKE loss is</p>
 <p><span class="math display">
-\ell\bigl(y_{t+1},\, \hat v_{t+1|t}\bigr)
-= \frac{y_{t+1}}{\hat v_{t+1|t}} - \log\!\left(\frac{y_{t+1}}{\hat v_{t+1|t}}\right) - 1.
+\ell\bigl(y_{t+1}, \hat v_{t+1\vert t}\bigr)
+= \frac{y_{t+1}}{\hat v_{t+1 \vert t}} - \log\left(\frac{y_{t+1}}{\hat v_{t+1 \vert t}}\right) - 1
 </span></p>
 <p>The <a href="#appendix-garch11-model-recap-and-mle">appendix</a> derives this loss from the Gaussian log-likelihood used to fit GARCH(1,1). In brief: maximizing the conditional log-likelihood of a Gaussian variance model is equivalent to minimizing <span class="math inline">\sum_t [\log \hat v_t + y_t / \hat v_t]</span>, and the per-observation QLIKE above is just this expression shifted by the constants <span class="math inline">-\log y_t - 1</span> so that <span class="math inline">\ell = 0</span> when <span class="math inline">\hat v_{t+1|t} = y_{t+1}</span> exactly.</p>
 <p>The “quasi” in QLIKE means the Gaussian distributional assumption need not hold. <a href="https://doi.org/10.1016/j.jeconom.2010.07.008">Patton (2011)</a> showed that QLIKE ranks forecasts consistently even when the true return distribution is non-Gaussian, as long as the conditional mean of <span class="math inline">y_{t+1}</span> equals the forecast target. That robustness is what makes it attractive for variance models, where the Gaussian assumption is routinely violated.</p>
 <p>The training objective sums this over the estimation sample:</p>
 <p><span class="math display">
-\mathcal{L}_{\text{QLIKE}}(\theta) = \sum_{t=s}^{T-1} \ell\bigl(y_{t+1},\, \hat v_{t+1|t}(\theta)\bigr).
+\mathcal{L}_{\text{QLIKE}}(\theta) = \sum_{t=s}^{T-1} \ell\bigl(y_{t+1}, \hat v_{t+1 \vert t}(\theta)\bigr)
 </span></p>
 <p>Both STES and XGBSTES use light L2 regularization in this post. For STES, we select the L2 penalty from a small grid via three-fold cross-validation. For XGBSTES, XGBoost’s built-in <code>reg_lambda</code> provides the same role. This keeps the gate weights from drifting too far; the heavier regularization machinery — adaptive lasso and elastic net — arrives in <a href="../volatility-forecasts-5/">Part 5</a> once we expand the feature set.</p>
 <p>For ES, we simply fit an <code>STESModel</code> with a constant-only feature under <code>loss="qlike"</code>, which reduces the logistic gate to a single optimized smoothing coefficient. For STES, <span class="math inline">\theta = \beta</span> enters through the logistic gate. For XGBSTES, the gate is still learned end-to-end, but the boosted linear weights are chosen to minimize the same QLIKE target rather than squared error. The sections below derive the gradients that make this possible.</p>
@@ -225,13 +225,13 @@ window.Quarto = {
 <h3 data-number="3.1" id="step-1-per-element-gradient-of-qlike" class="anchored"><span class="header-section-number">3.1</span> Step 1: Per-element gradient of QLIKE</h3>
 <p>The per-observation QLIKE loss at time <span class="math inline">t</span> is</p>
 <p><span class="math display">
-\ell_t = \frac{y_{t+1}}{\hat v_{t+1|t}} - \log\!\left(\frac{y_{t+1}}{\hat v_{t+1|t}}\right) - 1.
+\ell_t = \frac{y_{t+1}}{\hat v_{t+1 \vert t}} - \log\left(\frac{y_{t+1}}{\hat v_{t+1 \vert t}}\right) - 1
 </span></p>
-<p>Differentiating with respect to the forecast <span class="math inline">\hat v \equiv \hat v_{t+1|t}</span>:</p>
+<p>Differentiating with respect to the forecast <span class="math inline">\hat v \equiv \hat v_{t+1 \vert t}</span>:</p>
 <p><span class="math display">
 \frac{\partial \ell_t}{\partial \hat v}
 = -\frac{y_{t+1}}{\hat v^2} + \frac{1}{\hat v}
-= \frac{\hat v - y_{t+1}}{\hat v^2}.
+= \frac{\hat v - y_{t+1}}{\hat v^2}
 </span></p>
 <p>This is the key quantity. When <span class="math inline">\hat v &gt; y_{t+1}</span> the gradient is positive (the forecast is too high, push it down); when <span class="math inline">\hat v &lt; y_{t+1}</span> it is negative (push it up). The <span class="math inline">\hat v^2</span> denominator makes the gradient automatically <em>scale-aware</em> — small forecasts receive proportionally stronger corrections than large ones. Compare this with the RMSE gradient <span class="math inline">\partial \ell^{\text{MSE}}_t / \partial \hat v = 2(\hat v - y_{t+1})</span>, which treats all forecast levels equally.</p>
 <h3 data-number="3.2" id="step-2-chain-rule-through-the-stes-recursion" class="anchored"><span class="header-section-number">3.2</span> Step 2: Chain rule through the STES recursion</h3>
