@@ -24,13 +24,21 @@ node_modules
 _sass/dist
 assets/js/dist
 .DS_Store
+.env
+_render_check/
 
 assets/.DS_Store
 
 /.quarto/
 
 **/*.quarto_ipynb
+**/__pycache__/
+**/*.py[cod]
+**/*.bak
 
 # Local alphaforge caches (not part of the post)
 **/.af_store/
 **/.af_cache/
+
+# Derived local notebook artifacts
+posts/**/draft_executed.ipynb
