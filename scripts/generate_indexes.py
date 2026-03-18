@@ -211,7 +211,11 @@ def _parse_yaml_block(lines: Sequence[str], start: int, indent: int) -> tuple[An
                 items.append(nested)
                 continue
 
-            key, value = _split_key_value(remainder)
+            try:
+                key, value = _split_key_value(remainder)
+            except MetadataError:
+                items.append(_parse_scalar(remainder))
+                continue
             if value is None:
                 nested, index = _parse_yaml_block(lines, index, indent + 2)
                 item = {key: nested}

@@ -163,8 +163,8 @@ window.Quarto = {
 <p>In practice, fair value is never observed directly and must be estimated. As a first order approximation, how does a persistent error in the fair-value estimate affect the strategy’s risk-adjusted performance?</p>
 <p>This post answers that question first in the simplest possible setting: that the fair-value error is a known constant <span class="math inline">M</span>. Even in this stylised case, the results are instructive:</p>
 <ul>
-<li>The <strong>expected PnL is unchanged</strong> — the bias washes out because the true mispricing is symmetric about zero.</li>
-<li>The <strong>risk increases</strong> — the trader holds a systematic offset position that adds path volatility.</li>
+<li>The <strong>expected PnL is unchanged</strong> — the bias term integrates to <span class="math inline">M X_t</span>, which has zero expectation under the OU dynamics.</li>
+<li>The <strong>risk increases</strong> — the trader holds a systematic offset position that adds to the cumulative local variance of the PnL path.</li>
 </ul>
 <h1 data-number="1" id="model"><span class="header-section-number">1</span> Model</h1>
 <p>We continue with our setup from Part 1. The log price is <span class="math inline">p_t = \log P_t</span>, the true log fair value is <span class="math inline">v_t</span> (assumed constant), and the true mispricing follows an Ornstein–Uhlenbeck process:</p>
@@ -207,7 +207,7 @@ dY_t = \underbrace{-X_t\, dX_t}_{\text{Part 1}} + \underbrace{M\, dX_t}_{\text{b
 = \frac{\sigma^2 t}{2} - \frac{1}{2}\,\mathbb{E}[X_t^2] + M\,\mathbb{E}[X_t]
 = \frac{\sigma^2 t}{2} - \frac{s_t^2}{2} + 0.
 </span></p>
-<p>The bias term <span class="math inline">M X_t</span> drops out because <span class="math inline">\mathbb{E}[X_t] = 0</span>: the true mispricing is symmetric about zero, so any constant offset in the signal adds as much expected gain as expected loss.</p>
+<p>The bias term drops out by a direct calculation: since <span class="math inline">M</span> is constant, the bias-induced PnL derived above is <span class="math inline">\int_0^t M\, dX_u = M X_t</span>, and therefore <span class="math inline">\mathbb{E}[M X_t] = M \cdot \mathbb{E}[X_t] = 0</span> under the zero-mean OU dynamics with <span class="math inline">X_0 = 0</span>. Intuitively, the constant offset in the signal adds as much expected gain on favourable mispricings as it loses on unfavourable ones.</p>
 <p>The expected annualized PnL is therefore identical to the unbiased case from Part 1:</p>
 <p><span class="math display">
 \boxed{\mathbb{E}\!\left[\frac{Y_t}{t}\right] = \frac{1}{2}\left(\sigma^2 - \frac{s_t^2}{t}\right).}
@@ -347,7 +347,7 @@ Figure&nbsp;2: Terminal PnL distributions widen with bias (left). The standard d
 </div>
 </div>
 <h1 data-number="3" id="quadratic-variation"><span class="header-section-number">3</span> Quadratic Variation</h1>
-<p>As discussed in Part 1, the terminal variance <span class="math inline">\operatorname{Var}(Y_t/t) \sim O(1/t^2)</span> shrinks with horizon and understates the volatility experienced along the path. The more relevant risk measure for drawdowns and margin is the quadratic variation of the PnL process.</p>
+<p>The terminal variance <span class="math inline">\operatorname{Var}(Y_t/t)</span> shrinks as <span class="math inline">O(1/t^2)</span> at long horizons. That makes it a poor measure of the volatility actually experienced along the PnL path: a strategy can have vanishing endpoint dispersion while still accumulating substantial fluctuations in between. A more informative object is the quadratic variation of the PnL process, <span class="math inline">\langle Y\rangle_t</span>, which records the cumulative local variance of the martingale component of <span class="math inline">Y</span>. Part 1 motivated quadratic variation through drawdown and margin intuition; the precise statement is that <span class="math inline">\frac{1}{t}\mathbb{E}[\langle Y\rangle_t]</span> converges to a finite, non-degenerate long-run variance rate as <span class="math inline">t\to\infty</span>, whereas <span class="math inline">\operatorname{Var}(Y_t/t) \to 0</span>.</p>
 <p>From the OU dynamics <span class="math inline">dX_t = -\theta X_t\, dt + \sigma\, dW_t</span>, the PnL differential is</p>
 <p><span class="math display">
 dY_t = -(X_t - M)\, dX_t = \theta X_t(X_t - M)\, dt - \sigma(X_t - M)\, dW_t.
@@ -373,13 +373,14 @@ d\langle Y \rangle_t = \sigma^2 (X_t - M)^2\, dt.
 = \sigma^2 M^2 + \frac{\sigma^2}{2\theta}\left(\sigma^2 - \frac{s_t^2}{t}\right).
 }
 </span></p>
-<p>Compared to the unbiased case, we pick up an additive term <span class="math inline">\sigma^2 M^2</span> — a constant “floor” of volatility from the systematic offset position. <a href="#fig-terminal-pnl" class="quarto-xref">Figure&nbsp;2</a> confirms both results: terminal PnL distributions widen with bias, and the simulated standard deviation matches the theory.</p>
+<p>Compared to the unbiased case, we pick up an additive term <span class="math inline">\sigma^2 M^2</span> — a constant “floor” of local variance from the systematic offset position. As <span class="math inline">t\to\infty</span>, the annualised expected QV converges to <span class="math inline">\sigma^2 M^2 + \sigma^4/(2\theta)</span>, a finite positive limit, while <span class="math inline">\operatorname{Var}(Y_t/t) \to 0</span>. This contrast is precisely why the annualised expected QV, rather than the terminal variance, serves as the denominator in the risk-adjusted return defined below. <a href="#fig-terminal-pnl" class="quarto-xref">Figure&nbsp;2</a> confirms both results: terminal PnL distributions widen with bias, and the simulated standard deviation matches the theory.</p>
 <h1 data-number="4" id="expected-sharpe-ratio"><span class="header-section-number">4</span> Expected Sharpe Ratio</h1>
-<p>Following the same path-based Sharpe definition as Part 1:</p>
+<p>Following Part 1, we define a path-based risk-adjusted return by placing the square root of the annualised expected quadratic variation in the denominator:</p>
 <p><span class="math display">
-\mathrm{SR}_t := \frac{\mathbb{E}[Y_t / t]}{\sqrt{\mathbb{E}[\langle Y \rangle_t] / t}},
+\mathrm{SR}_t := \frac{\mathbb{E}[Y_t / t]}{\sqrt{\mathbb{E}[\langle Y \rangle_t] / t}}.
 </span></p>
-<p>we substitute our expressions for the numerator and denominator. Writing <span class="math inline">\alpha_t = \sigma^2 - s_t^2/t</span> for brevity:</p>
+<p>This differs from the classical Sharpe ratio, which uses <span class="math inline">\sqrt{\operatorname{Var}(Y_t/t)}</span> in the denominator. As shown above, the classical denominator decays as <span class="math inline">O(1/t)</span> and diverges to <span class="math inline">+\infty</span> at long horizons, while the path-based denominator converges to a finite limit — making <span class="math inline">\mathrm{SR}_t</span> the well-defined long-run object.</p>
+<p>Substituting our expressions for the numerator and denominator and writing <span class="math inline">\alpha_t = \sigma^2 - s_t^2/t</span> for brevity:</p>
 <p><span class="math display">
 \boxed{
 \mathrm{SR}_t
@@ -393,17 +394,18 @@ d\langle Y \rangle_t = \sigma^2 (X_t - M)^2\, dt.
 = \frac{\sigma^2/2}{\sqrt{\sigma^2 M^2 + \sigma^4/(2\theta)}}
 = \frac{\sigma/2}{\sqrt{M^2 + \sigma^2/(2\theta)}}.
 </span></p>
-<p>This can be written more revealingly as</p>
+<p>To interpret this, define the stationary mispricing scale <span class="math inline">s_\infty = \sigma/\sqrt{2\theta}</span> (the long-run standard deviation of <span class="math inline">X_t</span>) and the dimensionless bias <span class="math inline">\xi = M / s_\infty</span>. Then <span class="math inline">2\theta M^2/\sigma^2 = \xi^2</span> and the asymptotic Sharpe ratio factorises as</p>
 <p><span class="math display">
 \boxed{
 \mathrm{SR}_\infty
-= \sqrt{\frac{\theta}{2}} \cdot \frac{1}{\sqrt{1 + \dfrac{2\theta M^2}{\sigma^2}}}.
+= \sqrt{\frac{\theta}{2}} \cdot \frac{1}{\sqrt{1 + \xi^2}}.
 }
 </span></p>
-<p>The first factor <span class="math inline">\sqrt{\theta/2}</span> is exactly the unbiased Sharpe from Part 1. The second factor is a penalty that depends on the dimensionless ratio <span class="math inline">2\theta M^2/\sigma^2</span>:</p>
+<p>The first factor <span class="math inline">\sqrt{\theta/2}</span> is the unbiased Sharpe from Part 1. The second factor is a penalty that depends entirely on <span class="math inline">\xi</span> — how large the bias is relative to the natural fluctuation amplitude of the mispricing:</p>
 <ul>
-<li>When <span class="math inline">M = 0</span>, the penalty is <span class="math inline">1</span> and we recover Part 1.</li>
-<li>For fixed <span class="math inline">M</span> and <span class="math inline">\sigma</span>, faster mean reversion (<span class="math inline">\theta</span> large) makes the bias hurt more — the unbiased strategy would have captured cleaner gains, so the same offset position is relatively more costly.</li>
+<li>When <span class="math inline">M = 0</span> (<span class="math inline">\xi = 0</span>), the penalty is <span class="math inline">1</span> and we recover Part 1.</li>
+<li>For a fixed absolute bias <span class="math inline">M</span>, the penalty worsens with <span class="math inline">\theta</span>, since faster mean reversion shrinks <span class="math inline">s_\infty</span> and inflates <span class="math inline">\xi = M/s_\infty</span>. The unbiased strategy would have captured proportionally larger gains, making the same constant offset relatively more costly.</li>
+<li>For a fixed standardised bias <span class="math inline">\xi</span>, the penalty factor <span class="math inline">(1 + \xi^2)^{-1/2}</span> is independent of <span class="math inline">\theta</span> — it depends only on how large the bias is relative to the stationary fluctuation amplitude.</li>
 <li>The penalty is symmetric in <span class="math inline">M</span>: over-estimating and under-estimating fair value by the same amount are equally harmful.</li>
 </ul>
 <div id="cell-fig-sr-theta-bias" class="cell">
@@ -510,7 +512,7 @@ Figure&nbsp;3: Asymptotic Sharpe ratio vs mean-reversion speed <span class="math
 <img src="index_files/figure-html/fig-sr-penalty-heatmap-output-1.png" class="img-fluid">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sr-penalty-heatmap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: SR penalty factor <span class="math inline">(1 + 2\theta M^2/\sigma^2)^{-1/2}</span> over the <span class="math inline">(\theta, |M|/\sigma)</span> plane. Green regions indicate low penalty; red regions indicate large penalty.
+Figure&nbsp;4: SR penalty factor <span class="math inline">(1 + \xi^2)^{-1/2}</span> where <span class="math inline">\xi = |M|/s_\infty = |M|\sqrt{2\theta}/\sigma</span>, over the <span class="math inline">(\theta, |M|/\sigma)</span> plane. Green regions indicate low penalty; red regions indicate large penalty.
 </figcaption>
 </figure>
 </div>
@@ -575,10 +577,15 @@ Figure&nbsp;5: Finite-horizon Sharpe ratio <span class="math inline">\mathrm{SR}
 </div>
 </div>
 <h1 data-number="5" id="discussion"><span class="header-section-number">5</span> Discussion</h1>
-<p>The central finding of this analysis is the invariance of expected PnL to a constant fair-value bias. A persistent error <span class="math inline">M</span> in the trader’s estimate of fair value does not shift the average outcome (<a href="#fig-pnl-bias" class="quarto-xref">Figure&nbsp;1</a>), a consequence of the symmetry of <span class="math inline">X_t</span> about zero: the additional position induced by the bias earns as much on favourable moves as it loses on unfavourable ones. However, this invariance does not extend to risk. The bias creates a systematic offset in the trader’s position — even when there is no true mispricing, the trader holds roughly <span class="math inline">M</span> units of the asset — adding <span class="math inline">\sigma^2 M^2</span> to the annualised quadratic variation and <span class="math inline">M^2 s_t^2</span> to the terminal variance (<a href="#fig-terminal-pnl" class="quarto-xref">Figure&nbsp;2</a>).</p>
-<p>These two effects combine into a penalty term on the asymptotic Sharpe ratio. The ratio <span class="math inline">\mathrm{SR}_\infty(M)/\mathrm{SR}_\infty(0) = (1 + 2\theta M^2/\sigma^2)^{-1/2}</span> depends on a single dimensionless quantity: the bias squared, measured in units of the OU stationary standard deviation <span class="math inline">\sigma/\sqrt{2\theta}</span>. A bias comparable in magnitude to the stationary fluctuation amplitude roughly halves the Sharpe ratio (<a href="#fig-sr-theta-bias" class="quarto-xref">Figure&nbsp;3</a>). The penalty is symmetric in <span class="math inline">M</span> and increases with <span class="math inline">\theta</span>. Faster mean reversion amplifies the damage, since the unbiased strategy would have captured proportionally larger gains, making the same constant offset relatively more costly (<a href="#fig-sr-penalty-heatmap" class="quarto-xref">Figure&nbsp;4</a>). The finite-horizon Sharpe ratio converges monotonically to this asymptotic limit (<a href="#fig-sr-horizon-bias" class="quarto-xref">Figure&nbsp;5</a>).</p>
+<p>The central finding of this analysis is the invariance of expected PnL to a constant fair-value bias. A persistent error <span class="math inline">M</span> in the trader’s estimate of fair value does not shift the average outcome (<a href="#fig-pnl-bias" class="quarto-xref">Figure&nbsp;1</a>): since <span class="math inline">\int_0^t M\, dX_u = M X_t</span> and <span class="math inline">\mathbb{E}[X_t] = 0</span>, the bias-induced PnL has zero mean. This invariance does not extend to risk. The bias creates a systematic offset in the trader’s position — even when there is no true mispricing, the trader holds roughly <span class="math inline">M</span> units of the asset — adding <span class="math inline">\sigma^2 M^2</span> to the annualised expected quadratic variation and <span class="math inline">M^2 s_t^2</span> to the terminal variance (<a href="#fig-terminal-pnl" class="quarto-xref">Figure&nbsp;2</a>).</p>
+<p>These two effects combine into a penalty on the asymptotic Sharpe ratio. The ratio <span class="math inline">\mathrm{SR}_\infty(M)/\mathrm{SR}_\infty(0) = (1 + \xi^2)^{-1/2}</span> depends on a single dimensionless quantity <span class="math inline">\xi = M/s_\infty</span>, the bias measured in units of the stationary mispricing scale. A bias equal to <span class="math inline">s_\infty</span> (<span class="math inline">\xi = 1</span>) reduces the Sharpe ratio by a factor of <span class="math inline">1/\sqrt{2} \approx 0.707</span>, i.e.&nbsp;a 29% reduction; a full 50% reduction requires <span class="math inline">\xi = \sqrt{3}</span>, or <span class="math inline">M \approx 1.73\, s_\infty</span> (<a href="#fig-sr-theta-bias" class="quarto-xref">Figure&nbsp;3</a>). The penalty is symmetric in <span class="math inline">M</span> and, for a fixed absolute bias, increases with <span class="math inline">\theta</span>: faster mean reversion shrinks <span class="math inline">s_\infty</span>, so the same constant offset becomes proportionally larger (<a href="#fig-sr-penalty-heatmap" class="quarto-xref">Figure&nbsp;4</a>). The finite-horizon Sharpe ratio converges monotonically to this asymptotic limit (<a href="#fig-sr-horizon-bias" class="quarto-xref">Figure&nbsp;5</a>).</p>
 <h1 data-number="6" id="extension"><span class="header-section-number">6</span> Extension</h1>
-<p>The constant-bias model serves as a benchmark against which more realistic estimation structures can be measured. If <span class="math inline">M</span> is itself a random variable — as it would be when estimated from data — the expected Sharpe integrates over the distribution of <span class="math inline">M</span>, weighted by estimation uncertainty. A more consequential extension is to allow the bias to be correlated with the price process: Part 1 noted that a fair-value estimate positively correlated with <span class="math inline">X_t</span> degrades expected PnL through an additional covariance channel, not merely risk. Trailing estimators such as moving averages produce precisely this kind of path-dependent, correlated bias. In the <a href="../mean-reversion-strategy-3/">next post</a> we develop the correlated-bias framework and show that it subsumes the constant-<span class="math inline">M</span> results derived here as a special case.</p>
+<p>The constant-bias model serves as a benchmark against which more realistic estimation structures can be measured. If <span class="math inline">M</span> is itself a random variable drawn independently of the OU path — as it would be when estimated from a separate data source — the asymptotic Sharpe ratio depends only on <span class="math inline">\mathbb{E}[M^2]</span>. Applying the tower law to the expected quadratic variation formula gives</p>
+<p><span class="math display">
+\mathrm{SR}_\infty = \sqrt{\frac{\theta}{2}} \cdot \frac{1}{\sqrt{1 + \mathbb{E}[M^2]/s_\infty^2}},
+</span></p>
+<p>with <span class="math inline">M^2</span> replaced by <span class="math inline">\mathbb{E}[M^2]</span> and the same penalty structure as before. This is not obtained by averaging the pointwise penalty <span class="math inline">(1 + \xi^2)^{-1/2}</span> over the distribution of <span class="math inline">M</span>; the correct route is the tower-law expectation applied to the quadratic variation formula before taking the ratio. Independence of <span class="math inline">M</span> and the OU path is the key assumption that makes this work.</p>
+<p>A more consequential extension is to allow the bias to be correlated with the price process. Trailing estimators such as moving averages produce precisely this kind of path-dependent, correlated bias, which degrades expected PnL through an additional covariance channel, not merely risk. In the <a href="../mean-reversion-strategy-3/">next post</a> we develop the correlated-bias framework and show that it subsumes the constant-<span class="math inline">M</span> results derived here as a special case.</p>
 
 
 <script id="quarto-html-after-body" type="application/javascript">
