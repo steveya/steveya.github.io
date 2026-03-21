@@ -177,7 +177,7 @@ Even if we correct our gradient to include $\frac{\partial \ell_k}{\partial f_t}
 
 The Hessian computation is even more problematic. 
 
-### Iterative Implementation
+### Iterative Implementation (Algorithm 1)
 
 We sidestep this by turning the problem into an alternating fit between:
 1.	inferring a “helpful” gate sequence given the current variance state, and
@@ -329,236 +329,25 @@ $$
 We fit the model on the same data as in my (now updated) [last post](https://steveya.github.io/posts/volatility-forecast-1/). The results are presented in the next section.
 
 ## Results
-### ``XGBSTES`` Variants
+When we first ran this experiment, we tried several nearby variants of ``XGBSTES``. They were useful while we were exploring the idea, but they clutter the post now and they do not change the main conclusion. To keep the story focused, we will only report one representative ``XGBSTES`` specification below: the baseline ``gblinear`` model fit with the alternating procedure described above.
 
-We test several configurations of the ``XGBSTES`` model to understand how different design choices affect performance:
-
-1. **``XGBSTES_BASE``**: Baseline configuration with default hyperparameters (fewer boosting rounds)
-2. **``XGBSTES_BASE_MONO``**: With monotonicity constraints ($\uparrow$ `abs_return`, $\downarrow$ `return`)
-3. **``XGBSTES_BASE_HUBER``**: Using Pseudo-Huber loss (`reg:pseudohubererror`) for robustness to outliers
-4. **``XGBSTES_BASE_RESID``**: Residual learning mode (learns deviation from ES baseline via `base_margin`)
-5. **Combined variants**: ``XGBSTES_BASE_MONO_HUBER``, ``XGBSTES_BASE_MONO_RESID``, ``XGBSTES_BASE_HUBER_RESID``, ``XGBSTES_BASE_MONO_HUBER_RESID``
-
-The key hyperparameter variations tested:
-- **Monotonicity constraints**: Encode domain knowledge that higher absolute returns should increase $\alpha_t$ (faster updates), while signed returns should decrease it. Right now we only enforce positive monotonicity for all features. 
-- **Pseudo-Huber objective**: Robust loss function versus standard MSE
-- **Residual mode**: Learn $\alpha_t - \alpha_{ES}$ instead of $\alpha_t$ directly, leveraging ES as a strong baseline
-- **Denominator filtering**: Exclude training samples where $\lvert r_t^2 - v_t \rvert$ is very small (via `denom_quantile` parameter) to prevent noisy pseudo-labels
-
-See [tree_stes_model.py](https://github.com/steveya/volatility-forecast/blob/main/volatility_forecast/model/tree_stes_model.py) for implementation details.
-
-### ``XGBSTES`` vs ``STES`` on Simulated Returns
-On simulated GARCH returns, the simpler ``ES``/``STES`` family remains hard to beat: the data-generating process is largely stable with occasional shocks, so a smooth, low-variance forecaster is close to the truth.
-
-To make the comparison more informative than ``RMSE`` alone, Table 1 reports ``RMSE``/``MAE``/``MedAE`` on the simulated dataset. The numbers below are from 20 independent simulated runs (same simulation settings as the script, $\eta=4$). Most ``XGBSTES`` variants track the ``STES`` family closely on ``RMSE``, but ``XGBSTES_BASE`` is a clear outlier with worse ``RMSE`` and much better ``MAE``/``MedAE``.
+On ``SPY``, we keep the same fixed train/test split as in Part 1. Table 1 compares the constant ``ES`` baseline, the best-performing ``STES`` specification from the previous post, and the baseline ``XGBSTES`` fit from this post.
 
 | Model | ``RMSE`` | ``MAE`` | ``MedAE`` |
 | --- | --- | --- | --- |
-| ``STES_AE`` | **2.65e-04** | **1.35e-04** | 6.94e-05 |
-| ``STES_AESE`` | **2.65e-04** | 1.36e-04 | 7.10e-05 |
-| ``STES_SE`` | **2.65e-04** | 1.38e-04 | 7.27e-05 |
-| ``STES_EAE`` | 2.65e-04 | **1.35e-04** | **6.92e-05** |
-| ``STES_ESE`` | 2.65e-04 | 1.38e-04 | 7.31e-05 |
-| ``XGBSTES_BASE_HUBER`` | 2.65e-04 | 1.36e-04 | 7.08e-05 |
-| ``XGBSTES_BASE_HUBER_RESID`` | 2.65e-04 | 1.36e-04 | 7.11e-05 |
-| ``XGBSTES_BASE_RESID`` | 2.65e-04 | 1.37e-04 | 7.17e-05 |
-| ``XGBSTES_BASE_MONO_RESID`` | 2.65e-04 | 1.37e-04 | 7.14e-05 |
-| ``XGBSTES_BASE_MONO_HUBER`` | 2.65e-04 | 1.37e-04 | 7.13e-05 |
-| ``STES_EAESE`` | 2.65e-04 | 1.37e-04 | 7.16e-05 |
-| ``XGBSTES_BASE_MONO`` | 2.65e-04 | 1.37e-04 | **7.12e-05** |
-| ``XGBSTES_BASE_MONO_HUBER_RESID`` | 2.66e-04 | 1.37e-04 | 7.19e-05 |
-| ``ES`` | 2.66e-04 | 1.40e-04 | 7.49e-05 |
-| ``XGBSTES_BASE`` | 2.90e-04 | **1.29e-04** | **4.62e-05** |
-
-[Table 1: Simulated GARCH results (mean over 20 runs).]
-
-Several interesting patterns emerge:
-
-1. **Most constrained ``XGBSTES`` variants match ``STES`` on ``RMSE``**: The mono/huber/resid combinations cluster around 2.65e-04, essentially indistinguishable from the ``STES`` family on this stable GARCH DGP.
-
-2. **``XGBSTES_BASE`` trades ``RMSE`` for typical-error gains**: It posts a worse ``RMSE`` (2.90e-04) but the best ``MAE`` (1.29e-04) and ``MedAE`` (4.62e-05), consistent with smaller typical errors and occasional large misses that inflate ``RMSE``.
-
-3. **Hyperparameters matter less on this stable process**: The tight clustering across variants suggests that when the DGP is smooth, the precise gate specification has limited impact on overall error.
-
-4. **Monotonicity slightly improves the median**: Within the constrained group, monotonicity yields small ``MedAE`` gains, suggesting shock-magnitude features help reduce typical forecast errors.
-
-### ``XGBSTES`` vs ``STES`` on ``SPY`` Returns
-On ``SPY``, we evaluate the exact same model variants under two protocols:
-
-1. a fixed train/test split (to stay comparable with Part 1), and
-2. a walk-forward expanding-window evaluation (to see how robust the ranking is through time).
-
-Table 2 shows the fixed-split results on ``SPY`` (train sample: 2000-01-01 – 2015-11-26, test sample: 2015-11-27 – 2023-12-31). For consistency, we report ``RMSE``/``MAE``/``MedAE``; the results are averaged across 100 random initializations.
-
-| Model | ``RMSE`` | ``MAE`` | ``MedAE`` |
-| --- | --- | --- | --- |
-| ``STES_EAESE`` | **4.49e-04** | 1.38e-04 | 5.11e-05 |
-| ``STES_AESE`` | **4.49e-04** | 1.38e-04 | 5.01e-05 |
-| ``STES_ESE`` | **4.50e-04** | 1.34e-04 | 4.79e-05 |
-| ``STES_SE`` | 4.52e-04 | 1.35e-04 | 4.69e-05 |
-| ``STES_EAE`` | 4.52e-04 | 1.34e-04 | **4.57e-05** |
-| ``STES_AE`` | 4.54e-04 | 1.34e-04 | **4.61e-05** |
 | ``ES`` | 4.64e-04 | 1.40e-04 | 5.00e-05 |
-| ``XGBSTES_BASE_MONO_HUBER`` | 4.92e-04 | **1.26e-04** | **2.32e-05** |
-| ``XGBSTES_BASE_MONO_HUBER_RESID`` | 4.93e-04 | 1.29e-04 | **2.43e-05** |
-| ``XGBSTES_BASE_HUBER_RESID`` | 5.00e-04 | 1.30e-04 | 2.60e-05 |
+| ``STES_EAESE`` | **4.49e-04** | 1.38e-04 | 5.11e-05 |
 | ``XGBSTES_BASE`` | 5.01e-04 | **1.25e-04** | 3.06e-05 |
-| ``XGBSTES_BASE_HUBER`` | 5.03e-04 | 1.31e-04 | 2.50e-05 |
-| ``XGBSTES_BASE_RESID`` | 5.09e-04 | **1.24e-04** | 2.92e-05 |
-| ``XGBSTES_BASE_MONO_RESID`` | 5.14e-04 | 1.25e-04 | 2.91e-05 |
-| ``XGBSTES_BASE_MONO`` | 5.16e-04 | 1.38e-04 | 2.86e-05 |
 
-[Table 2: ``SPY`` fixed split results (100 runs).]
+[Table 1: ``SPY`` fixed split results.]
 
-The complete ``SPY`` results reveal several interesting patterns:
+The result is a little mixed. ``XGBSTES`` improves ``MAE`` and ``MedAE``, so on a typical day it tracks volatility more closely than ``STES``. At the same time, it underperforms ``STES`` on ``RMSE`` and even falls behind the constant ``ES`` benchmark. The more flexible gate helps in ordinary periods, but it also creates larger misses when the timing is wrong.
 
-1. **``STES`` family dominates ``RMSE``**: The ``STES`` variants (`STES_EAESE`, `STES_AESE`, `STES_ESE`) achieve the best ``RMSE`` (4.49-4.50e-04) in the fixed-split evaluation, maintaining their advantage from the simulated setting.
-
-2. **``XGBSTES`` variants excel at ``MAE``/``MedAE``**: The tree-gated models show a clear advantage on median and mean absolute errors. `XGBSTES_BASE_MONO_HUBER` achieves the best ``MedAE`` (2.30e-05) and second-best ``MAE`` (1.26e-04), while `XGBSTES_BASE_RESID` posts the lowest ``MAE`` (1.24e-04).
-
-3. **Monotonicity + Huber loss is the winning ``XGBSTES`` configuration**: `XGBSTES_BASE_MONO_HUBER` consistently performs best among the tree variants, suggesting that domain-informed constraints (higher absolute returns → higher $\alpha_t$) combined with robust loss functions are beneficial for real data.
-
-4. **Walk-forward results confirm the pattern, with ``ES`` still very competitive on ``RMSE``**: The expanding-window evaluation (Table 3) validates the ``RMSE`` vs. ``MAE``/``MedAE`` tradeoff. The ``STES`` family leads on ``RMSE`` (3.54-3.65e-04), and ``ES`` is essentially tied with the best ``STES`` (3.56e-04), while ``XGBSTES`` variants dominate the lower tail (``MedAE``: 3.52e-05 for `XGBSTES_BASE_MONO_HUBER` vs. 6.77e-05 for best ``STES``).
-
-This divergence—worse ``RMSE`` but better ``MAE``/``MedAE``—suggests the ``XGBSTES`` variants produce a different error distribution: smaller typical errors but occasional larger misses that RMSE penalizes disproportionately.
-
-Table 3 reports the walk-forward results (expanding window, 10 folds × 100 seeds). This evaluation is noisier, but it is a helpful sanity check that the ranking is not an artifact of one particular split.
-
-| Model | ``RMSE`` | ``MAE`` | ``MedAE`` |
-| --- | --- | --- | --- |
-| ``STES_EAE`` | **3.54e-04** | 1.63e-04 | 6.77e-05 |
-| ``ES`` | **3.56e-04** | 1.71e-04 | 7.41e-05 |
-| ``STES_AE`` | **3.59e-04** | **1.61e-04** | 6.77e-05 |
-| ``STES_AESE`` | 3.62e-04 | 1.67e-04 | 7.47e-05 |
-| ``STES_ESE`` | 3.62e-04 | **1.63e-04** | 6.97e-05 |
-| ``STES_EAESE`` | 3.64e-04 | 1.69e-04 | 7.69e-05 |
-| ``STES_SE`` | 3.65e-04 | **1.63e-04** | 7.08e-05 |
-| ``XGBSTES_BASE_MONO_HUBER`` | 3.83e-04 | **1.51e-04** | **3.52e-05** |
-| ``XGBSTES_BASE_MONO_HUBER_RESID`` | 3.84e-04 | **1.52e-04** | 3.61e-05 |
-| ``XGBSTES_BASE_HUBER`` | 3.88e-04 | **1.53e-04** | **3.53e-05** |
-| ``XGBSTES_BASE_MONO_RESID`` | 3.88e-04 | 1.54e-04 | 4.10e-05 |
-| ``XGBSTES_BASE_MONO`` | 3.89e-04 | 1.55e-04 | 4.09e-05 |
-| ``XGBSTES_BASE_HUBER_RESID`` | 3.91e-04 | 1.54e-04 | **3.59e-05** |
-| ``XGBSTES_BASE`` | 3.94e-04 | 1.63e-04 | 4.30e-05 |
-| ``XGBSTES_BASE_RESID`` | 3.95e-04 | 1.63e-04 | 4.29e-05 |
-
-[Table 3: ``SPY`` walk-forward CV results (expanding window, 100 runs × 10 folds).]
-
-## Why ``RMSE`` vs ``MAE``/``MedAE`` diverge
-The fixed-split and walk-forward tables suggest a consistent tradeoff. ``XGBSTES`` reduces typical errors but suffers occasional large misses. To understand why, we look at three diagnostics that directly test the difference in error-distributions.
-
-### Error distribution diagnostics
-Table 4 reports absolute error quantiles (p50/p80/p90/p95/p99), the max absolute error, and a 1% trimmed ``RMSE`` (``RMSE`` after dropping the top 1% largest squared errors).
-
-| Model | p50 | p80 | p90 | p95 | p99 | max | Trimmed RMSE (1%) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| ``STES_EAESE`` | 5.11e-05 | 1.60e-04 | 2.75e-04 | 4.55e-04 | 1.22e-03 | 1.10e-02 | 1.87e-04 |
-| ``XGBSTES_BASE`` | 3.16e-05 | 1.13e-04 | 2.39e-04 | 5.01e-04 | 1.37e-03 | 1.22e-02 | 1.97e-04 |
-| ``XGBSTES_BASE_MONO_HUBER`` | 2.34e-05 | 1.18e-04 | 2.60e-04 | 5.18e-04 | 1.67e-03 | 1.23e-02 | 2.14e-04 |
-
-[Table 4: Absolute error quantiles and trimmed ``RMSE`` on ``SPY`` fixed-split.]
-
-The pattern matches the ``RMSE`` vs ``MAE``/``MedAE`` tradeoff: ``XGBSTES`` substantially reduces typical errors (p50/p80), but has a heavier upper tail (p95/p99/max). Trimming the top 1% of squared errors narrows the gap but does not flip the ranking, suggesting the ``RMSE`` penalty is not due to small number of large errors.
-
-Below we mirror the diagnostic style from Part 1, but now compares the **tree-gated** ``XGBSTES`` models against the **parametric** ``STES`` family. The goal is to move beyond aggregate metrics (``RMSE``/``MAE``/``MedAE``) and explain *where* and *why* the models differ out-of-sample. We use the loss differential
-
-$$
-D_t = (y_t - \hat y_t^{STES})^2 - (y_t - \hat y_t^{XGB})^2,
-$$
-
-so that $D_t > 0$ means XGB is better at time $t$, while $D_t < 0$ means XGB is worse.
-
-![Figure 1. ``SPY`` fixed-split OOS: STES_EAESE vs XGBSTES_BASE forecasts and loss differential](/assets/img/post_assets/volatility-forecasts-2/spy_stes_vs_xgb_forecasts_and_D.png)
-
-The top panel overlays the OOS target variance proxy and one-step forecasts from ``STES`` and ``XGBSTES``. The curves are visually close most days, indicating that both models learn a broadly similar level for day-to-day volatility.
-
-The bottom panel plots the loss differential $D_t$. The key pattern is **rare, high-amplitude negative spikes** in $D_t$. Those spikes correspond to a small number of dates where ``XGBSTES`` makes a large miss (typically under-reacting to a variance surge, or over-reacting when variance collapses). This is consistent with the headline metric divergence.
-
-### Regime-conditional performance
-To see whether the tree-gated models win on “most days” but lose in turbulent periods, Table 5 slices the OOS sample into low/medium/high realized-variance regimes (based on quantiles of the realized variance proxy ``y``), and reports ``RMSE`` and ``MedAE`` within each regime.
-
-| Model | Low vol RMSE | Mid vol RMSE | High vol RMSE | Low vol MedAE | High vol MedAE |
-| --- | --- | --- | --- | --- | --- |
-| ``STES_EAESE`` | 1.65e-04 | 1.39e-04 | 7.46e-04 | 4.05e-05 | 9.72e-05 |
-| ``XGBSTES_BASE`` | 8.58e-05 | 7.52e-05 | 8.40e-04 | 2.08e-05 | 1.29e-04 |
-| ``XGBSTES_BASE_MONO_HUBER`` | 1.21e-04 | 7.60e-05 | 8.60e-04 | 1.28e-05 | 1.47e-04 |
-
-[Table 5: Regime-conditional errors on SPY (realized-volatility quantiles).]
-
-We see more clear tradeoffs ``XGBSTES`` is materially better in low/medium-volatility regimes (both ``RMSE`` and ``MedAE``), but worse in the high-volatility regime where large misses dominate ``RMSE``.
-
-The event-study plots below summarize what the ``WIN`` and ``LOSS`` look like in the OOS sample, where ``WIN``/``LOSS`` are defined by the top/bottom quantiles of the per-date squared-error differential (``STES`` error minus ``XGB`` error) similar to what we did in Post 1.
-
-![Figure 2. Event study: $\lvert r_t \rvert$ around XGB win vs lose dates](/assets/img/post_assets/volatility-forecasts-2/spy_event_absr_stes_vs_xgb.png)
-
-The return-magnitude event study shows that ``LOSE`` dates are associated with a large spike in $\lvert r \rvert$ at $k=1$, whereas ``WIN`` dates show a dip at $k=1$. This is consistent with the interpretation that ``LOSE`` episodes coincide with large shocks arriving immediately after the forecast date.
-
-![Figure 3. Event study: innovation proxy $u_t$ around XGB win vs lose dates](/assets/img/post_assets/volatility-forecasts-2/spy_event_u_stes_vs_xgb.png)
-
-The innovation event study shows that ``LOSE`` dates coincide with large positive $u$ (realized variance exceeding the ``STES``-based state estimate), while ``WIN`` dates coincide with large negative $u$ (variance lower than the ``STES`` estimate). This suggests a strong asymmetry: ``XGB`` tends to win when ``STES`` is too high, and tends to lose when variance surges.
-
-![Figure 4. Event study: gate alpha around ``XGB`` win vs lose dates](/assets/img/post_assets/volatility-forecasts-2/spy_event_alpha_stes_vs_xgb.png)
-
-The gate event chart indicate that ``STES`` $\alpha$ remains relatively stable and similar across ``WIN``/``LOSE`` events. However, ``XGB`` $\alpha$ diverges strongly: it spikes around ``WIN`` events and collapses around ``LOSE`` events near the shock timing.
-
-``XGBSTES`` can become overly conservative (low $\alpha$) precisely when a fast update is required, producing large forecast errors on shock days.
-
-### Gate behavior ($\alpha_t$)
-Since ``STES`` uses a parametric logistic gate and ``XGBSTES`` uses a nonparametric tree gate, we compare the implied $\alpha_t$ behavior directly. Table 6 summarizes the distribution of $\alpha_t$ and how often each model saturates near 0 or 1.
-
-| Model | alpha mean | alpha std | pct alpha < 0.1 | pct alpha > 0.9 |
-| --- | --- | --- | --- | --- |
-| ``STES_EAESE`` | 0.115 | 0.023 | 8.5% | 0.0% |
-| ``XGBSTES_BASE`` | 0.214 | 0.279 | 54.5% | 3.9% |
-| ``XGBSTES_BASE_MONO_HUBER`` | 0.246 | 0.304 | 49.8% | 5.7% |
-
-[Table 6: Gate summary statistics for SPY fixed-split.]
-
-Relative to ``STES_EAESE``, the tree-gated models produce a much more dispersed gate: they spend far more time near a “very slow update” regime (alpha < 0.1), but also occasionally jump to near-1 (fast update). This kind of switching can reduce typical errors while still being vulnerable to rare mis-timed updates during volatility spikes.
-
-![Figure 5. Gate diagnostics (``STES_EAESE``): alpha distribution and helpfulness vs $\lvert r \rvert$](/assets/img/post_assets/volatility-forecasts-2/spy_oos_stes_gate_helpfulness_2x2.png)
-
-In the STES panel, $\alpha_t$ is concentrated around a narrow band (roughly 0.10–0.15) with occasional spikes. More importantly, the binned mean $\alpha_t$ versus $\lvert r_t \rvert$ quantiles is monotone increasing: larger shocks tend to produce larger update weights, which matches the intended volatility logic.
-
-![Figure 6. Gate diagnostics (``XGBSTES_BASE``): alpha distribution and helpfulness vs $\vert r \rvert$](/assets/img/post_assets/volatility-forecasts-2/spy_oos_xgb_gate_helpfulness_2x2.png)
-
-In the ``XGBSTES`` panel, $\alpha_t$ is far more dispersed, with frequent near-0 and near-1 values. The binned mean $\alpha_t$ versus $\lvert r_t \rvert$ suggests that the relationship, rather than increasing monotonically, is **hump-shaped**. ``XGBSTES`` assigns very high $\alpha$ at moderate $\lvert r \rvert$, but reduces $\alpha$ in the most extreme $\lvert r \rvert$ bins.
-
-This explains why typical errors are small but ``RMSE`` is poor. In calm/moderate regimes, aggressive gating can reduce typical tracking error and give better ``MAE``/``MedAE``. In extreme tail regimes, the gate falls when it should rise, causing under-reaction and create rare large misses, worsening ``RMSE``.
-
-![Figure 7. Mechanism view: $\Delta\alpha_t=\alpha^{XGB}_t-\alpha^{STES}_t$ vs innovation proxy $u_t$](/assets/img/post_assets/volatility-forecasts-2/spy_delta_alpha_vs_u_stes_vs_xgb.png)
-
-This plot compares the gate difference
-
-$$
-\Delta\alpha_t = \alpha_t^{XGB} - \alpha_t^{STES}
-$$
-
-against the innovation proxy
-
-$$
-u_t = r_t^2 - \hat v_t^{STES}.
-$$
-
-The scatter shows that $\Delta\alpha_t$ is highly variable even when $u_t$ is near 0, and does not reliably become positive when $u_t$ is large and positive. This indicates that ``XGBSTES`` does not learn a clean sign-consistent adjustment rule relative to innovations, which makes it vulnerable to under-reaction episodes.
-
-![Figure 8. STES gate-score contribution differences (XGB win minus lose)](/assets/img/post_assets/volatility-forecasts-2/spy_stes_gate_contrib_xgb_win_minus_lose.png)
-
-In regimes where ``XGB`` beats ``STES``, what differs in the ``STES`` gate inputs?
-
-The ``WIN``-minus-``LOSE`` difference is strongly positive on magnitude-related features (e.g., abs returns), with negative shifts on signed and squared-return contributions. Interpreted conservatively, this suggests that ``XGB`` outperformance aligns with regimes where magnitude signals are prominent, while its underperformance corresponds to different mixtures of signed vs magnitude signals, where the tree gate may be miscalibrated.
-
-This supports the case for explicitly encoding domain knowledge (e.g., monotonic constraints on shock-magnitude features), since the unconstrained tree gate appears most brittle in tail regimes.
+That tradeoff was the reason we kept working on this model family. The alternating fit was clearly learning something, yet it was not learning the right thing consistently enough to replace ``STES``.
 
 ## Wrapping Up
-The key takeaways from the comprehensive evaluation:
+This version of ``XGBSTES`` was still a useful step for us. The naive implementation was wrong, and working through why it was wrong clarified the mismatch between recursive state-space models and row-wise boosting objectives. The alternating fit repaired that mismatch enough to make the model trainable, but not enough to make it better than ``STES`` on the metric we cared about most.
 
-- **On simulated data**: The ``STES`` family and most ``XGBSTES`` variants are essentially tied on ``RMSE`` (around 2.65e-04), while ``XGBSTES_BASE`` stands out with worse ``RMSE`` but much better ``MAE``/``MedAE``.
-
-- **On real SPY data**: ``STES`` leads on ``RMSE`` in the fixed split, and ``ES`` is essentially tied for best ``RMSE`` in walk-forward. ``XGBSTES`` variants dominate ``MAE``/``MedAE``, highlighting a meaningful shift in the error distribution.
-
-- **Best ``XGBSTES`` configuration**: Combining monotonicity constraints with Pseudo-Huber loss (`XGBSTES_BASE_MONO_HUBER`) consistently performs best among the tree variants, indicating that domain-informed regularization helps on real data.
-
-The error distribution difference—smaller median/mean absolute errors but larger root mean squared error—suggests the tree-gated approach may be better suited for applications where typical forecast accuracy matters more than avoiding occasional large misses. This could be valuable for risk management systems that focus on day-to-day volatility tracking rather than extreme tail events.
+That is where we will leave Part 2. ``XGBSTES`` with ``Algorithm 1`` is interesting, it does improve typical errors, and it does produce a visibly different gate from ``STES``. It also does not become the model we keep using later in the series. The next post picks up from exactly that point and moves from the alternating fit to an end-to-end optimization scheme.
 
 
