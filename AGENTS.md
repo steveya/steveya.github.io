@@ -12,6 +12,7 @@ This file applies to the whole repo. Deeper `AGENTS.md` files override it for sp
 
 - Source files live under `index.qmd`, `pages/`, and published post sources such as `posts/<slug>/index.qmd` or `posts/<slug>/index.ipynb`.
 - Output directory is `docs/`, which GitHub Pages publishes after CI/CD renders the site.
+- Generated `docs/` output is ignored by Git; commit site sources, not render output.
 - Navbar HTML is injected through `_quarto.yml` with `_includes/nav.html`.
 - Listings generally target published post sources such as `posts/*/index.qmd` and `posts/*/index.ipynb`, not draft files.
 - Bibliography lives at `references.bib`.
@@ -43,7 +44,8 @@ This file applies to the whole repo. Deeper `AGENTS.md` files override it for sp
 
 ## Series-Level Workflow Rules
 
-- If a task touches a numbered series, load the matching shared workflow anchor at `posts/<series-stem>-workflow/AGENTS.md`.
+- If a task touches a numbered series, load the matching shared workflow anchor at `posts/<series-stem>-workflow/AGENTS.md` when present.
+- Mean-reversion work follows this repo's rules without a separate series workflow anchor.
 - Treat the series as the primary unit of continuity:
   - locate the current frontier
   - identify the latest baseline and open branch
@@ -64,7 +66,10 @@ This file applies to the whole repo. Deeper `AGENTS.md` files override it for sp
 
 Goal: work privately in a notebook, keep commits source-focused, and let CI/CD render the published site unless the user explicitly asks for a local render.
 
-Draft notebooks are excluded from rendering and publishing via `.quartoignore`:
+Rendering and publishing use the explicit public-source allowlist in `_quarto.yml`.
+Only the homepage, `pages/*.qmd`, and published `posts/*/index.qmd` or
+`posts/*/index.ipynb` sources are selected. Drafts, workflow files, and paper
+research notes are not rendered. Draft paths also recorded in `.quartoignore` include:
 
 - `drafts/`
 - `posts/**/draft.ipynb`

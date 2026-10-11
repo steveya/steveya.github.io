@@ -42,3 +42,26 @@ assets/.DS_Store
 
 # Derived local notebook artifacts
 posts/**/draft_executed.ipynb
+
+# CI-generated website and local build output
+/docs/
+/tmp/
+/test-results/
+/playwright-report/
+/render.log
+
+# Local LaTeX compilation output
+/paper/*.aux
+/paper/*.bbl
+/paper/*.blg
+/paper/*.fdb_latexmk
+/paper/*.fls
+/paper/*.log
+/paper/*.out
+/paper/*.synctex.gz
+/paper/main.pdf
+/paper/updated.pdf
+
+# Downloaded reference source, retained locally
+/paper/arXiv-1410.3394v1.tar
+/paper/arXiv-1410.3394v1/

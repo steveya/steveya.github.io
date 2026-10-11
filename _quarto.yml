@@ -1,6 +1,11 @@
 project:
   type: website
   output-dir: docs
+  render:
+    - index.qmd
+    - pages/*.qmd
+    - posts/*/index.qmd
+    - posts/*/index.ipynb
   pre-render:
     - python3 scripts/generate_indexes.py
 
