@@ -5,7 +5,7 @@
 This is a **Quarto-based static website** deployed to GitHub Pages. It serves as a personal research blog focused on quantitative finance, data science, and machine learning. Content is organized as multi-part series and standalone notes.
 
 - **Site generator**: Quarto (1.5+)
-- **Output directory**: `docs/` (GitHub Pages publishes from here)
+- **Output directory**: `docs/` (ignored output rendered and deployed by CI)
 - **Languages**: Quarto Markdown (`.qmd`), Jupyter notebooks (`.ipynb`), Python, JavaScript
 - **Code execution is disabled** (`execute: enabled: false` in `_quarto.yml`). Posts contain static code blocks only.
 
@@ -29,7 +29,7 @@ This is a **Quarto-based static website** deployed to GitHub Pages. It serves as
 ├── _includes/               # HTML templates (nav.html)
 ├── drafts/                  # Private notebook drafts (ignored by Quarto)
 ├── tests/e2e/               # Playwright smoke tests
-├── docs/                    # Rendered output (committed for GitHub Pages)
+├── docs/                    # Ignored rendered output, uploaded by CI
 └── .github/workflows/       # CI and deploy pipelines
 ```
 
@@ -59,13 +59,14 @@ npm run serve:docs
 
 **Build**: `npm run build` (alias for `quarto render`). The pre-render hook automatically runs `python3 scripts/generate_indexes.py` to regenerate index pages from post metadata.
 
-**Test**: `npm test` runs Playwright E2E tests against the rendered `docs/` directory. Tests cover search filtering and bibliography rendering.
+**Test**: `npm test` runs Playwright E2E tests against the rendered `docs/` directory. Tests cover the complete public-source render scope, search filtering, and bibliography rendering.
 
 **CI**: On every PR and push to main, GitHub Actions (`.github/workflows/ci.yml`):
 1. Renders the site with `quarto render` and **fails on any WARN-level messages**
 2. Runs Playwright smoke tests
 
-Always ensure `quarto render` produces zero warnings before pushing.
+CI must render with zero warnings before merge. Render locally only when requested
+or needed to debug a rendering problem; do not commit generated output.
 
 ## Creating new posts
 
@@ -102,11 +103,13 @@ scripts/preview_notebook_post.sh drafts/<slug>.ipynb <slug>
 # Publish: keep posts/<slug>/index.qmd, leave notebook in drafts/
 ```
 
-Draft files are excluded via `.quartoignore`: `drafts/`, `posts/**/draft.ipynb`, `posts/**/_draft.ipynb`.
+The explicit render list in `_quarto.yml` selects only `index.qmd`, `pages/*.qmd`,
+`posts/*/index.qmd`, and `posts/*/index.ipynb`. Draft notebooks, workflow files,
+and paper research notes are not published. `.quartoignore` also records draft paths.
 
 ### Index generation
 
-`scripts/generate_indexes.py` scans all `posts/*/index.qmd` files and auto-generates:
+`scripts/generate_indexes.py` scans published `posts/*/index.qmd` and `posts/*/index.ipynb` files and auto-generates:
 - `pages/series.qmd` — posts grouped by series
 - `pages/notes.qmd` — standalone notes
 - `pages/projects.qmd` — from `data/projects.yml`
@@ -143,7 +146,7 @@ These rules apply to all post content. Follow them strictly.
 ## Key conventions
 
 - Post slugs use kebab-case with numeric suffixes for series parts (e.g., `volatility-forecasts-1`)
-- Listings target `posts/*/index.qmd` — publish as `.qmd`, not `.ipynb`
+- Published sources use `posts/*/index.qmd` or `posts/*/index.ipynb`; promote drafts only with explicit publication approval
 - The navbar is injected via `_includes/nav.html` (referenced in `_quarto.yml`)
 - The search page (`pages/search.qmd`) uses custom JS filtering over Quarto listings
-- The `docs/` directory is committed to the repo for GitHub Pages deployment
+- The ignored `docs/` directory is rendered and uploaded by CI for GitHub Pages deployment; commit sources, not output
